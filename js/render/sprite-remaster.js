@@ -56,8 +56,10 @@ function playerMotionPose(){
     torsoLean:moving?(horizontal?Math.sign(move.x||1)*-.024:Math.sign(move.y||1)*.011):settle*.006,
     lowerSquash:dodge?.9:1-contact*.018,
     upperStretch:dodge?1.12:1+contact*.012,
-    alpha:player.invuln>0?.68+.22*Math.sin(elapsed*34):1,
-    hitFlash:player.invuln>0&&Math.sin(elapsed*38)>.45
+    // 무적시간에도 본체를 항상 완전한 불투명도로 유지한다.
+    // 빠른 alpha/filter 반복은 모바일 LCD에서 캐릭터 전체가 깜빡이는 것처럼 보였다.
+    alpha:1,
+    hitFlash:false
   };
 }
 
@@ -103,16 +105,51 @@ function drawArticulatedPlayerFrame(img,pose,cx,cy,scale){
 }
 
 /**
+ * 캐릭터 발밑에 타원형 방향 링을 그린다.
+ * 전체 원은 낮은 명도로 유지하고, 현재 시선 방향의 호와 화살촉만 밝게 표시한다.
+ * 화면 위에 떠 있는 UI가 아니라 지면 표식처럼 보이도록 세로축을 압축한다.
+ */
+function drawPlayerDirectionRing(cx,cy,angle,z){
+  const footY=cy+18*z;
+  const radius=22*z;
+
+  ctx.save();
+  ctx.translate(cx,footY);
+  ctx.scale(1,.42);
+  ctx.strokeStyle="rgba(174,218,235,.20)";
+  ctx.lineWidth=2*z;
+  ctx.beginPath();ctx.arc(0,0,radius,0,Math.PI*2);ctx.stroke();
+
+  ctx.strokeStyle="rgba(218,248,255,.92)";
+  ctx.lineWidth=3*z;
+  ctx.lineCap="round";
+  ctx.beginPath();ctx.arc(0,0,radius,angle-.62,angle+.62);ctx.stroke();
+  ctx.restore();
+
+  const tipX=cx+Math.cos(angle)*radius;
+  const tipY=footY+Math.sin(angle)*radius*.42;
+  ctx.save();
+  ctx.translate(tipX,tipY);
+  ctx.rotate(angle);
+  ctx.fillStyle="rgba(218,248,255,.94)";
+  ctx.beginPath();
+  ctx.moveTo(7*z,0);ctx.lineTo(-4*z,-3.4*z);ctx.lineTo(-2*z,0);ctx.lineTo(-4*z,3.4*z);ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+
+/**
  * 플레이어 렌더링.
  * 무적 상태에서 draw 호출 자체를 건너뛰지 않으므로 이동 중 깜빡임이 발생하지 않는다.
  */
 drawPlayer=function(){
   const pose=playerMotionPose(),img=spriteImages.characters[selectedWeapon];
-  const cx=W/2,cy=H/2;
+  const cx=W/2,cy=H/2,z=mobileCameraScale(),a=facingAngle();
+
+  // 방향 표시는 캐릭터 발밑 지면에 먼저 그려 본체 뒤에 위치시킨다.
+  drawPlayerDirectionRing(cx,cy,a,z);
 
   // 회피 잔상은 본체와 동일 프레임을 사용하되 더 넓게 펼쳐 속도를 강조한다.
   if(pose.dodge&&img&&img.complete&&img.naturalWidth){
-    const a=facingAngle();
     for(let i=4;i>=1;i--){
       const ghost={...pose,alpha:.035+i*.035,hitFlash:false,hipShift:0,torsoShift:0,bodyBob:0};
       drawArticulatedPlayerFrame(img,ghost,cx-Math.cos(a)*i*11,cy-Math.sin(a)*i*11,2.78);
@@ -120,28 +157,20 @@ drawPlayer=function(){
   }
 
   if(!drawArticulatedPlayerFrame(img,pose,cx,cy,2.78)){
-    oldDrawPlayerV7();
-    return;
+    // 이미지 로딩 전에도 구형 깜빡임 렌더러로 돌아가지 않는다.
+    ctx.save();ctx.imageSmoothingEnabled=false;
+    drawPixelHero(ctx,cx,cy,selectedWeapon,pose.dir,pose.frame,3*z);
+    ctx.restore();
   }
 
   // 발 접촉 그림자도 보행 주기에 따라 폭이 변한다.
-  const z=mobileCameraScale(),shadowPulse=pose.moving?.88+Math.abs(Math.sin(playerMotionState.phase*Math.PI/2))*.12:1;
+  const shadowPulse=pose.moving?.88+Math.abs(Math.sin(playerMotionState.phase*Math.PI/2))*.12:1;
   ctx.save();
   ctx.globalCompositeOperation="destination-over";
   ctx.fillStyle="rgba(0,0,0,.24)";
   ctx.beginPath();
   ctx.ellipse(cx,cy+18*z,17*z*shadowPulse,5*z,0,0,Math.PI*2);
   ctx.fill();
-  ctx.restore();
-
-  // 방향 표식은 캐릭터 앞쪽 지면에 작고 낮게 표시한다.
-  const a=facingAngle();
-  const markerX=cx+Math.cos(a)*20*z;
-  const markerY=cy+17*z+Math.sin(a)*11*z;
-  ctx.save();
-  ctx.translate(markerX,markerY);ctx.rotate(a);
-  ctx.fillStyle="rgba(205,241,255,.56)";
-  ctx.beginPath();ctx.moveTo(5*z,0);ctx.lineTo(-3*z,-2.6*z);ctx.lineTo(-1.5*z,0);ctx.lineTo(-3*z,2.6*z);ctx.closePath();ctx.fill();
   ctx.restore();
 
   if(player.shield>0){

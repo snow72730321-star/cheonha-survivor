@@ -1,11 +1,14 @@
-const CACHE="cheonha-v12.2-audit-fix";
-const APP_SHELL=["./index.html", "./manifest.webmanifest", "./css/animation-pass.css", "./css/awakening-cutscene.css", "./css/base.css", "./css/mobile.css", "./css/remaster.css", "./css/systems.css", "./js/audio/audio-manager.js", "./js/boss/blood-demon.js", "./js/core/pwa.js", "./js/core/runtime-state.js", "./js/core/startup.js", "./js/data/characters-meta.js", "./js/render/canvas-renderer.js", "./js/render/sprite-remaster.js", "./js/skills/bow.js", "./js/skills/fist.js", "./js/skills/katana.js", "./js/skills/poison.js", "./js/skills/saber.js", "./js/skills/spear.js", "./js/skills/sword.js", "./js/skills/tao.js", "./js/systems/combat-runtime.js", "./js/systems/meta-combat.js", "./js/systems/storage-forge.js", "./js/ui/input.js", "./js/ui/menu-codex.js", "./js/ui/meta-menus-events.js", "./js/vfx/awakening-cutscene.js", "./js/vfx/v10.js", "./assets/characters/bow.png", "./assets/characters/fist.png", "./assets/characters/katana.png", "./assets/characters/poison.png", "./assets/characters/saber.png", "./assets/characters/spear.png", "./assets/characters/sword.png", "./assets/characters/tao.png", "./assets/enemies/assassin.png", "./assets/enemies/bandit.png", "./assets/enemies/blackblade.png", "./assets/enemies/boss.png", "./assets/enemies/brute.png", "./assets/enemies/ironmonk.png", "./assets/enemies/master.png", "./assets/enemies/poisonhand.png", "./assets/enemies/spear.png", "./assets/icons/icon-192.png", "./assets/icons/icon-512.png", "./assets/portraits/bow.png", "./assets/portraits/fist.png", "./assets/portraits/katana.png", "./assets/portraits/poison.png", "./assets/portraits/saber.png", "./assets/portraits/spear.png", "./assets/portraits/sword.png", "./assets/portraits/tao.png"];
-self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()))});
-self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
+const CACHE="cheonha-v12.3-player-render";
+const FILES=["./", "index.html", "css/base.css", "css/systems.css", "css/remaster.css", "css/mobile.css", "js/core/runtime-state.js", "js/systems/storage-forge.js", "js/ui/menu-codex.js", "js/systems/combat-runtime.js", "js/render/canvas-renderer.js", "js/ui/input.js", "js/data/characters-meta.js", "js/systems/meta-combat.js", "js/ui/meta-menus-events.js", "js/render/sprite-remaster.js", "js/skills/sword.js", "js/skills/spear.js", "js/skills/bow.js", "js/skills/poison.js", "js/skills/tao.js", "js/skills/saber.js", "js/skills/katana.js", "js/skills/fist.js", "js/boss/blood-demon.js", "js/vfx/v10.js", "js/core/pwa.js", "js/core/startup.js"];
+self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
+self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",event=>{
   if(event.request.method!=="GET")return;
-  const url=new URL(event.request.url);
-  const code=url.pathname.endsWith(".html")||url.pathname.endsWith(".js")||url.pathname.endsWith(".css")||url.pathname.endsWith("/");
-  if(code){event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response}).catch(()=>caches.match(event.request).then(hit=>hit||caches.match("./index.html"))));return}
-  event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response})));
+  event.respondWith(
+    fetch(event.request).then(response=>{
+      const copy=response.clone();
+      caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+      return response;
+    }).catch(()=>caches.match(event.request).then(hit=>hit||caches.match("./")))
+  );
 });
