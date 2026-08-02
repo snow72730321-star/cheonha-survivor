@@ -103,10 +103,21 @@ if(storage.get("murimAccountV1.backup")!==validEnvelope||storage.get("murimAccou
   throw new Error(`백업 복구 또는 정상 백업 보존 검증 실패: ${JSON.stringify({valid:!!validEnvelope,backupSame:storage.get("murimAccountV1.backup")===validEnvelope,main:storage.get("murimAccountV1")?.slice(0,30)})}`);
 }
 
-// 실제 전투를 시작하고 고정 틱을 여러 번 실행해 생성·판정 경로가 예외 없이 동작하는지 확인한다.
+// 실제 전투를 시작하고 자동공격이 발동하는지 회귀 테스트한다.
+// 이 검사는 공격 타이머가 최소값에 고정되어 0에 도달하지 못했던 v14.0 버그를 방지한다.
 const gameplay=vm.runInContext(`(()=>{
   selectedWeapon="sword";selectedDifficulty="chuchul";startGame();
-  for(let i=0;i<360;i++)update(1/60);
+  enemies=[];projectiles=[];
+  spawnEnemy("bandit",player.x+120,player.y);
+  const attackTarget=enemies[0];
+  attackTarget.speed=0;attackTarget.damage=0;
+  const attackHpBefore=attackTarget.hp;
+  let basicAttackEvents=0;
+  const offAttack=GameEvents.on("attack:basic",()=>basicAttackEvents++);
+  for(let i=0;i<180;i++)update(1/60);
+  offAttack();
+  const attackWorked=attackTarget.dead||attackTarget.hp<attackHpBefore||projectiles.length>0;
+  for(let i=0;i<180;i++)update(1/60);
   const beforeLevel=player.level;
   gainXp(5000);
   const sanitized=SaveManager.sanitizeAccount({
@@ -115,12 +126,13 @@ const gameplay=vm.runInContext(`(()=>{
   });
   return {
     state,elapsed,enemies:enemies.length,projectiles:projectiles.length,
+    attackWorked,basicAttackEvents,attackHpBefore,attackHpAfter:attackTarget.hp,
     levelGain:player.level-beforeLevel,pending:pendingLevelUps,choices:ui.choices.children.length,
     sanitizedGold:sanitized.gold,sanitizedRuns:sanitized.stats.runs,sanitizedFps:sanitized.settings.fps,
     sanitizedId:sanitized.weapons[0].id,sanitizedName:sanitized.weapons[0].name
   };
 })()`,context);
-if(gameplay.state!=="levelup"||gameplay.elapsed<5.9||gameplay.enemies<1||gameplay.levelGain<2||gameplay.pending!==gameplay.levelGain||gameplay.choices!==3){
+if(gameplay.state!=="levelup"||gameplay.elapsed<5.9||gameplay.enemies<1||!gameplay.attackWorked||gameplay.basicAttackEvents<1||gameplay.levelGain<2||gameplay.pending!==gameplay.levelGain||gameplay.choices!==3){
   throw new Error(`전투·연속 레벨업 검증 실패: ${JSON.stringify(gameplay)}`);
 }
 if(gameplay.sanitizedGold!==0||gameplay.sanitizedRuns!==0||gameplay.sanitizedFps!==60||

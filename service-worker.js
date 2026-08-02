@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14 오프라인 캐시. 문서 요청과 정적 리소스의 실패 처리를 분리한다. */
-const CACHE="cheonha-v14-stable-forge";
+/** v14.1 오프라인 캐시. 문서 요청과 정적 리소스의 실패 처리를 분리한다. */
+const CACHE="cheonha-v14-1-attack-hotfix";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css",

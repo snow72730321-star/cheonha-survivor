@@ -37,7 +37,6 @@ function enforcePlayerLimits(){
   player.pierceBonus=Math.min(limits.pierceBonus,Math.max(0,Math.floor(player.pierceBonus||0)));
   player.areaMul=Math.min(limits.areaMultiplier,Math.max(.5,player.areaMul||1));
   player.cooldownRate=Math.min(limits.cooldownRate,Math.max(.25,player.cooldownRate||1));
-  if(player.fireTimer>0)player.fireTimer=Math.max(GameBalance.limits.attackInterval,player.fireTimer);
 }
 
 /** 게임 종료·중도 포기의 기록을 정확히 한 번만 집계한다. */
@@ -258,7 +257,17 @@ const runtimeUpdate=update;
 update=function(dt){
   // 공간 인덱스는 매 고정 틱 시작 시 한 번 재구축한다.
   GameSpatial.rebuild(enemies);
+
+  // 공격 쿨다운은 매 틱 감소해야 한다. 이전 구현처럼 여기서 매번
+  // 최소값으로 끌어올리면 0에 도달하지 못해 자동공격이 영구 정지한다.
+  // 따라서 실제로 새 공격이 발사되어 타이머가 다시 양수가 된 순간에만
+  // 최소 공격 간격을 적용한다.
+  const fireTimerBefore=player.fireTimer;
   const result=runtimeUpdate.apply(this,arguments);
+  const firedThisTick=fireTimerBefore<=dt&&player.fireTimer>0;
+  if(firedThisTick){
+    player.fireTimer=Math.max(GameBalance.limits.attackInterval,player.fireTimer);
+  }
   if(state==="playing"){
     player.animationState=player.dodgeTimer>0?"dodge":player.invuln>.45?"hit":player.moving?"walk":"idle";
     enforcePlayerLimits();updateHiddenProgressHud(dt);
