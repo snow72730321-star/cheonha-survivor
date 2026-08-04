@@ -126,9 +126,14 @@ levelChoice=function levelChoiceQueued(){
     button.type="button";button.className="choice";
     button.innerHTML=`<strong>${choice.name}<span class="tag">${choice.tag}</span></strong><small>${choice.desc}</small>`;
     button.addEventListener("click",()=>{
+      const previousArtLevel=choice.kind==="art"?(player.arts[choice.id]||0):-1;
       choice.apply();enforcePlayerLimits();pendingLevelUps--;
       ui.levelUp.classList.remove("show");
-      beep(540,.1,.055,"triangle");showMessage(`${choice.name}의 깨달음을 얻었다`,1.5);
+      if(choice.kind==="art"&&previousArtLevel===0){
+        const art=weaponDefs[selectedWeapon].arts.find(item=>item.id===choice.id);
+        GameEvents.emit("skill:learned",{id:choice.id,name:choice.name,hidden:!!art?.hidden});
+      }else GameAudio.playUI("level-choice");
+      showMessage(`${choice.name}의 깨달음을 얻었다`,1.5);
       GameEvents.emit("level:choice",{choice,remaining:pendingLevelUps});
       if(pendingLevelUps>0){setTimeout(levelChoice,0)}else{state="playing";ui.dodgeBtn.style.display="flex";last=performance.now()}
     },{once:true});

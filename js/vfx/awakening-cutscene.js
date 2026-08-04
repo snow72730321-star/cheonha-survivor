@@ -46,10 +46,10 @@
 
     // 각성기 특유의 정적 → 기동 → 폭발 흐름을 오디오 레이어와 맞춘다.
     if(typeof GameAudio!=="undefined")GameAudio.play("ultimate");
-    else beep(105,.22,.09,"sawtooth");
-    setTimeout(()=>beep(210,.14,.045,"triangle"),330);
-    setTimeout(()=>beep(520,.09,.05,"sawtooth"),790);
-    setTimeout(()=>beep(920,.055,.055,"square"),1490);
+    else GameAudio.playSFX("awakening-start");
+    setTimeout(()=>GameAudio.playSFX("awakening-rise"),330);
+    setTimeout(()=>GameAudio.playSFX("awakening-slash"),790);
+    setTimeout(()=>GameAudio.playSFX("awakening-impact"),1490);
 
     setTimeout(()=>{
       cutscene.classList.remove("show");

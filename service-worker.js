@@ -1,13 +1,13 @@
 "use strict";
 
 /** v14.1 오프라인 캐시. 문서 요청과 정적 리소스의 실패 처리를 분리한다. */
-const CACHE="cheonha-v14-3-hybrid-vfx";
+const CACHE="cheonha-v14-3-1-audio-balance";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css",
   "js/core/runtime-state.js","js/core/game-events.js","js/core/save-manager.js","js/core/asset-loader.js","js/core/pwa.js","js/core/startup.js",
   "js/data/balance-v14.js","js/data/characters-meta.js",
-  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js",
+  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings.js",
   "js/audio/audio-manager.js","js/vfx/awakening-cutscene.js","js/vfx/v10.js","js/vfx/sprite-vfx.js",
@@ -47,8 +47,14 @@ const APP_SHELL=[
   "assets/vfx/weapons/sword_cyan.png"
 ];
 
+const MEDIA_ASSETS=["assets/audio/battle-bgm.mp3"];
+
 self.addEventListener("install",event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then(async cache=>{
+    await cache.addAll(APP_SHELL);
+    // 80MB 이상의 BGM은 저장 공간 제한으로 설치 전체가 실패하지 않도록 별도 최선 노력 캐시로 처리한다.
+    await Promise.allSettled(MEDIA_ASSETS.map(asset=>cache.add(asset)));
+  }).then(()=>self.skipWaiting()));
 });
 
 self.addEventListener("activate",event=>{
@@ -58,6 +64,8 @@ self.addEventListener("activate",event=>{
 self.addEventListener("fetch",event=>{
   const request=event.request;
   if(request.method!=="GET")return;
+  // 대용량 MP3의 Range 응답(206)은 Cache Storage에 직접 넣을 수 없으므로 네트워크에 위임한다.
+  if(request.headers.has("range")){event.respondWith(fetch(request));return}
 
   // 문서 이동은 네트워크 우선, 실패 시에만 앱 셸을 반환한다.
   if(request.mode==="navigate"){

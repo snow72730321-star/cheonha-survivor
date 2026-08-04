@@ -11,13 +11,13 @@
 <meta name="referrer" content="no-referrer"/>
 <link href="manifest.webmanifest" rel="manifest"/>
 <link href="assets/icons/icon-192.png" rel="apple-touch-icon"/>
-<title>천하생존록 v14.3 · Hybrid Skill VFX</title>
+<title>천하생존록 v14.3.1 · Audio & Balance Patch</title>
 
-<link href="css/base.css" rel="stylesheet"/><link href="css/systems.css" rel="stylesheet"/><link href="css/remaster.css" rel="stylesheet"/><link href="css/mobile.css" rel="stylesheet"/><link href="css/animation-pass.css" rel="stylesheet"/><link href="css/awakening-cutscene.css" rel="stylesheet"/><link href="css/forge-v13.css" rel="stylesheet"/><link href="css/v14-improvements.css" rel="stylesheet"/><meta content="v14.3-hybrid-vfx" name="game-build"/></head>
+<link href="css/base.css" rel="stylesheet"/><link href="css/systems.css" rel="stylesheet"/><link href="css/remaster.css" rel="stylesheet"/><link href="css/mobile.css" rel="stylesheet"/><link href="css/animation-pass.css" rel="stylesheet"/><link href="css/awakening-cutscene.css" rel="stylesheet"/><link href="css/forge-v13.css" rel="stylesheet"/><link href="css/v14-improvements.css" rel="stylesheet"/><meta content="v14.3.1-audio-balance" name="game-build"/></head>
 <body>
 <div id="assetLoader" role="status" aria-live="polite"><div class="asset-loader-card"><b>강호를 불러오는 중</b><div id="assetLoaderText" class="settings-note">필수 에셋 확인 중…</div><div class="asset-loader-bar"><span id="assetLoaderFill"></span></div></div></div>
 <div id="systemToast" role="status" aria-live="polite"></div>
-<div id="hiddenProgressHud" aria-live="polite"></div>
+<div id="hiddenProgressHud" aria-live="polite"></div><div id="skillLearnToast" aria-live="polite"><span>신규 무공 습득</span><b>무공</b></div>
 <canvas aria-label="무협 서바이버 게임 화면" id="game"></canvas>
 <div id="hud"><div class="top"><div class="status"><div class="hline"><b class="weapon-label" id="weaponHud">무기 미선택</b><b id="levelText">경지 1</b><span id="timeText">00:00</span><span id="killText">격파 0</span></div><div class="bar"><span id="hpFill"></span></div><div style="height:5px"></div><div class="bar"><span id="xpFill"></span></div><div class="hline" style="margin:5px 0 0"><span id="goldHud">금자 0</span><span id="oreHud">광석 0</span><span id="dodgeHud">보법 준비</span></div><div id="bossWrap"><div class="hline" style="margin:5px 0 3px"><b>혈마</b><span id="bossText"></span></div><div class="bar"><span id="bossFill"></span></div></div></div><div class="hbuttons"><button aria-label="소리" class="iconbtn" id="soundBtn" type="button">🔊</button><button aria-label="일시정지" class="iconbtn" id="pauseBtn" type="button">Ⅱ</button></div></div><div id="message"></div></div>
 <div id="joystick"><div id="stick"></div></div><button aria-label="궁극기" id="ultimateBtn" type="button"><span id="ultimateFill"></span>절기<span id="ultimateCd">0%</span></button><button aria-label="보법 회피" id="dodgeBtn" type="button">회피<span id="dodgeCd">준비</span></button>
@@ -30,12 +30,18 @@
 <section class="overlay" id="cutscene"><div class="cutscene-flash"></div><div class="cutscene-seal"></div><div class="cutscene-slash s1"></div><div class="cutscene-slash s2"></div><div class="cutscene-slash s3"></div><div class="panel"><div class="cutscene-frame"><canvas height="320" id="cutsceneCanvas" width="320"></canvas><div class="cutscene-title-wrap"><div class="cutscene-name" id="cutsceneName">천검개벽</div><div class="cutscene-line" id="cutsceneLine">ULTIMATE</div></div></div></div></section>
 <section class="overlay" id="achievements"><div class="panel"><h2>강호 업적</h2><p class="desc">달성 즉시 금자를 지급하며 기기에 영구 저장된다.</p><div class="collection-grid" id="achievementList"></div><button class="primary" id="achievementClose" type="button">닫기</button></div></section>
 <section class="overlay" id="skins"><div class="panel"><h2>협객 스킨</h2><p class="desc">전투 능력치는 변하지 않는다. 초상화·도트 팔레트·절기 색상만 변경된다.</p><div class="collection-grid" id="skinList"></div><button class="primary" id="skinClose" type="button">닫기</button></div></section>
-<section class="overlay" id="settings"><div class="panel"><h2>그래픽·조작 설정</h2>
+<section class="overlay" id="settings"><div class="panel"><h2>그래픽·오디오·조작 설정</h2>
 <div class="settings-row"><label for="qualitySelect">그래픽 품질</label><select id="qualitySelect"><option value="low">저사양</option><option value="normal">기본</option><option value="high">고화질</option></select></div>
 <div class="settings-row"><label for="fpsSelect">렌더 프레임</label><select id="fpsSelect"><option value="30">30 FPS</option><option value="60">60 FPS</option></select></div>
 <div class="settings-row"><label for="shakeSelect">화면 흔들림</label><select id="shakeSelect"><option value="0">끔</option><option value="0.55">약함</option><option value="1">기본</option></select></div>
 <div class="settings-row"><label for="damageNumbers">피해 문자 효과</label><input id="damageNumbers" type="checkbox"/></div>
 <div class="settings-row"><label for="damageNumberSize">피해 문자 크기</label><select id="damageNumberSize"><option value="0.8">작게</option><option value="1">기본</option><option value="1.25">크게</option><option value="1.5">매우 크게</option></select></div>
+<div class="settings-section"><h3>오디오</h3>
+<div class="settings-row volume-row"><label for="masterVolume">Master <output id="masterVolumeValue">80%</output></label><input id="masterVolume" type="range" min="0" max="100" step="1" value="80"/></div>
+<div class="settings-row volume-row"><label for="bgmVolume">BGM <output id="bgmVolumeValue">55%</output></label><input id="bgmVolume" type="range" min="0" max="100" step="1" value="55"/></div>
+<div class="settings-row volume-row"><label for="sfxVolume">SFX <output id="sfxVolumeValue">80%</output></label><input id="sfxVolume" type="range" min="0" max="100" step="1" value="80"/></div>
+<div class="settings-row volume-row"><label for="uiVolume">UI <output id="uiVolumeValue">85%</output></label><input id="uiVolume" type="range" min="0" max="100" step="1" value="85"/></div>
+<p class="settings-note">BGM은 첫 화면 터치·클릭·키 입력 이후 재생됩니다. 실제 파일이 없는 효과음 호출은 무음 처리됩니다.</p></div>
 <div class="settings-section"><h3>조작</h3>
 <div class="settings-row"><label for="leftHanded">왼손잡이 버튼 배치</label><input id="leftHanded" type="checkbox"/></div>
 <div class="settings-row"><label for="vibration">진동 피드백</label><input id="vibration" type="checkbox"/></div>
@@ -91,6 +97,7 @@
 <script defer src="js/vfx/sprite-vfx.js"></script>
 <script defer src="js/ui/advanced-settings.js"></script>
 <script defer src="js/systems/game-runtime-v14.js"></script>
+<script defer src="js/systems/combat-progression-v14-3-1.js"></script>
 <script defer src="js/core/pwa.js"></script>
 <script defer src="js/core/startup.js"></script></body>
 </html>

@@ -1,119 +1,156 @@
 "use strict";
 
 /**
- * 천하생존록 오디오 디렉터.
+ * HTMLAudioElement 기반 오디오 디렉터.
  *
- * 외부 음원 파일 없이 Web Audio API로 짧은 효과음과 전투 분위기를 합성한다.
- * 이후 실제 WAV/OGG 에셋을 추가할 때도 이 모듈의 play() 호출부는 유지하고,
- * 내부 구현만 샘플 재생 방식으로 교체할 수 있다.
+ * - 첫 사용자 제스처 이후에만 전투 BGM을 재생한다.
+ * - Master/BGM/SFX/UI 채널을 독립적으로 조절한다.
+ * - 전투·보스·일시정지 상태에 맞춰 BGM 페이드와 채널 더킹을 적용한다.
+ * - 등록되지 않았거나 파일이 없는 효과음은 오류 없이 무음 처리한다.
+ * - 향후 파일을 추가하면 registerSFX()만 호출해 동일한 재생 API를 사용할 수 있다.
  */
 const GameAudio=(()=>{
-  let ac=null,master=null,sfxBus=null,musicBus=null,unlocked=false;
-  let ambience=null,bossPulse=null,lastState="menu",lastAttack=0;
+  const BGM_SRC="assets/audio/battle-bgm.mp3";
+  const DEFAULTS=Object.freeze({master:.8,bgm:.55,sfx:.8,ui:.85});
+  const manifests={sfx:new Map(),ui:new Map()};
+  const pools={sfx:new Map(),ui:new Map()};
+  let bgm=null,unlocked=false,muted=false;
+  let bgmGain=0,targetBgmGain=0,sfxStateGain=1,uiStateGain=1;
+  let lastUpdate=performance.now(),duckUntil=0,duckAmount=1,lastMode="menu";
 
-  const weaponTone={sword:760,spear:330,bow:920,poison:510,tao:680,saber:220,katana:1050,fist:145};
+  const clamp01=value=>Math.min(1,Math.max(0,Number(value)||0));
+  const currentSettings=()=>{
+    const source=account?.settings||{};
+    return {
+      master:clamp01(source.masterVolume??DEFAULTS.master),
+      bgm:clamp01(source.bgmVolume??DEFAULTS.bgm),
+      sfx:clamp01(source.sfxVolume??DEFAULTS.sfx),
+      ui:clamp01(source.uiVolume??DEFAULTS.ui)
+    };
+  };
 
-  function ensure(){
-    if(ac)return ac;
-    ac=new (window.AudioContext||window.webkitAudioContext)();
-    master=ac.createGain();sfxBus=ac.createGain();musicBus=ac.createGain();
-    master.gain.value=.72;sfxBus.gain.value=.78;musicBus.gain.value=.16;
-    sfxBus.connect(master);musicBus.connect(master);master.connect(ac.destination);
-    return ac;
+  function createElement(src,loop=false){
+    const element=new Audio(src);
+    element.preload=loop?"auto":"metadata";
+    element.loop=loop;
+    element.playsInline=true;
+    element.crossOrigin="anonymous";
+    return element;
+  }
+
+  function ensureBgm(){
+    if(!bgm)bgm=createElement(BGM_SRC,true);
+    return bgm;
+  }
+
+  function modeProfile(){
+    const bossActive=!!(boss&&!boss.dead);
+    if(state==="paused")return {mode:"pause",bgm:.16,sfx:.28,ui:.82};
+    if(state==="cutscene")return {mode:"cutscene",bgm:.28,sfx:.48,ui:.75};
+    if(state==="levelup"||state==="augment")return {mode:"choice",bgm:.48,sfx:.55,ui:1};
+    if(state==="playing"&&bossActive)return {mode:"boss",bgm:.88,sfx:1,ui:.88};
+    if(state==="playing")return {mode:"combat",bgm:1,sfx:1,ui:.9};
+    if(state==="victory"||state==="gameover")return {mode:"result",bgm:.2,sfx:.5,ui:1};
+    return {mode:"menu",bgm:.38,sfx:.6,ui:1};
+  }
+
+  function applyVolumes(){
+    const settings=currentSettings();
+    const active=muted||!soundOn?0:1;
+    if(bgm)bgm.volume=clamp01(settings.master*settings.bgm*bgmGain*active);
   }
 
   function unlock(){
-    ensure();
-    if(ac.state==="suspended")ac.resume();
+    if(unlocked)return;
     unlocked=true;
-    startAmbience();
+    const track=ensureBgm();
+    track.volume=0;
+    const playResult=track.play();
+    if(playResult&&typeof playResult.catch==="function")playResult.catch(()=>{});
+    syncState(true);
   }
 
-  function tone(freq,duration=.08,volume=.05,type="sine",delay=0,slide=0,bus=sfxBus){
-    if(!soundOn)return;
-    ensure();
-    const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();
-    o.type=type;o.frequency.setValueAtTime(Math.max(30,freq),t);
-    if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),t+duration);
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),t+.008);
-    g.gain.exponentialRampToValueAtTime(.0001,t+duration);
-    o.connect(g);g.connect(bus||sfxBus);o.start(t);o.stop(t+duration+.02);
-  }
-
-  function noise(duration=.08,volume=.035,delay=0,cutoff=1800){
-    if(!soundOn)return;
-    ensure();
-    const rate=ac.sampleRate,len=Math.max(1,Math.floor(rate*duration)),buf=ac.createBuffer(1,len,rate),data=buf.getChannelData(0);
-    for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
-    const src=ac.createBufferSource(),filter=ac.createBiquadFilter(),g=ac.createGain(),t=ac.currentTime+delay;
-    src.buffer=buf;filter.type="lowpass";filter.frequency.value=cutoff;g.gain.value=volume;
-    src.connect(filter);filter.connect(g);g.connect(sfxBus);src.start(t);
-  }
-
-  function play(name,weapon=selectedWeapon){
-    if(!unlocked||!soundOn)return;
-    const f=weaponTone[weapon]||500;
-    switch(name){
-      case "attack":
-        if(performance.now()-lastAttack<55)return;lastAttack=performance.now();
-        if(weapon==="katana"){tone(f,.045,.032,"sine",0,-520);noise(.045,.018,.018,4200)}
-        else if(weapon==="saber"){tone(f,.09,.055,"sawtooth",0,-90);noise(.07,.036,.02,1200)}
-        else if(weapon==="spear"){tone(f,.065,.04,"triangle",0,230);noise(.045,.02,.018,2600)}
-        else if(weapon==="bow"){tone(f,.035,.026,"triangle",0,-140);tone(f*1.45,.025,.016,"sine",.025,-220)}
-        else if(weapon==="tao"){tone(f,.11,.032,"sine",0,420);tone(f*1.7,.05,.018,"square",.055,-180)}
-        else if(weapon==="poison"){tone(f,.05,.025,"triangle",0,-230);noise(.06,.014,.02,3500)}
-        else if(weapon==="fist"){tone(f,.075,.06,"sine",0,-65);noise(.04,.035,0,650)}
-        else{tone(f,.065,.035,"triangle",0,-300);noise(.05,.022,.014,3100)}
-        break;
-      case "hit": tone(115,.045,.035,"square",0,-45);noise(.035,.025,0,900);break;
-      case "dodge": tone(480,.08,.032,"triangle",0,420);noise(.08,.022,0,3800);break;
-      case "perfect": tone(880,.12,.045,"sine",0,520);tone(1320,.18,.028,"triangle",.035,-180);break;
-      case "boss": tone(72,.65,.08,"sawtooth");tone(108,.5,.05,"square",.14,-25);break;
-      case "ultimate":
-        tone(f*.5,.28,.06,"sine",0,f*.25);tone(f, .4,.045,"triangle",.12,f*.7);
-        noise(.24,.04,.34,5000);tone(58,.55,.075,"sawtooth",.42,-18);break;
-      case "level": tone(520,.12,.03,"sine");tone(780,.14,.03,"sine",.09);tone(1040,.18,.025,"sine",.18);break;
+  function syncState(immediate=false){
+    const profile=modeProfile();
+    targetBgmGain=profile.bgm;
+    sfxStateGain=profile.sfx;
+    uiStateGain=profile.ui;
+    if(profile.mode!==lastMode){
+      lastMode=profile.mode;
+      if(profile.mode==="boss")duck(.42,.72);
     }
-  }
-
-  function startAmbience(){
-    if(ambience||!soundOn)return;
-    ensure();
-    const o=ac.createOscillator(),filter=ac.createBiquadFilter(),g=ac.createGain();
-    o.type="sine";o.frequency.value=55;filter.type="lowpass";filter.frequency.value=240;g.gain.value=.035;
-    o.connect(filter);filter.connect(g);g.connect(musicBus);o.start();ambience={o,g};
+    if(immediate)bgmGain=Math.min(bgmGain,targetBgmGain*.15);
+    applyVolumes();
   }
 
   function update(){
-    if(!unlocked||!ac)return;
-    const active=soundOn?1:0;
-    master.gain.setTargetAtTime(active*.72,ac.currentTime,.08);
-    const newState=boss&&!boss.dead?"boss":state==="playing"?"combat":"menu";
-    if(newState!==lastState){
-      lastState=newState;
-      musicBus.gain.setTargetAtTime(newState==="boss"?.26:newState==="combat"?.16:.08,ac.currentTime,.6);
-      // 보스 출현음은 boss:spawn 이벤트에서 한 번만 재생한다.
-    }
-    if(ambience){
-      const target=newState==="boss"?43:newState==="combat"?55:65;
-      ambience.o.frequency.setTargetAtTime(target,ac.currentTime,.8);
-    }
+    if(!unlocked)return;
+    const now=performance.now(),dt=Math.min(.1,Math.max(0,(now-lastUpdate)/1000));
+    lastUpdate=now;
+    syncState(false);
+    const speed=targetBgmGain<bgmGain?5.8:2.4;
+    bgmGain+= (targetBgmGain-bgmGain)*(1-Math.exp(-speed*dt));
+    if(now>=duckUntil)duckAmount=1;
+    applyVolumes();
   }
 
-  return {unlock,play,update};
+  function registerSFX(name,src,options={}){
+    if(!name||!src)return false;
+    const channel=options.channel==="ui"?"ui":"sfx";
+    manifests[channel].set(name,{src,maxVoices:Math.max(1,Math.min(12,options.maxVoices||4)),volume:clamp01(options.volume??1)});
+    pools[channel].delete(name);
+    return true;
+  }
+
+  function poolFor(name,channel){
+    const def=manifests[channel].get(name);
+    if(!def)return null;
+    if(!pools[channel].has(name)){
+      const voices=Array.from({length:def.maxVoices},()=>createElement(def.src,false));
+      pools[channel].set(name,{voices,index:0,def});
+    }
+    return pools[channel].get(name);
+  }
+
+  function play(name,channel="sfx",options={}){
+    if(!unlocked||muted||!soundOn)return false;
+    const actualChannel=channel==="ui"?"ui":"sfx";
+    const pool=poolFor(name,actualChannel);
+    if(!pool)return false;
+    const voice=pool.voices[pool.index++%pool.voices.length];
+    const settings=currentSettings();
+    const stateGain=actualChannel==="ui"?uiStateGain:sfxStateGain;
+    const channelGain=actualChannel==="ui"?settings.ui:settings.sfx;
+    voice.pause();
+    try{voice.currentTime=0}catch(_){/* 일부 브라우저는 메타데이터 전 접근을 막는다. */}
+    voice.volume=clamp01(settings.master*channelGain*stateGain*duckAmount*pool.def.volume*(options.volume??1));
+    const result=voice.play();
+    if(result&&typeof result.catch==="function")result.catch(()=>{});
+    return true;
+  }
+
+  function playSFX(name,options){return play(name,"sfx",options)}
+  function playUI(name,options){return play(name,"ui",options)}
+
+  function duck(duration=.25,amount=.68){
+    duckUntil=Math.max(duckUntil,performance.now()+Math.max(0,duration)*1000);
+    duckAmount=Math.min(duckAmount,clamp01(amount));
+  }
+
+  function setMuted(value){muted=!!value;soundOn=!muted;ui.soundBtn.textContent=muted?"🔇":"🔊";applyVolumes()}
+  function toggleMuted(){setMuted(!muted);if(!muted)unlock();return muted}
+  function configure(){syncState(false);applyVolumes()}
+
+  // 현재 배포본에는 BGM만 포함된다. 아래 API로 실제 파일을 등록하기 전까지 SFX/UI 호출은 무음이다.
+  GameEvents.on("runtime:frame",update);
+  GameEvents.on("boss:spawn",()=>{duck(.55,.58);syncState(false)});
+  GameEvents.on("ultimate:used",()=>duck(.7,.5));
+  GameEvents.on("player:hurt",()=>duck(.16,.78));
+  GameEvents.on("settings:save",configure);
+  GameEvents.on("save:loaded",configure);
+  GameEvents.on("run:finished",()=>syncState(false));
+
+  ["pointerdown","touchstart","keydown"].forEach(type=>window.addEventListener(type,unlock,{once:true,passive:true}));
+
+  return Object.freeze({unlock,update,configure,registerSFX,playSFX,playUI,duck,setMuted,toggleMuted,isUnlocked:()=>unlocked,isMuted:()=>muted});
 })();
-
-// iOS Safari는 사용자 제스처 이후에만 오디오 컨텍스트를 허용한다.
-["pointerdown","touchstart","keydown"].forEach(type=>window.addEventListener(type,GameAudio.unlock,{once:true,passive:true}));
-
-// 함수 덮어쓰기 대신 게임 이벤트를 구독해 사운드를 연결한다.
-GameEvents.on("attack:basic",()=>GameAudio.play("attack"));
-GameEvents.on("dodge:used",()=>GameAudio.play("dodge"));
-GameEvents.on("dodge:perfect",()=>GameAudio.play("perfect"));
-GameEvents.on("player:hurt",()=>GameAudio.play("hit"));
-GameEvents.on("ultimate:used",()=>GameAudio.play("ultimate"));
-GameEvents.on("boss:spawn",()=>GameAudio.play("boss"));
-GameEvents.on("level:gained",()=>GameAudio.play("level"));
-
-// 오디오 상태 갱신은 렌더 루프와 독립적으로 안전하게 실행한다.
-GameEvents.on("runtime:frame",()=>GameAudio.update());

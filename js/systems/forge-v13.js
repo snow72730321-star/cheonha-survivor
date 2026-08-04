@@ -215,18 +215,18 @@
   function executeEnhance(){
     const item=selectedItem(); if(!item||item.level>=15)return;
     const cost=enhanceCost(item), scene=detailOverlay().querySelector("#anvilScene"), message=detailOverlay().querySelector("#enhanceMessage");
-    if(account.gold<cost){message.className="forge-result-message bad";message.textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;beep(110,.12,.04,"sawtooth");return}
-    account.gold-=cost; scene.className="anvil-scene striking"; message.className="forge-result-message"; message.textContent="장인이 호흡을 가다듬고 망치를 내리친다…"; beep(145,.08,.055,"square");
+    if(account.gold<cost){message.className="forge-result-message bad";message.textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;GameAudio.playUI("error");return}
+    account.gold-=cost; scene.className="anvil-scene striking"; message.className="forge-result-message"; message.textContent="장인이 호흡을 가다듬고 망치를 내리친다…"; GameAudio.playUI("forge-strike");
     setTimeout(()=>{
       const success=Math.random()<finalEnhanceChance(item);
       if(success){
         item.level++; item.failStack=0; item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level);
         scene.className="anvil-scene success"; message.className="forge-result-message good";message.textContent=`강화 성공! ${item.name}이 +${item.level}에 도달했다.`;
-        beep(520,.08,.04,"triangle");setTimeout(()=>beep(760,.16,.045,"sine"),75);
+        GameAudio.playUI("forge-success");setTimeout(()=>GameAudio.playUI("forge-success-tail"),75);
       }else{
         item.failStack=Math.min(5,item.failStack+1);
         scene.className="anvil-scene failure"; message.className="forge-result-message bad";message.textContent=`강화 실패. 장인의 숨결이 ${item.failStack*5}%p 누적됐다. 단계 하락이나 파괴는 없다.`;
-        beep(92,.24,.055,"sawtooth");
+        GameAudio.playUI("forge-failure");
       }
       saveAccountData();renderDetail();setTimeout(()=>scene.className="anvil-scene",650);
     },520);
@@ -243,11 +243,11 @@
   function executeRefine(black){
     const item=selectedItem();if(!item)return;
     const cost=refineCost(item,black), root=detailOverlay();
-    if(account.gold<cost){root.querySelector("#refineHelp").textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;beep(110,.12,.04,"sawtooth");return}
+    if(account.gold<cost){root.querySelector("#refineHelp").textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;GameAudio.playUI("error");return}
     account.gold-=cost;item.rerolls++;
     const grade=maybeTierUp(item,black), lines=rollPotentialLines(item,grade);
-    if(!black){item.potentialGrade=grade;item.potentials=lines;saveAccountData();beep(620,.1,.035,"triangle");renderDetail();root.querySelector("#refineHelp").textContent=`정련 완료. ${POTENTIAL_NAMES[grade]} 잠재 3줄이 적용됐다.`;return}
-    pendingPotential={grade,lines};saveAccountData();renderPotentialCompare();beep(440,.08,.03,"sine");
+    if(!black){item.potentialGrade=grade;item.potentials=lines;saveAccountData();GameAudio.playUI("refine");renderDetail();root.querySelector("#refineHelp").textContent=`정련 완료. ${POTENTIAL_NAMES[grade]} 잠재 3줄이 적용됐다.`;return}
+    pendingPotential={grade,lines};saveAccountData();renderPotentialCompare();GameAudio.playUI("potential-preview");
   }
 
   function potentialBox(title,grade,lines,cls=""){
@@ -258,7 +258,7 @@
     const item=selectedItem(),root=detailOverlay(),box=root.querySelector("#potentialCompare");if(!pendingPotential||!item)return;
     box.innerHTML=`<div class="compare-potentials">${potentialBox("기존",item.potentialGrade,item.potentials)}${potentialBox("신규",pendingPotential.grade,pendingPotential.lines,"new")}</div><div class="refine-actions"><button class="secondary" id="keepPotential">기존 유지</button><button class="primary" id="acceptPotential">신규 적용</button></div>`;
     box.querySelector("#keepPotential").addEventListener("click",()=>{pendingPotential=null;renderDetail();detailOverlay().querySelector("#refineHelp").textContent="기존 잠재옵션을 유지했다."});
-    box.querySelector("#acceptPotential").addEventListener("click",()=>{item.potentialGrade=pendingPotential.grade;item.potentials=pendingPotential.lines;pendingPotential=null;saveAccountData();renderDetail();detailOverlay().querySelector("#refineHelp").textContent="신규 잠재옵션을 적용했다.";beep(760,.16,.045,"triangle")});
+    box.querySelector("#acceptPotential").addEventListener("click",()=>{item.potentialGrade=pendingPotential.grade;item.potentials=pendingPotential.lines;pendingPotential=null;saveAccountData();renderDetail();detailOverlay().querySelector("#refineHelp").textContent="신규 잠재옵션을 적용했다.";GameAudio.playUI("potential-accept")});
   }
 
   function renderCodex(){
@@ -275,7 +275,7 @@
     const before=new Set((account.weapons||[]).map(x=>x.id));
     legacyForgeWeapon();
     const made=(account.weapons||[]).find(x=>!before.has(x.id));
-    if(made){normalizeWeapon(made);account.forgeCodex[made.ability]=true;saveAccountData();refreshForge();beep(380,.08,.045,"square");setTimeout(()=>beep(690,.22,.04,"triangle"),85)}
+    if(made){normalizeWeapon(made);account.forgeCodex[made.ability]=true;saveAccountData();refreshForge();GameAudio.playUI("forge-complete");setTimeout(()=>GameAudio.playUI("forge-complete-tail"),85)}
   };
 
   // 단조 버튼은 meta-menus-events.js에서 현재 window.forgeWeapon을 호출하도록 연결된다.
@@ -288,14 +288,14 @@
       normalizeWeapon(item);const gd=gradeDefs.find(g=>g.id===item.grade),eq=account.equipped[item.weapon]===item.id;
       return `<div class="weapon-item v13-item ${eq?"equipped":""}"><strong><span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span><span>${item.damageMul.toFixed(2)}x</span></strong><p>${weaponDefs[item.weapon].name} · ${item.abilityName}: ${item.abilityDesc}</p><div class="potential-mini">${item.potentials.map(x=>`<span>• ${potentialText(x)}</span>`).join("")}</div><div class="weapon-actions"><button data-equip="${item.id}">${eq?"장착 중":"장착"}</button><button data-detail="${item.id}">모루·잠재</button><button data-break="${item.id}">분해</button></div></div>`;
     }).join(""):'<p class="desc">아직 제작한 무기가 없다.</p>';
-    ui.weaponInventory.querySelectorAll("[data-equip]").forEach(b=>b.addEventListener("click",()=>{const item=account.weapons.find(x=>x.id===b.dataset.equip);account.equipped[item.weapon]=item.id;saveAccountData();renderWeaponInventory();beep(330,.06,.025,"triangle")}));
+    ui.weaponInventory.querySelectorAll("[data-equip]").forEach(b=>b.addEventListener("click",()=>{const item=account.weapons.find(x=>x.id===b.dataset.equip);account.equipped[item.weapon]=item.id;saveAccountData();renderWeaponInventory();GameAudio.playUI("equip")}));
     ui.weaponInventory.querySelectorAll("[data-detail]").forEach(b=>b.addEventListener("click",()=>openDetail(b.dataset.detail)));
     ui.weaponInventory.querySelectorAll("[data-break]").forEach(b=>b.addEventListener("click",()=>{
       const i=account.weapons.findIndex(x=>x.id===b.dataset.break),item=account.weapons[i];if(i<0)return;
       const refund=45+gradeIndex(item.grade)*58+item.level*28;
       account.gold+=refund;
       const oreChance=Math.min(.75,.18+gradeIndex(item.grade)*.09);if(Math.random()<oreChance){const key=oreKey(item.ability,item.grade);account.ores[key]=(account.ores[key]||0)+1}
-      if(account.equipped[item.weapon]===item.id)delete account.equipped[item.weapon];account.weapons.splice(i,1);saveAccountData();refreshForge();showMessage(`무기를 분해해 ${refund} 금자를 회수했다.`,1.4);beep(130,.12,.035,"square")
+      if(account.equipped[item.weapon]===item.id)delete account.equipped[item.weapon];account.weapons.splice(i,1);saveAccountData();refreshForge();showMessage(`무기를 분해해 ${refund} 금자를 회수했다.`,1.4);GameAudio.playUI("dismantle")
     }));
   };
 

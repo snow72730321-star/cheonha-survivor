@@ -20,3 +20,16 @@ body.reduce-motion #cutscene{transition:none!important}
 #stick{width:calc(48px * var(--joystick-scale));height:calc(48px * var(--joystick-scale))}
 #dodgeBtn,#ultimateBtn{scale:var(--button-scale)}
 body.left-handed #dodgeBtn,body.left-handed #ultimateBtn{transform-origin:bottom left}
+
+
+/* v14.3.1 신규 무공 습득 및 오디오 설정 */
+#skillLearnToast{position:fixed;left:50%;top:23%;z-index:30;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:220px;padding:13px 22px;border:1px solid rgba(255,229,154,.72);border-radius:16px;background:linear-gradient(135deg,rgba(20,24,19,.96),rgba(55,43,20,.93));box-shadow:0 12px 42px rgba(0,0,0,.48),0 0 28px rgba(255,220,120,.14);opacity:0;pointer-events:none;transform:translate(-50%,-18px) scale(.92)}
+#skillLearnToast.show{animation:skill-learn-toast 1.25s ease both}
+#skillLearnToast span{font-size:10px;letter-spacing:.18em;color:#d9b95f}
+#skillLearnToast b{font-size:20px;color:#fff1bd;text-shadow:0 0 16px rgba(255,224,135,.38)}
+@keyframes skill-learn-toast{0%{opacity:0;transform:translate(-50%,12px) scale(.86)}18%,72%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-16px) scale(.96)}}
+.volume-row{display:grid;grid-template-columns:minmax(120px,.75fr) minmax(140px,1.25fr);gap:12px;align-items:center}
+.volume-row label{display:flex;justify-content:space-between;gap:10px}
+.volume-row output{color:var(--gold);font-variant-numeric:tabular-nums}
+.volume-row input[type="range"]{width:100%;accent-color:var(--gold)}
+@media(max-width:520px){.volume-row{grid-template-columns:1fr}.volume-row label{margin-bottom:-4px}}

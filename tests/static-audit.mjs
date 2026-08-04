@@ -23,10 +23,10 @@ function walk(directory){
 }
 walk(path.join(root,"js"));
 const combined=jsFiles.map(file=>fs.readFileSync(file,"utf8")).join("\n");
-for(const forbidden of ["openLevelUp","cloneNode(true)","sort(()=>Math.random()-.5)"]){
+for(const forbidden of ["openLevelUp","cloneNode(true)","sort(()=>Math.random()-.5)","createOscillator","webkitAudioContext","AudioContext","function beep","beep("]){
   if(combined.includes(forbidden))throw new Error(`제거되지 않은 위험 패턴: ${forbidden}`);
 }
-for(const required of ["GameSpatial.queryCircle","pendingLevelUps","SaveManager","fixedTimestepLoop","SkillRegistry.register"]){
+for(const required of ["GameSpatial.queryCircle","pendingLevelUps","SaveManager","fixedTimestepLoop","SkillRegistry.register","CombatProgressionV1431","registerSFX","battle-bgm.mp3"]){
   if(!combined.includes(required))throw new Error(`필수 개선 코드 누락: ${required}`);
 }
 console.log(`정적 검사 통과: JS ${jsFiles.length}개, HTML 참조 ${refs.length}개, 오프라인 참조 ${shellRefs.length}개`);

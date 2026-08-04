@@ -21,6 +21,8 @@ const AdvancedSettings=(()=>{
     const values={
       vibration:s.vibration,leftHanded:s.leftHanded,reducedMotion:s.reducedMotion,
       highContrast:s.highContrast,devMetrics:s.devMetrics,
+      masterVolume:Math.round((s.masterVolume??.8)*100),bgmVolume:Math.round((s.bgmVolume??.55)*100),
+      sfxVolume:Math.round((s.sfxVolume??.8)*100),uiVolume:Math.round((s.uiVolume??.85)*100),
       cutsceneMode:s.cutsceneMode,joystickSize:s.joystickSize,
       buttonScale:s.buttonScale,damageNumberSize:s.damageNumberSize,bossArrowSize:s.bossArrowSize,
       keyMoveUp:s.keyMoveUp,keyMoveDown:s.keyMoveDown,keyMoveLeft:s.keyMoveLeft,
@@ -43,7 +45,10 @@ const AdvancedSettings=(()=>{
     for(const id of ["joystickSize","buttonScale","damageNumberSize","bossArrowSize"]){
       const input=byId(id);if(input)s[id]=Number(input.value);
     }
-    saveAccountData();apply();
+    for(const id of ["masterVolume","bgmVolume","sfxVolume","uiVolume"]){
+      const input=byId(id);if(input)s[id]=Math.min(1,Math.max(0,Number(input.value)/100));
+    }
+    GameAudio.configure();saveAccountData();apply();
   }
 
   function vibrate(pattern){
@@ -64,7 +69,11 @@ const AdvancedSettings=(()=>{
     GameEvents.on("dodge:perfect",()=>vibrate([18,20,18]));
     GameEvents.on("player:hurt",()=>vibrate(28));
     GameEvents.on("boss:spawn",()=>vibrate([35,35,55]));
-    GameEvents.on("settings:open",loadIntoForm);
+    for(const id of ["masterVolume","bgmVolume","sfxVolume","uiVolume"]){
+      const input=byId(id),output=byId(id+"Value");
+      input?.addEventListener("input",()=>{if(output)output.textContent=`${input.value}%`;const key=id;account.settings[key]=Number(input.value)/100;GameAudio.configure()});
+    }
+    GameEvents.on("settings:open",()=>{loadIntoForm();for(const id of ["masterVolume","bgmVolume","sfxVolume","uiVolume"]){const input=byId(id),output=byId(id+"Value");if(input&&output)output.textContent=`${input.value}%`}});
     GameEvents.on("settings:save",saveFromForm);
   }
 

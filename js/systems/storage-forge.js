@@ -11,8 +11,7 @@ const player={x:0,y:0,r:14,hp:100,maxHp:100,speed:170,level:1,xp:0,xpNeed:18,kil
 
 function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;canvas.width=Math.floor(W*DPR);canvas.height=Math.floor(H*DPR);canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(DPR,0,0,DPR,0,0)}
 function fmtTime(s){s=Math.max(0,Math.floor(s));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
-function initAudio(){if(!soundOn)return;try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume()}catch(_){}}
-function beep(f=300,d=.04,v=.025,t="sine"){if(!soundOn||!audio)return;try{const o=audio.createOscillator(),g=audio.createGain();o.type=t;o.frequency.setValueAtTime(f,audio.currentTime);g.gain.setValueAtTime(v,audio.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+d);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+d)}catch(_){}}
+function initAudio(){if(typeof GameAudio!=="undefined")GameAudio.unlock()}
 function showMessage(t,s=1.6){ui.message.textContent=t;ui.message.classList.add("show");messageTimer=s}
 function loadRecords(){let r={};try{r=JSON.parse(localStorage.getItem("murimSurvivorV2")||"{}") }catch(_){}ui.bestKills.textContent=r.kills||0;ui.bestLevel.textContent=r.level||1;ui.bestTime.textContent=fmtTime(r.time||0);refreshAccountUI()}
 function saveRecords(){let r={};try{r=JSON.parse(localStorage.getItem("murimSurvivorV2")||"{}") }catch(_){}r={kills:Math.max(r.kills||0,player.kills),level:Math.max(r.level||1,player.level),time:Math.max(r.time||0,elapsed)};try{localStorage.setItem("murimSurvivorV2",JSON.stringify(r))}catch(_){}saveAccountData();loadRecords()}

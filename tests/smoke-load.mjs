@@ -51,18 +51,17 @@ class ImageStub extends NodeStub{
   set src(value){this._src=value;queueMicrotask(()=>{this.complete=true;this.naturalWidth=128;this.naturalHeight=160;this.onload?.();this.listeners.load?.()})}
   get src(){return this._src}
 }
-class AudioContextStub{
-  constructor(){this.state="running";this.currentTime=0;this.sampleRate=44100;this.destination={}}
-  resume(){} createGain(){return {gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},setTargetAtTime(){}},connect(){return this}}}
-  createOscillator(){return {frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},setTargetAtTime(){}},connect(){return this},start(){},stop(){}}}
-  createBuffer(){return {getChannelData(){return new Float32Array(8)}}} createBufferSource(){return {connect(){return this},start(){}}} createBiquadFilter(){return {frequency:{value:0},connect(){return this}}}
+class AudioStub{
+  constructor(src=""){this.src=src;this.preload="";this.loop=false;this.playsInline=true;this.crossOrigin="";this.volume=1;this.currentTime=0;this.paused=true}
+  play(){this.paused=false;return Promise.resolve()}
+  pause(){this.paused=true}
 }
 
 const storage=new Map();
 const localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,String(value)),removeItem:key=>storage.delete(key)};
 const listeners=new Map();
 const sandbox={
-  console,document,localStorage,Image:ImageStub,AudioContext:AudioContextStub,webkitAudioContext:AudioContextStub,
+  console,document,localStorage,Image:ImageStub,Audio:AudioStub,
   navigator:{vibrate(){},serviceWorker:{register:async()=>({})}},location:{protocol:"https:"},
   innerWidth:1280,innerHeight:720,devicePixelRatio:1,performance,Math,Date,JSON,Map,Set,WeakMap,Promise,
   Blob:class{},URL:{createObjectURL:()=>"blob:test",revokeObjectURL(){}},confirm:()=>false,
@@ -135,9 +134,30 @@ const gameplay=vm.runInContext(`(()=>{
 if(gameplay.state!=="levelup"||gameplay.elapsed<5.9||gameplay.enemies<1||!gameplay.attackWorked||gameplay.basicAttackEvents<1||gameplay.levelGain<2||gameplay.pending!==gameplay.levelGain||gameplay.choices!==3){
   throw new Error(`전투·연속 레벨업 검증 실패: ${JSON.stringify(gameplay)}`);
 }
+
+// 신규 무공은 습득 직후 공격하지 않고 준비시간과 첫 재사용 대기시간을 갖는다.
+const skillGate=vm.runInContext(`(()=>{
+  const learned=[];
+  const off=GameEvents.on("skill:learned",detail=>learned.push(detail));
+  const button=ui.choices.children.find(node=>node.innerHTML.includes("무공 습득"));
+  if(!button)return {found:false};
+  button.click();off();
+  return {
+    found:true,learned:learned.length,id:learned[0]?.id||"",
+    warmup:player.skillWarmup,fireTimer:player.fireTimer,
+    primedMeteor:(CombatProgressionV1431.primeNewArt("meteor"),player.cooldowns.meteor),
+    threat:CombatProgressionV1431.threatFactor(),
+    strongPower:CombatProgressionV1431.forgedPower({damageMul:2,ability:"han",potentials:[{key:"damage",value:.2}]})
+  };
+})()`,context);
+if(!skillGate.found||skillGate.learned!==1||skillGate.warmup<.64||skillGate.fireTimer<.31||skillGate.primedMeteor<4.9||skillGate.strongPower<=1){
+  throw new Error(`신규 무공 준비시간·동적 난이도 검증 실패: ${JSON.stringify(skillGate)}`);
+}
+
 if(gameplay.sanitizedGold!==0||gameplay.sanitizedRuns!==0||gameplay.sanitizedFps!==60||
    gameplay.sanitizedId.includes('"')||/[<>]/.test(gameplay.sanitizedName)){
   throw new Error(`저장 검증 실패: ${JSON.stringify(gameplay)}`);
 }
 console.log("브라우저 스모크 로드 통과",assertions);
 console.log("전투 스모크 테스트 통과",gameplay);
+console.log("신규 무공·동적 난이도 테스트 통과",skillGate);
