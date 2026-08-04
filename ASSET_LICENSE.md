@@ -22,3 +22,8 @@
 `assets/audio/sfx-hq/`의 WAV 효과음 39개는 이 프로젝트용으로 새로 제작된 44.1kHz 스테레오 정적 음원 에셋이다. 프로젝트 코드와 함께 MIT License 조건으로 사용·수정·재배포할 수 있다. 게임 실행 중에는 OscillatorNode, beep 또는 주파수 파형을 생성하지 않고 이 파일을 AudioBuffer로 디코딩해 재생한다.
 
 `assets/audio/sfx/`의 v14.3.3 효과음은 이전 버전 호환을 위해 파일만 남아 있으며 v14.3.4에서는 참조하거나 재생하지 않는다.
+
+
+## v14.3.5 일섬 발도술 효과음
+
+`assets/audio/sfx-hq/katana-iai-sharp-v1435.wav`는 이 프로젝트용으로 새로 제작된 44.1kHz 스테레오 정적 WAV다. 특정 상용 게임의 원본 음원을 복제하거나 포함하지 않았으며, 프로젝트 코드와 함께 MIT License 조건으로 사용·수정·재배포할 수 있다.

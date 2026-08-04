@@ -6,8 +6,8 @@ const html=fs.readFileSync(path.join(root,"index.html"),"utf8");
 const refs=[...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match=>match[1].split("?")[0]).filter(ref=>!ref.startsWith("http"));
 const missing=refs.filter(ref=>!fs.existsSync(path.join(root,ref)));
 if(missing.length)throw new Error(`누락된 HTML 참조: ${missing.join(", ")}`);
-if(!html.includes('js/audio/audio-manager-v14-3-4.js'))throw new Error("v14.3.4 오디오 엔진이 HTML에 연결되지 않음");
-if(html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 v14.3.3 오디오 엔진이 HTML에 남아 있음");
+if(!html.includes('js/audio/audio-manager-v14-3-5.js'))throw new Error("v14.3.5 오디오 엔진이 HTML에 연결되지 않음");
+if(html.includes('js/audio/audio-manager-v14-3-4.js')||html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 오디오 엔진이 HTML에 남아 있음");
 
 for(const requiredId of ["audioPanelBtn","audioQuickPanel","quickMasterVolume","quickBgmVolume","quickSfxVolume","quickUiVolume"]){
   if(!html.includes(`id="${requiredId}"`))throw new Error(`인게임 오디오 UI 누락: ${requiredId}`);
@@ -38,13 +38,18 @@ for(const required of ["GameSpatial.queryCircle","pendingLevelUps","SaveManager"
   if(!combined.includes(required))throw new Error(`필수 개선 코드 누락: ${required}`);
 }
 
-const audioManager=fs.readFileSync(path.join(root,"js/audio/audio-manager-v14-3-4.js"),"utf8");
+const audioManager=fs.readFileSync(path.join(root,"js/audio/audio-manager-v14-3-5.js"),"utf8");
 for(const required of ["createBufferSource","decodeAudioData","MAX_ACTIVE_VOICES=10","GROUP_LIMITS","PROFILE_CHECK_MS","requestIdleCallback"]){
   if(!audioManager.includes(required))throw new Error(`모바일 오디오 최적화 누락: ${required}`);
 }
 const updateBody=audioManager.match(/function update\(\)\{([\s\S]*?)\n  \}/)?.[1]||"";
 if(updateBody.includes("refreshControls"))throw new Error("오디오 프레임 업데이트에서 DOM 갱신이 다시 호출됨");
 if(audioManager.includes("Array.from({length:def.maxVoices}"))throw new Error("구형 HTMLAudio 다중 풀 구현이 남아 있음");
+
+if(!audioManager.includes('define("attack-katana","katana-iai-sharp-v1435.wav"'))throw new Error("일섬 발도술 신규 효과음 매핑 누락");
+if(audioManager.includes('define("attack-katana","katana-cut.wav"'))throw new Error("일섬 발도술에 구형 뿅 계열 효과음이 남아 있음");
+const iaiSfx=path.join(root,"assets/audio/sfx-hq/katana-iai-sharp-v1435.wav");
+if(!fs.existsSync(iaiSfx)||fs.statSync(iaiSfx).size<50000)throw new Error("일섬 발도술 신규 WAV 누락 또는 손상");
 
 const sfxDir=path.join(root,"assets/audio/sfx-hq");
 const sfxFiles=fs.readdirSync(sfxDir).filter(name=>name.endsWith(".wav"));
