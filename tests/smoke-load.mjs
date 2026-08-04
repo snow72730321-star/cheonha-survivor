@@ -71,10 +71,18 @@ class MediaElementSourceStub{
   constructor(element){this.mediaElement=element;this.connections=[]}
   connect(node){this.connections.push(node);return node}
 }
+class AudioBufferSourceStub{
+  constructor(){this.buffer=null;this.playbackRate={value:1};this.connections=[];this.onended=null;this.stopped=false}
+  connect(node){this.connections.push(node);return node}
+  start(){queueMicrotask(()=>this.onended?.())}
+  stop(){this.stopped=true;queueMicrotask(()=>this.onended?.())}
+}
 class AudioContextStub{
   constructor(){this.state="running";this.currentTime=0;this.destination={}}
   createGain(){return new GainNodeStub()}
   createMediaElementSource(element){return new MediaElementSourceStub(element)}
+  createBufferSource(){return new AudioBufferSourceStub()}
+  decodeAudioData(_data,success){const buffer={duration:.3};queueMicrotask(()=>success?.(buffer));return Promise.resolve(buffer)}
   resume(){this.state="running";return Promise.resolve()}
 }
 
@@ -87,6 +95,9 @@ const sandbox={
   innerWidth:1280,innerHeight:720,devicePixelRatio:1,performance,Math,Date,JSON,Map,Set,WeakMap,Promise,
   Blob:class{},URL:{createObjectURL:()=>"blob:test",revokeObjectURL(){}},confirm:()=>false,
   setTimeout,clearTimeout,queueMicrotask,
+  fetch:async()=>({ok:true,status:200,statusText:"OK",arrayBuffer:async()=>new ArrayBuffer(128)}),
+  requestIdleCallback:callback=>setTimeout(()=>callback({timeRemaining:()=>8}),0),
+  cancelIdleCallback:id=>clearTimeout(id),
   requestAnimationFrame:()=>0,cancelAnimationFrame(){},
   addEventListener(type,handler){listeners.set(type,handler)},removeEventListener(){},
 };
@@ -112,8 +123,9 @@ if(assertions.version!==14||assertions.skills!==8||assertions.bosses!==1||!asser
   throw new Error(`부팅 검증 실패: ${JSON.stringify(assertions)}`);
 }
 
-// v14.3.3 회귀: iOS용 GainNode 믹서가 실제 채널 음량을 바꾸고 SFX 파일 풀이 등록되는지 확인한다.
+// v14.3.4 회귀: GainNode 믹서, AudioBuffer 재사용, 채널 음량을 확인한다.
 await vm.runInContext("GameAudio.unlock()",context);
+await new Promise(resolve=>setTimeout(resolve,40));
 const audioRegression=vm.runInContext(`(()=>{
   state="playing";GameAudio.configure(true);
   const before=GameAudio.debugState();
@@ -123,12 +135,12 @@ const audioRegression=vm.runInContext(`(()=>{
   const after=GameAudio.debugState();
   return {before,after,played,panel:!!document.getElementById("audioQuickPanel")};
 })()`,context);
-if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegression.played||
+if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegression.played||audioRegression.after.loadedBuffers<1||
    Math.abs(audioRegression.after.settings.bgm-.2)>.001||Math.abs(audioRegression.after.settings.sfx-.35)>.001||
    !(audioRegression.after.gains.bgm<audioRegression.before.gains.bgm)||!audioRegression.panel){
   throw new Error(`오디오 믹서·효과음 회귀 검증 실패: ${JSON.stringify(audioRegression)}`);
 }
-console.log("오디오 믹서·효과음 회귀 테스트 통과",audioRegression);
+console.log("AudioBuffer 오디오 엔진 회귀 테스트 통과",audioRegression);
 
 // 주 저장이 깨졌을 때 정상 백업을 복구하고 백업 자체는 보존하는지 확인한다.
 vm.runInContext("account.gold=321;SaveManager.save()",context);
