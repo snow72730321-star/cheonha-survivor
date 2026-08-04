@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.3.5 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-3-5-katana-iai-sharp";
+/** v14.3.6 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-3-6-saber-weight-vfx";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -10,7 +10,7 @@ const APP_SHELL=[
   "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js",
-  "js/audio/audio-manager-v14-3-5.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-2.js","js/vfx/v10.js","js/vfx/sprite-vfx.js",
+  "js/audio/audio-manager-v14-3-6.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-2.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-6.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
   "assets/icons/icon-192.png","assets/icons/icon-512.png",
   "assets/characters/sword.png","assets/characters/spear.png","assets/characters/bow.png","assets/characters/poison.png","assets/characters/tao.png","assets/characters/saber.png","assets/characters/katana.png","assets/characters/fist.png",
@@ -39,6 +39,7 @@ const APP_SHELL=[
   "assets/vfx/magic/moon_orb.png",
   "assets/vfx/magic/poison_cloud.png",
   "assets/vfx/weapons/arrow_green.png",
+  "assets/vfx/weapons/saber_heavy_arc.png",
   "assets/vfx/weapons/fist_gold.png",
   "assets/vfx/weapons/needle_purple.png",
   "assets/vfx/weapons/slash_cyan.png",

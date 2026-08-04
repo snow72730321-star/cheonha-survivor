@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root=path.resolve(import.meta.dirname,"..");
 const vfxRoot=path.join(root,"assets","vfx");
-const renderer=fs.readFileSync(path.join(root,"js","vfx","sprite-vfx.js"),"utf8");
+const renderer=fs.readFileSync(path.join(root,"js","vfx","sprite-vfx-v14-3-6.js"),"utf8");
 const serviceWorker=fs.readFileSync(path.join(root,"service-worker.js"),"utf8");
 
 function walk(directory){
@@ -29,6 +29,9 @@ for(const file of pngs){
   if(!renderer.includes(relative))throw new Error(`VFX 레지스트리 누락: ${relative}`);
   if(!serviceWorker.includes(`"${relative}"`))throw new Error(`오프라인 캐시 누락: ${relative}`);
 }
+
+if(!renderer.includes('saberHeavy:{src:"assets/vfx/weapons/saber_heavy_arc.png"'))throw new Error("박도 전용 무화살표 참격 스프라이트 누락");
+if(!renderer.includes('v.type==="heavyArc"'))throw new Error("박도 heavyArc 전용 렌더링 분기 누락");
 
 for(const required of ["drawProjectiles=function","drawVisuals=function","drawHazards=function","drawFields=function","VFXSprites.spawn","GameAssets.load"]){
   if(!renderer.includes(required))throw new Error(`VFX 렌더러 필수 구현 누락: ${required}`);

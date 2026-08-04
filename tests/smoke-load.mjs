@@ -123,7 +123,7 @@ if(assertions.version!==14||assertions.skills!==8||assertions.bosses!==1||!asser
   throw new Error(`부팅 검증 실패: ${JSON.stringify(assertions)}`);
 }
 
-// v14.3.4 회귀: GainNode 믹서, AudioBuffer 재사용, 채널 음량을 확인한다.
+// v14.3.6 회귀: GainNode 믹서, AudioBuffer 재사용, 채널 음량을 확인한다.
 await vm.runInContext("GameAudio.unlock()",context);
 await new Promise(resolve=>setTimeout(resolve,40));
 const audioRegression=vm.runInContext(`(()=>{
@@ -132,10 +132,11 @@ const audioRegression=vm.runInContext(`(()=>{
   GameAudio.setVolume("bgm",.2,false);
   GameAudio.setVolume("sfx",.35,false);
   const played=GameAudio.playSFX("attack-sword");
+  const saberPlayed=GameAudio.playSFX("attack-saber");
   const after=GameAudio.debugState();
-  return {before,after,played,panel:!!document.getElementById("audioQuickPanel")};
+  return {before,after,played,saberPlayed,panel:!!document.getElementById("audioQuickPanel")};
 })()`,context);
-if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegression.played||audioRegression.after.loadedBuffers<1||
+if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegression.played||!audioRegression.saberPlayed||audioRegression.after.loadedBuffers<2||
    Math.abs(audioRegression.after.settings.bgm-.2)>.001||Math.abs(audioRegression.after.settings.sfx-.35)>.001||
    !(audioRegression.after.gains.bgm<audioRegression.before.gains.bgm)||!audioRegression.panel){
   throw new Error(`오디오 믹서·효과음 회귀 검증 실패: ${JSON.stringify(audioRegression)}`);
