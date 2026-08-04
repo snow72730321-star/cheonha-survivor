@@ -152,5 +152,7 @@ const GameAudio=(()=>{
 
   ["pointerdown","touchstart","keydown"].forEach(type=>window.addEventListener(type,unlock,{once:true,passive:true}));
 
-  return Object.freeze({unlock,update,configure,registerSFX,playSFX,playUI,duck,setMuted,toggleMuted,isUnlocked:()=>unlocked,isMuted:()=>muted});
+  // play()는 v14.3.1 캐시와 섞인 구형 호출을 위한 호환 별칭이다.
+  // 신규 코드는 채널이 명확한 playSFX()/playUI()를 사용한다.
+  return Object.freeze({unlock,update,configure,registerSFX,play,playSFX,playUI,duck,setMuted,toggleMuted,isUnlocked:()=>unlocked,isMuted:()=>muted});
 })();

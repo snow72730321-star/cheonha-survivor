@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.1 오프라인 캐시. 문서 요청과 정적 리소스의 실패 처리를 분리한다. */
-const CACHE="cheonha-v14-3-1-audio-balance";
+/** v14.3.2 오프라인 캐시. 코드 업데이트는 네트워크 우선으로 즉시 반영한다. */
+const CACHE="cheonha-v14-3-2-ultimate-audio-hotfix";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css",
@@ -10,7 +10,7 @@ const APP_SHELL=[
   "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings.js",
-  "js/audio/audio-manager.js","js/vfx/awakening-cutscene.js","js/vfx/v10.js","js/vfx/sprite-vfx.js",
+  "js/audio/audio-manager.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-2.js","js/vfx/v10.js","js/vfx/sprite-vfx.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
   "assets/icons/icon-192.png","assets/icons/icon-512.png",
   "assets/characters/sword.png","assets/characters/spear.png","assets/characters/bow.png","assets/characters/poison.png","assets/characters/tao.png","assets/characters/saber.png","assets/characters/katana.png","assets/characters/fist.png",
@@ -75,8 +75,20 @@ self.addEventListener("fetch",event=>{
     return;
   }
 
-  // JS/CSS/이미지는 캐시 우선 후 백그라운드 갱신한다. HTML을 리소스 대신 반환하지 않는다.
-  event.respondWith(caches.match(request,{ignoreSearch:true}).then(cached=>{
+  const url=new URL(request.url);
+  const isCode=/\.(?:js|css|webmanifest)$/i.test(url.pathname);
+
+  // JS/CSS/매니페스트는 네트워크 우선으로 배포 직후 구버전 코드가 한 번 더 실행되는 문제를 막는다.
+  if(isCode){
+    event.respondWith(fetch(request).then(response=>{
+      if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
+      return response;
+    }).catch(()=>caches.match(request)));
+    return;
+  }
+
+  // 이미지 등 불변 에셋은 캐시 우선 후 백그라운드 갱신한다.
+  event.respondWith(caches.match(request).then(cached=>{
     const network=fetch(request).then(response=>{
       if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
       return response;

@@ -161,3 +161,16 @@ if(gameplay.sanitizedGold!==0||gameplay.sanitizedRuns!==0||gameplay.sanitizedFps
 console.log("브라우저 스모크 로드 통과",assertions);
 console.log("전투 스모크 테스트 통과",gameplay);
 console.log("신규 무공·동적 난이도 테스트 통과",skillGate);
+
+// v14.3.1 회귀: 전체 절기 컷신이 공개되지 않은 GameAudio.play()를 호출해 즉시 중단되던 오류를 검증한다.
+const ultimateRegression=vm.runInContext(`(()=>{
+  state="playing";account.settings.cutsceneMode="full";account.settings.reducedMotion=false;
+  player.ultimate=100;
+  let emitted=0;const off=GameEvents.on("ultimate:used",()=>emitted++);
+  useUltimate();off();
+  return {state,ultimate:player.ultimate,emitted,legacyPlay:typeof GameAudio.play,playSFX:typeof GameAudio.playSFX};
+})()`,context);
+if(ultimateRegression.state!=="cutscene"||ultimateRegression.ultimate!==0||ultimateRegression.emitted!==1||ultimateRegression.legacyPlay!=="function"||ultimateRegression.playSFX!=="function"){
+  throw new Error(`절기 오디오 회귀 검증 실패: ${JSON.stringify(ultimateRegression)}`);
+}
+console.log("절기 오디오 회귀 테스트 통과",ultimateRegression);
