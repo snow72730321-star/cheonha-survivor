@@ -1,6 +1,6 @@
 {
   "name": "cheonha-survivor-v14-3",
-  "version": "14.3.2",
+  "version": "14.3.3",
   "private": true,
   "scripts": {
     "test": "node tests/static-audit.mjs && node tests/vfx-audit.mjs && node tests/smoke-load.mjs",

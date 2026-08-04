@@ -1,6 +1,16 @@
-# 천하생존록 v14.3.2 · Ultimate Audio Hotfix
+# 천하생존록 v14.3.3 · Audio Mixer & SFX
 
 브라우저와 GitHub Pages에서 실행되는 HTML5 Canvas 기반 무협 서바이버 게임이다. 별도 서버 프로그램이나 빌드 도구 없이 저장소 루트의 `index.html`을 배포하면 실행된다.
+
+
+## v14.3.3 오디오 믹서·효과음 패치
+
+- iPhone/iPad에서도 실제로 작동하도록 BGM·SFX·UI를 GainNode 채널 믹서로 분리했습니다.
+- 전투 HUD의 `🎚` 버튼에서 Master/BGM/SFX/UI 음량을 즉시 조절하고 자동 저장할 수 있습니다.
+- 공격 8종, 적·보스 타격, 플레이어 피해, 회피, 레벨업, 무공 습득, 아이템·광석·금자·회복 획득 효과음을 추가했습니다.
+- 단조, 강화 성공·실패, 재련, 잠재 적용, 장착, 분해, 보스 출현, 절기, 승리·패배 효과음을 추가했습니다.
+- 모든 효과음은 `assets/audio/sfx/`의 정적 WAV 파일이며 OscillatorNode·beep·런타임 합성음은 사용하지 않습니다.
+- 서비스 워커 캐시를 `cheonha-v14-3-3-audio-mixer-sfx`로 갱신했습니다.
 
 
 ## v14.3.2 긴급 수정
@@ -90,10 +100,12 @@ npm run check
 - 자동공격 실제 피해 발생
 - 연속 레벨업 대기열
 - 저장 데이터 복구·정규화
+- GainNode 채널 음량 즉시 반영과 39개 WAV 효과음 등록
 
 ## 주요 구조
 
 ```text
+assets/audio/  전투 BGM과 정적 WAV 효과음
 assets/vfx/    발동형 스킬·투사체·타격·파티클 PNG
 js/vfx/        VFX 레지스트리와 하이브리드 렌더러
 js/core/       부팅, 이벤트, 저장, PWA, 통합 에셋 로딩

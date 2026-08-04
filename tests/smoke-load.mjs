@@ -57,11 +57,32 @@ class AudioStub{
   pause(){this.paused=true}
 }
 
+class AudioParamStub{
+  constructor(value=1){this.value=value}
+  cancelScheduledValues(){}
+  setTargetAtTime(value){this.value=value}
+  setValueAtTime(value){this.value=value}
+}
+class GainNodeStub{
+  constructor(){this.gain=new AudioParamStub(1);this.connections=[]}
+  connect(node){this.connections.push(node);return node}
+}
+class MediaElementSourceStub{
+  constructor(element){this.mediaElement=element;this.connections=[]}
+  connect(node){this.connections.push(node);return node}
+}
+class AudioContextStub{
+  constructor(){this.state="running";this.currentTime=0;this.destination={}}
+  createGain(){return new GainNodeStub()}
+  createMediaElementSource(element){return new MediaElementSourceStub(element)}
+  resume(){this.state="running";return Promise.resolve()}
+}
+
 const storage=new Map();
 const localStorage={getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,String(value)),removeItem:key=>storage.delete(key)};
 const listeners=new Map();
 const sandbox={
-  console,document,localStorage,Image:ImageStub,Audio:AudioStub,
+  console,document,localStorage,Image:ImageStub,Audio:AudioStub,AudioContext:AudioContextStub,
   navigator:{vibrate(){},serviceWorker:{register:async()=>({})}},location:{protocol:"https:"},
   innerWidth:1280,innerHeight:720,devicePixelRatio:1,performance,Math,Date,JSON,Map,Set,WeakMap,Promise,
   Blob:class{},URL:{createObjectURL:()=>"blob:test",revokeObjectURL(){}},confirm:()=>false,
@@ -90,6 +111,24 @@ const assertions=vm.runInContext(`({
 if(assertions.version!==14||assertions.skills!==8||assertions.bosses!==1||!assertions.fixed||assertions.accountVersion!==14){
   throw new Error(`부팅 검증 실패: ${JSON.stringify(assertions)}`);
 }
+
+// v14.3.3 회귀: iOS용 GainNode 믹서가 실제 채널 음량을 바꾸고 SFX 파일 풀이 등록되는지 확인한다.
+await vm.runInContext("GameAudio.unlock()",context);
+const audioRegression=vm.runInContext(`(()=>{
+  state="playing";GameAudio.configure(true);
+  const before=GameAudio.debugState();
+  GameAudio.setVolume("bgm",.2,false);
+  GameAudio.setVolume("sfx",.35,false);
+  const played=GameAudio.playSFX("attack-sword");
+  const after=GameAudio.debugState();
+  return {before,after,played,panel:!!document.getElementById("audioQuickPanel")};
+})()`,context);
+if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegression.played||
+   Math.abs(audioRegression.after.settings.bgm-.2)>.001||Math.abs(audioRegression.after.settings.sfx-.35)>.001||
+   !(audioRegression.after.gains.bgm<audioRegression.before.gains.bgm)||!audioRegression.panel){
+  throw new Error(`오디오 믹서·효과음 회귀 검증 실패: ${JSON.stringify(audioRegression)}`);
+}
+console.log("오디오 믹서·효과음 회귀 테스트 통과",audioRegression);
 
 // 주 저장이 깨졌을 때 정상 백업을 복구하고 백업 자체는 보존하는지 확인한다.
 vm.runInContext("account.gold=321;SaveManager.save()",context);
