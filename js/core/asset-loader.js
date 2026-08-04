@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.3-hybrid-vfx";
+  const BUILD="v14.3.7-skill-identity-vfx";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const vfxFiles=[
@@ -40,7 +40,32 @@ const GameAssets=(()=>{
     "assets/vfx/weapons/slash_cyan.png",
     "assets/vfx/weapons/slash_red.png",
     "assets/vfx/weapons/spear_gold.png",
-    "assets/vfx/weapons/sword_cyan.png"
+    "assets/vfx/weapons/sword_cyan.png",
+    "assets/vfx/skills/bow_arrow_rain.png",
+    "assets/vfx/skills/bow_sunmoon_burst.png",
+    "assets/vfx/skills/fist_dragon_return.png",
+    "assets/vfx/skills/fist_hundred_step.png",
+    "assets/vfx/skills/fist_iron_mountain.png",
+    "assets/vfx/skills/fist_taiji_vortex.png",
+    "assets/vfx/skills/katana_moon_chain.png",
+    "assets/vfx/skills/katana_nameless_cuts.png",
+    "assets/vfx/skills/katana_zanshin.png",
+    "assets/vfx/skills/poison_lifedeath_seal.png",
+    "assets/vfx/skills/poison_miasma_bloom.png",
+    "assets/vfx/skills/poison_thousand_fan.png",
+    "assets/vfx/skills/saber_demon_wheel.png",
+    "assets/vfx/skills/saber_mountain_split.png",
+    "assets/vfx/skills/saber_thunder_fan.png",
+    "assets/vfx/skills/saber_whirlwind.png",
+    "assets/vfx/skills/spear_dragon_spin.png",
+    "assets/vfx/skills/spear_overlord.png",
+    "assets/vfx/skills/spear_starfall.png",
+    "assets/vfx/skills/sword_meteor_rain.png",
+    "assets/vfx/skills/sword_taiji_array.png",
+    "assets/vfx/skills/sword_ten_thousand.png",
+    "assets/vfx/skills/tao_fire_dragon.png",
+    "assets/vfx/skills/tao_five_thunder.png",
+    "assets/vfx/skills/tao_ice_array.png"
   ];
   const files=[
     ...characterIds.map(id=>`assets/characters/${id}.png`),

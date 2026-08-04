@@ -143,6 +143,26 @@ if(!audioRegression.after.graph||audioRegression.after.registered<40||!audioRegr
 }
 console.log("AudioBuffer 오디오 엔진 회귀 테스트 통과",audioRegression);
 
+
+// v14.3.7 회귀: 무공별 전용 VFX와 벽력도법 부채꼴이 실제 visuals에 생성되는지 확인한다.
+const vfxRegression=vm.runInContext(`(()=>{
+  const cases={
+    sword:[["meteor",3],["tenk",2]],spear:[["dragonspin",3],["overlord",2]],bow:[["arrowrain",3],["sunmoon",2]],
+    poison:[["thousand",3],["miasma",3],["lifedeath",2]],tao:[["firedragon",3],["icepulse",3],["fivethunder",2]],
+    saber:[["whirlwind",3],["mountain",3],["demon",2]],katana:[["moonchain",3],["zanshinDrop",3],["nameless",2]],
+    fist:[["hundredstep",3],["taijifist",3],["dragonreturn",2]]
+  };
+  const emitted=[];visuals=[];
+  for(const [weapon,skills] of Object.entries(cases)){selectedWeapon=weapon;for(const [id,lv] of skills){const before=visuals.length;emitSkillVfx(id,lv);emitted.push({weapon,id,type:visuals[before]?.type||""})}}
+  selectedWeapon="saber";state="playing";visuals=[];enemies=[];player.arts.thundersaber=4;player.fireTimer=0;
+  spawnEnemy("bandit",player.x+110,player.y);enemies[0].speed=0;GameSpatial.rebuild(enemies);fireBasic();
+  return {emitted,saberTypes:visuals.map(v=>v.type),customCount:new Set(emitted.map(v=>v.type)).size};
+})()`,context);
+if(vfxRegression.customCount<20||!vfxRegression.saberTypes.includes("cone")||!vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill"))){
+  throw new Error(`무공별 VFX·벽력도법 부채꼴 회귀 검증 실패: ${JSON.stringify(vfxRegression)}`);
+}
+console.log("무공별 전용 VFX·벽력도법 부채꼴 회귀 테스트 통과",vfxRegression);
+
 // 주 저장이 깨졌을 때 정상 백업을 복구하고 백업 자체는 보존하는지 확인한다.
 vm.runInContext("account.gold=321;SaveManager.save()",context);
 const validEnvelope=storage.get("murimAccountV1");

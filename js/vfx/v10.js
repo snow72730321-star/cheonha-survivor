@@ -13,40 +13,40 @@ function emitCastVfx(w,a,lv=1){const [c1,c2,c3]=vfxPalette(w),x=player.x,y=playe
  else if(w==="bow"){VFX10.push({type:"bowstring",x,y,a,r:40,life:.18,max:.18,color:c3});for(let i=0;i<Math.ceil(2*q);i++)VFX10.push({type:"feather",x:x-Math.cos(a)*12,y:y-Math.sin(a)*12,a:a+Math.PI+(i-.5)*.4,r:22,life:.32,max:.32,color:c2})}
  else if(w==="poison"){VFX10.push({type:"poisonVein",x,y,r:31+lv*2,life:.35,max:.35,color:c2});VFX10.push({type:"glyph",x,y,r:21,life:.3,max:.3,color:c1,spokes:8})}
  else if(w==="tao"){VFX10.push({type:"rune",x,y,r:35+lv*2,life:.34,max:.34,color:c1,spin:1});VFX10.push({type:"sparkCrown",x,y,r:28,life:.22,max:.22,color:c3})}
- else if(w==="saber"){VFX10.push({type:"heavyArc",x,y,a,r:72+lv*4,life:.25,max:.25,color:c1,width:12});VFX10.push({type:"crack",x:x+Math.cos(a)*45,y:y+Math.sin(a)*45,a,r:42,life:.38,max:.38,color:c2})}
+ else if(w==="saber"){VFX10.push({type:"skillSaberThunderFan",x,y,a,r:88+lv*5,life:.3,max:.3,color:c1,width:12})}
  else if(w==="katana"){VFX10.push({type:"focusLine",x,y,a,r:190,life:.16,max:.16,color:c3,width:2});VFX10.push({type:"petalBurst",x,y,a,r:42,life:.42,max:.42,color:c2})}
- else {VFX10.push({type:"pressure",x,y,a,r:62+lv*3,life:.24,max:.24,color:c1});VFX10.push({type:"impact",x:x+Math.cos(a)*28,y:y+Math.sin(a)*28,r:30,life:.22,max:.22,color:c3})}
+ else {VFX10.push({type:"skillFistIronMountain",x,y,a,r:70+lv*4,life:.28,max:.28,color:c1})}
 }
 function emitSkillVfx(id,lv=1){const [c1,c2,c3]=vfxPalette(),x=player.x,y=player.y,a=facingAngle();
  const ring=(r,col=c1,life=.45)=>VFX10.push({type:"ornateRing",x,y,r,life,max:life,color:col,spokes:6+Math.min(8,lv)});
  switch(id){
-  case "meteor": ring(68+lv*7,c1,.65); VFX10.push({type:"skyGate",x,y,r:110+lv*8,life:.7,max:.7,color:c2}); break;
-  case "tenk": ring(120+lv*14,c3,.8); VFX10.push({type:"swordHalo",x,y,r:145+lv*16,life:.9,max:.9,color:c1,count:14+lv*4}); break;
-  case "dragonspin": VFX10.push({type:"helix",x,y,r:115+lv*10,life:.55,max:.55,color:c1}); break;
-  case "starfall": VFX10.push({type:"skyGate",x,y,r:90+lv*9,life:.55,max:.55,color:c2}); break;
-  case "overlord": VFX10.push({type:"dragonSpear",x,y,a,r:Math.max(W,H)*1.1,life:.6,max:.6,color:c1,width:22+lv*4}); break;
-  case "arrowrain": VFX10.push({type:"cloudSplit",x,y,r:Math.max(W,H)*.55,life:.8,max:.8,color:c1}); break;
-  case "sunmoon": ring(70+lv*8,Math.floor(elapsed)%2?"#b9d8ec":"#ffd465",.65); break;
-  case "thousand": VFX10.push({type:"fanBurst",x,y,a,r:125+lv*10,life:.48,max:.48,color:c1,count:14+lv*3}); break;
-  case "miasma": VFX10.push({type:"poisonVein",x,y,r:85+lv*12,life:.8,max:.8,color:c2}); break;
-  case "lifedeath": ring(150+lv*16,c1,.8); VFX10.push({type:"yinBloom",x,y,r:130+lv*12,life:.8,max:.8,color:c2}); break;
-  case "firedragon": VFX10.push({type:"dragonBreath",x,y,a,r:160+lv*12,life:.52,max:.52,color:"#ff8c52"}); break;
-  case "icepulse": ring(115+lv*12,"#9eeaff",.42); VFX10.push({type:"iceShardRing",x,y,r:120+lv*12,life:.46,max:.46,color:"#d7f7ff",count:8+lv}); break;
-  case "fivethunder": VFX10.push({type:"heavenSeal",x,y,r:140+lv*12,life:.8,max:.8,color:"#c6eaff"}); break;
-  case "whirlwind": VFX10.push({type:"bladeStorm",x,y,r:88+lv*10,life:.45,max:.45,color:c1,count:6+lv}); break;
-  case "mountain": VFX10.push({type:"earthSplit",x,y,a,r:260+lv*20,life:.65,max:.65,color:c2}); break;
-  case "demon": VFX10.push({type:"demonHalo",x,y,r:175+lv*14,life:.85,max:.85,color:"#ff534d"}); break;
-  case "moonchain": VFX10.push({type:"moonTrail",x,y,a,r:170+lv*16,life:.55,max:.55,color:c1}); break;
-  case "zanshinDrop": VFX10.push({type:"afterimageBlade",x,y,a,r:72+lv*8,life:.55,max:.55,color:c2}); break;
-  case "nameless": VFX10.push({type:"screenCut",x,y,a,r:Math.max(W,H)*1.2,life:.7,max:.7,color:c3,count:7+lv}); break;
-  case "hundredstep": VFX10.push({type:"pressure",x,y,a,r:180+lv*16,life:.45,max:.45,color:c1}); break;
-  case "taijifist": VFX10.push({type:"yinBloom",x,y,r:120+lv*12,life:.65,max:.65,color:c1}); break;
-  case "dragonreturn": VFX10.push({type:"dragonBreath",x,y,a,r:Math.max(W,H),life:.75,max:.75,color:c1}); break;
+  case "meteor": VFX10.push({type:"skillSwordMeteor",x,y,r:82+lv*7,life:.72,max:.72,color:c1}); break;
+  case "tenk": VFX10.push({type:"skillSwordTenk",x,y,r:120+lv*15,life:.85,max:.85,color:c1}); break;
+  case "dragonspin": VFX10.push({type:"skillSpearSpin",x,y,r:112+lv*11,life:.52,max:.52,color:c1}); break;
+  case "starfall": VFX10.push({type:"skillSpearStarfall",x,y,r:80+lv*9,life:.6,max:.6,color:c2}); break;
+  case "overlord": VFX10.push({type:"skillSpearOverlord",x,y,a,r:Math.max(W,H)*1.05,life:.62,max:.62,color:c1,width:22+lv*4}); break;
+  case "arrowrain": VFX10.push({type:"skillBowArrowRain",x,y,r:Math.max(W,H)*.48,life:.8,max:.8,color:c1}); break;
+  case "sunmoon": VFX10.push({type:"skillBowSunMoon",x,y,r:84+lv*9,life:.68,max:.68,color:c1}); break;
+  case "thousand": VFX10.push({type:"skillPoisonThousand",x,y,a,r:135+lv*11,life:.5,max:.5,color:c1}); break;
+  case "miasma": VFX10.push({type:"skillPoisonMiasma",x,y,r:88+lv*12,life:.82,max:.82,color:c2}); break;
+  case "lifedeath": VFX10.push({type:"skillPoisonLifeDeath",x,y,r:150+lv*16,life:.82,max:.82,color:c1}); break;
+  case "firedragon": VFX10.push({type:"skillTaoFireDragon",x,y,a,r:170+lv*14,life:.58,max:.58,color:"#ff8c52",width:28}); break;
+  case "icepulse": VFX10.push({type:"skillTaoIceArray",x,y,r:118+lv*13,life:.48,max:.48,color:"#9eeaff"}); break;
+  case "fivethunder": VFX10.push({type:"skillTaoFiveThunder",x,y,r:145+lv*13,life:.82,max:.82,color:"#c6eaff"}); break;
+  case "whirlwind": VFX10.push({type:"skillSaberWhirlwind",x,y,r:90+lv*10,life:.46,max:.46,color:c1}); break;
+  case "mountain": VFX10.push({type:"skillSaberMountain",x,y,a,r:260+lv*20,life:.68,max:.68,color:c2,width:30+lv*3}); break;
+  case "demon": VFX10.push({type:"skillSaberDemon",x,y,r:180+lv*15,life:.86,max:.86,color:"#ff534d"}); break;
+  case "moonchain": VFX10.push({type:"skillKatanaMoonChain",x,y,a,r:180+lv*17,life:.56,max:.56,color:c1,width:28}); break;
+  case "zanshinDrop": VFX10.push({type:"skillKatanaZanshin",x,y,a,r:75+lv*8,life:.58,max:.58,color:c2}); break;
+  case "nameless": VFX10.push({type:"skillKatanaNameless",x,y,a,r:Math.max(W,H)*1.15,life:.72,max:.72,color:c3}); break;
+  case "hundredstep": VFX10.push({type:"skillFistHundredStep",x,y,a,r:190+lv*17,life:.48,max:.48,color:c1,width:28}); break;
+  case "taijifist": VFX10.push({type:"skillFistTaiji",x,y,r:125+lv*13,life:.68,max:.68,color:c1}); break;
+  case "dragonreturn": VFX10.push({type:"skillFistDragonReturn",x,y,a,r:Math.max(W,H),life:.78,max:.78,color:c1,width:36}); break;
  }
 }
 const projectileV10=projectile;projectile=function(o){const p=Object.assign({},o);p.vfxWeapon=p.vfxWeapon||selectedWeapon;p.vfxSeed=Math.random()*99;p.vfxAge=0;projectileV10(p)};
 const fireBasicV10=fireBasic;fireBasic=function(){const t=nearest();if(t)emitCastVfx(selectedWeapon,Math.atan2(t.y-player.y,t.x-player.x),player.arts[weaponDefs[selectedWeapon].basic.id]||1);fireBasicV10()};
-const tickArtsV10=tickArts;tickArts=function(dt){const before={...player.cooldowns};tickArtsV10(dt);for(const [id,now] of Object.entries(player.cooldowns)){if((before[id]??0)<=0&&now>0)emitSkillVfx(id,player.arts[id]||1)}};
+const tickArtsV10=tickArts;tickArts=function(dt){const before={...player.cooldowns};tickArtsV10(dt);for(const [id,now] of Object.entries(player.cooldowns)){if((before[id]??0)<=0&&now>0)emitSkillVfx(id,id==="icepulse"?(player.arts.icearray||1):(player.arts[id]||1))}};
 const updateProjectilesV10=updateProjectiles;updateProjectiles=function(dt){updateProjectilesV10(dt);const q=VFX10.quality();for(const p of projectiles){p.vfxAge=(p.vfxAge||0)+dt;if(!p.trail||Math.random()>.25*q)continue;const col=p.color||vfxPalette(p.vfxWeapon)[0];if(p.shape==="arrow")VFX10.push({type:"streak",x:p.x,y:p.y,a:Math.atan2(p.vy,p.vx)+Math.PI,r:24,life:.16,max:.16,color:col,width:2});
  else if(p.shape==="spear")VFX10.push({type:"streak",x:p.x,y:p.y,a:Math.atan2(p.vy,p.vx)+Math.PI,r:36,life:.14,max:.14,color:col,width:4});
  else if(p.shape==="crescent")VFX10.push({type:"arcEcho",x:p.x,y:p.y,a:Math.atan2(p.vy,p.vx),r:18+p.r,life:.18,max:.18,color:col,width:3});

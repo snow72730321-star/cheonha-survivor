@@ -7,6 +7,8 @@ const refs=[...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match=>match[1].spl
 const missing=refs.filter(ref=>!fs.existsSync(path.join(root,ref)));
 if(missing.length)throw new Error(`누락된 HTML 참조: ${missing.join(", ")}`);
 if(!html.includes('js/audio/audio-manager-v14-3-6.js'))throw new Error("v14.3.6 오디오 엔진이 HTML에 연결되지 않음");
+if(!html.includes('js/vfx/sprite-vfx-v14-3-7.js'))throw new Error("v14.3.7 무공별 VFX 렌더러가 HTML에 연결되지 않음");
+if(html.includes('js/vfx/sprite-vfx-v14-3-6.js'))throw new Error("구형 v14.3.6 VFX 렌더러가 HTML에 남아 있음");
 if(html.includes('js/audio/audio-manager-v14-3-5.js')||html.includes('js/audio/audio-manager-v14-3-4.js')||html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 오디오 엔진이 HTML에 남아 있음");
 
 for(const requiredId of ["audioPanelBtn","audioQuickPanel","quickMasterVolume","quickBgmVolume","quickSfxVolume","quickUiVolume"]){

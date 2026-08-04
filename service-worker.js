@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.3.6 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-3-6-saber-weight-vfx";
+/** v14.3.7 무공별 전용 VFX 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-3-7-skill-identity-vfx";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -10,7 +10,7 @@ const APP_SHELL=[
   "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js",
-  "js/audio/audio-manager-v14-3-6.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-2.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-6.js",
+  "js/audio/audio-manager-v14-3-6.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-2.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-7.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
   "assets/icons/icon-192.png","assets/icons/icon-512.png",
   "assets/characters/sword.png","assets/characters/spear.png","assets/characters/bow.png","assets/characters/poison.png","assets/characters/tao.png","assets/characters/saber.png","assets/characters/katana.png","assets/characters/fist.png",
@@ -45,7 +45,32 @@ const APP_SHELL=[
   "assets/vfx/weapons/slash_cyan.png",
   "assets/vfx/weapons/slash_red.png",
   "assets/vfx/weapons/spear_gold.png",
-  "assets/vfx/weapons/sword_cyan.png"
+  "assets/vfx/weapons/sword_cyan.png",
+  "assets/vfx/skills/bow_arrow_rain.png",
+  "assets/vfx/skills/bow_sunmoon_burst.png",
+  "assets/vfx/skills/fist_dragon_return.png",
+  "assets/vfx/skills/fist_hundred_step.png",
+  "assets/vfx/skills/fist_iron_mountain.png",
+  "assets/vfx/skills/fist_taiji_vortex.png",
+  "assets/vfx/skills/katana_moon_chain.png",
+  "assets/vfx/skills/katana_nameless_cuts.png",
+  "assets/vfx/skills/katana_zanshin.png",
+  "assets/vfx/skills/poison_lifedeath_seal.png",
+  "assets/vfx/skills/poison_miasma_bloom.png",
+  "assets/vfx/skills/poison_thousand_fan.png",
+  "assets/vfx/skills/saber_demon_wheel.png",
+  "assets/vfx/skills/saber_mountain_split.png",
+  "assets/vfx/skills/saber_thunder_fan.png",
+  "assets/vfx/skills/saber_whirlwind.png",
+  "assets/vfx/skills/spear_dragon_spin.png",
+  "assets/vfx/skills/spear_overlord.png",
+  "assets/vfx/skills/spear_starfall.png",
+  "assets/vfx/skills/sword_meteor_rain.png",
+  "assets/vfx/skills/sword_taiji_array.png",
+  "assets/vfx/skills/sword_ten_thousand.png",
+  "assets/vfx/skills/tao_fire_dragon.png",
+  "assets/vfx/skills/tao_five_thunder.png",
+  "assets/vfx/skills/tao_ice_array.png"
 ];
 
 self.addEventListener("install",event=>{
