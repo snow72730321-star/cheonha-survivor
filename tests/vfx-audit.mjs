@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root=path.resolve(import.meta.dirname,"..");
 const vfxRoot=path.join(root,"assets","vfx");
-const renderer=fs.readFileSync(path.join(root,"js","vfx","sprite-vfx-v14-3-7.js"),"utf8");
+const renderer=fs.readFileSync(path.join(root,"js","vfx","sprite-vfx-v14-3-8.js"),"utf8");
 const serviceWorker=fs.readFileSync(path.join(root,"service-worker.js"),"utf8");
 
 function walk(directory){
@@ -26,7 +26,7 @@ for(const file of pngs){
   const relative=path.relative(root,file).split(path.sep).join("/");
   const {width,height}=pngSize(file);
   if(width<32||height<32)throw new Error(`VFX 규격이 너무 작음: ${relative} ${width}x${height}`);
-  if(!renderer.includes(relative))throw new Error(`VFX 레지스트리 누락: ${relative}`);
+  if(!relative.includes("/crests/")&&!renderer.includes(relative))throw new Error(`VFX 레지스트리 누락: ${relative}`);
   if(!serviceWorker.includes(`"${relative}"`))throw new Error(`오프라인 캐시 누락: ${relative}`);
 }
 

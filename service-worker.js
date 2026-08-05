@@ -1,14 +1,14 @@
 "use strict";
 
-/** v14.3.9 고품질 문파·가문 문장 패치 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-3-9-handcrafted-heraldry";
+/** v14.3.10 캐릭터 프레임 안전 여백 패치 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-3-10-sprite-safe-padding";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
   "js/core/runtime-state.js","js/core/game-events.js","js/core/save-manager.js","js/core/asset-loader.js","js/core/pwa.js","js/core/startup.js",
   "js/data/balance-v14.js","js/data/characters-meta.js",
   "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
-  "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster.js",
+  "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster-v14-3-10.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js",
   "js/audio/audio-manager-v14-3-8.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-8.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-8.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",

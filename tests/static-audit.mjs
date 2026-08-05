@@ -6,8 +6,9 @@ const html=fs.readFileSync(path.join(root,"index.html"),"utf8");
 const refs=[...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(match=>match[1].split("?")[0]).filter(ref=>!ref.startsWith("http"));
 const missing=refs.filter(ref=>!fs.existsSync(path.join(root,ref)));
 if(missing.length)throw new Error(`누락된 HTML 참조: ${missing.join(", ")}`);
-if(!html.includes('js/audio/audio-manager-v14-3-6.js'))throw new Error("v14.3.6 오디오 엔진이 HTML에 연결되지 않음");
-if(!html.includes('js/vfx/sprite-vfx-v14-3-7.js'))throw new Error("v14.3.7 무공별 VFX 렌더러가 HTML에 연결되지 않음");
+if(!html.includes('js/audio/audio-manager-v14-3-8.js'))throw new Error("v14.3.8 오디오 엔진이 HTML에 연결되지 않음");
+if(!html.includes('js/vfx/sprite-vfx-v14-3-8.js'))throw new Error("v14.3.8 무공별 VFX 렌더러가 HTML에 연결되지 않음");
+if(!html.includes('js/render/sprite-remaster-v14-3-10.js'))throw new Error("v14.3.10 안전 여백 렌더러가 HTML에 연결되지 않음");
 if(html.includes('js/vfx/sprite-vfx-v14-3-6.js'))throw new Error("구형 v14.3.6 VFX 렌더러가 HTML에 남아 있음");
 if(html.includes('js/audio/audio-manager-v14-3-5.js')||html.includes('js/audio/audio-manager-v14-3-4.js')||html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 오디오 엔진이 HTML에 남아 있음");
 
@@ -40,7 +41,7 @@ for(const required of ["GameSpatial.queryCircle","pendingLevelUps","SaveManager"
   if(!combined.includes(required))throw new Error(`필수 개선 코드 누락: ${required}`);
 }
 
-const audioManager=fs.readFileSync(path.join(root,"js/audio/audio-manager-v14-3-6.js"),"utf8");
+const audioManager=fs.readFileSync(path.join(root,"js/audio/audio-manager-v14-3-8.js"),"utf8");
 for(const required of ["createBufferSource","decodeAudioData","MAX_ACTIVE_VOICES=10","GROUP_LIMITS","PROFILE_CHECK_MS","requestIdleCallback"]){
   if(!audioManager.includes(required))throw new Error(`모바일 오디오 최적화 누락: ${required}`);
 }
@@ -73,5 +74,13 @@ for(const name of sfxFiles){
   if(channels!==2||rate!==44100)throw new Error(`HQ WAV 규격 오류: ${name} (${channels}ch ${rate}Hz)`);
 }
 if(totalBytes>8*1024*1024)throw new Error(`HQ 효과음 총용량 과다: ${(totalBytes/1024/1024).toFixed(2)}MiB`);
+
+for(const folder of ["characters","enemies"]){
+  for(const name of fs.readdirSync(path.join(root,"assets",folder)).filter(name=>name.endsWith(".png"))){
+    const data=fs.readFileSync(path.join(root,"assets",folder,name));
+    const width=data.readUInt32BE(16),height=data.readUInt32BE(20);
+    if(width!==144||height!==176)throw new Error(`스프라이트 안전 여백 규격 오류: ${folder}/${name} ${width}x${height}`);
+  }
+}
 
 console.log(`정적 검사 통과: JS ${jsFiles.length}개, HTML 참조 ${refs.length}개, 오프라인 참조 ${shellRefs.length}개, HQ WAV ${sfxFiles.length}개 ${(totalBytes/1024/1024).toFixed(2)}MiB`);
