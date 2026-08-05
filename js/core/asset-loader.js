@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.3.7-skill-identity-vfx";
+  const BUILD="v14.3.9-handcrafted-heraldry";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const vfxFiles=[
@@ -65,7 +65,15 @@ const GameAssets=(()=>{
     "assets/vfx/skills/sword_ten_thousand.png",
     "assets/vfx/skills/tao_fire_dragon.png",
     "assets/vfx/skills/tao_five_thunder.png",
-    "assets/vfx/skills/tao_ice_array.png"
+    "assets/vfx/skills/tao_ice_array.png",
+    "assets/vfx/crests/sword_crest.png",
+    "assets/vfx/crests/spear_crest.png",
+    "assets/vfx/crests/bow_crest.png",
+    "assets/vfx/crests/poison_crest.png",
+    "assets/vfx/crests/tao_crest.png",
+    "assets/vfx/crests/saber_crest.png",
+    "assets/vfx/crests/katana_crest.png",
+    "assets/vfx/crests/fist_crest.png"
   ];
   const files=[
     ...characterIds.map(id=>`assets/characters/${id}.png`),
