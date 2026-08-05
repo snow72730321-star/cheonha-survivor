@@ -8,7 +8,7 @@ const missing=refs.filter(ref=>!fs.existsSync(path.join(root,ref)));
 if(missing.length)throw new Error(`누락된 HTML 참조: ${missing.join(", ")}`);
 if(!html.includes('js/audio/audio-manager-v14-3-8.js'))throw new Error("v14.3.8 오디오 엔진이 HTML에 연결되지 않음");
 if(!html.includes('js/vfx/sprite-vfx-v14-3-8.js'))throw new Error("v14.3.8 무공별 VFX 렌더러가 HTML에 연결되지 않음");
-if(!html.includes('js/render/sprite-remaster-v14-3-13.js'))throw new Error("v14.3.11 전체 프레임 렌더러가 HTML에 연결되지 않음");
+if(!html.includes('js/render/sprite-remaster-v14-3-14.js'))throw new Error("v14.3.11 전체 프레임 렌더러가 HTML에 연결되지 않음");
 if(html.includes('js/vfx/sprite-vfx-v14-3-6.js'))throw new Error("구형 v14.3.6 VFX 렌더러가 HTML에 남아 있음");
 if(html.includes('js/audio/audio-manager-v14-3-5.js')||html.includes('js/audio/audio-manager-v14-3-4.js')||html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 오디오 엔진이 HTML에 남아 있음");
 
@@ -84,7 +84,7 @@ for(const folder of ["characters","enemies"]){
   }
 }
 
-const spriteRenderer=fs.readFileSync(path.join(root,"js/render/sprite-remaster-v14-3-13.js"),"utf8");
+const spriteRenderer=fs.readFileSync(path.join(root,"js/render/sprite-remaster-v14-3-14.js"),"utf8");
 if(spriteRenderer.includes("row*fh+split"))throw new Error("상하체 분할 source rect가 남아 있음");
 if(spriteRenderer.includes("fh-split"))throw new Error("상하체 분할 렌더링이 남아 있음");
 
