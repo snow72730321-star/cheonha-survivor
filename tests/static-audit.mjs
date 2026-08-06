@@ -79,7 +79,7 @@ for(const folder of ["characters","enemies"]){
   for(const name of fs.readdirSync(path.join(root,"assets",folder)).filter(name=>name.endsWith(".png"))){
     const data=fs.readFileSync(path.join(root,"assets",folder,name));
     const width=data.readUInt32BE(16),height=data.readUInt32BE(20);
-    const expected=folder==="characters"?(["sword.png","spear.png"].includes(name)?[384,512]:[144,208]):[128,160];
+    const expected=folder==="characters"?(["sword.png","spear.png","katana.png"].includes(name)?[384,512]:[144,208]):[128,160];
     if(width!==expected[0]||height!==expected[1])throw new Error(`스프라이트 규격 오류: ${folder}/${name} ${width}x${height}`);
   }
 }
