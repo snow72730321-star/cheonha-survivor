@@ -296,6 +296,8 @@ loop=function fixedTimestepLoop(now){
   let steps=0;
   while(fixedAccumulator>=GameBalance.fixedStep&&steps<GameBalance.maxCatchUpSteps){
     let step=GameBalance.fixedStep;
+    const gameSpeed=Math.max(1,Math.min(3,Number(account.settings?.gameSpeed||1)));
+    step*=gameSpeed;
     if(typeof slowTimer!=="undefined"&&slowTimer>0){slowTimer-=step;step*=slowScale}else if(typeof slowScale!=="undefined")slowScale=1;
     update(step);GameEvents.emit("runtime:tick",{dt:step});fixedAccumulator-=GameBalance.fixedStep;steps++;
   }
@@ -310,6 +312,27 @@ loop=function fixedTimestepLoop(now){
 
 // 중도 포기도 정상 원정으로 집계한다. 캡처 단계에서 기존 메뉴 이동 리스너보다 먼저 실행한다.
 document.getElementById("quitBtn")?.addEventListener("click",()=>finalizeRunStats(false,"quit"),{capture:true});
+
+function syncGameSpeedButton(){
+  const button=document.getElementById("speedBtn");
+  if(!button)return;
+  const speed=Math.max(1,Math.min(3,Number(account.settings?.gameSpeed||1)));
+  button.textContent=`${speed}×`;
+  button.setAttribute("aria-label",`게임 속도 ${speed}배`);
+  button.setAttribute("title",`게임 속도 ${speed}배`);
+}
+
+document.getElementById("speedBtn")?.addEventListener("click",()=>{
+  ensureV6Account();
+  const speeds=[1,1.5,2,3];
+  const current=Number(account.settings?.gameSpeed||1);
+  const index=Math.max(0,speeds.indexOf(current));
+  account.settings.gameSpeed=speeds[(index+1)%speeds.length];
+  saveAccountData();
+  syncGameSpeedButton();
+  if(typeof showMessage==="function")showMessage(`전투 속도 ${account.settings.gameSpeed}배`,.8);
+});
+syncGameSpeedButton();
 
 window.getLastRunReport=()=>lastRunReport;
 window.GameRuntimeV14=Object.freeze({enforcePlayerLimits,finalizeRunStats,buildRunReport});

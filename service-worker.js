@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.3.20 백소린·연하진 컨셉 시트 원본 추출 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-3-20-baek-yeon-source";
+/** v14.3.21 종료 조건·배속 기능 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-3-21-end-speed-fix";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",

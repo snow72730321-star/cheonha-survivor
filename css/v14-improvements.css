@@ -33,3 +33,7 @@ body.left-handed #dodgeBtn,body.left-handed #ultimateBtn{transform-origin:bottom
 .volume-row output{color:var(--gold);font-variant-numeric:tabular-nums}
 .volume-row input[type="range"]{width:100%;accent-color:var(--gold)}
 @media(max-width:520px){.volume-row{grid-template-columns:1fr}.volume-row label{margin-bottom:-4px}}
+
+/* v14.3.21 game speed control */
+.speed-btn{min-width:42px;padding:0 7px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.speed-btn:active{transform:scale(.94)}
