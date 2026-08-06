@@ -8,7 +8,7 @@ const missing=refs.filter(ref=>!fs.existsSync(path.join(root,ref)));
 if(missing.length)throw new Error(`누락된 HTML 참조: ${missing.join(", ")}`);
 if(!html.includes('js/audio/audio-manager-v14-3-8.js'))throw new Error("v14.3.8 오디오 엔진이 HTML에 연결되지 않음");
 if(!html.includes('js/vfx/sprite-vfx-v14-3-8.js'))throw new Error("v14.3.8 무공별 VFX 렌더러가 HTML에 연결되지 않음");
-if(!html.includes('js/render/sprite-remaster-v14-3-16.js'))throw new Error("v14.3.16 동적 전체 프레임 렌더러가 HTML에 연결되지 않음");
+if(!html.includes('js/render/sprite-remaster-v14-3-18.js'))throw new Error("v14.3.18 원본 추출 정규화 렌더러가 HTML에 연결되지 않음");
 if(html.includes('js/vfx/sprite-vfx-v14-3-6.js'))throw new Error("구형 v14.3.6 VFX 렌더러가 HTML에 남아 있음");
 if(html.includes('js/audio/audio-manager-v14-3-5.js')||html.includes('js/audio/audio-manager-v14-3-4.js')||html.includes('js/audio/audio-manager-v14-3-3.js'))throw new Error("구형 오디오 엔진이 HTML에 남아 있음");
 
@@ -79,14 +79,14 @@ for(const folder of ["characters","enemies"]){
   for(const name of fs.readdirSync(path.join(root,"assets",folder)).filter(name=>name.endsWith(".png"))){
     const data=fs.readFileSync(path.join(root,"assets",folder,name));
     const width=data.readUInt32BE(16),height=data.readUInt32BE(20);
-    const expected=folder==="characters"?[144,208]:[128,160];
+    const expected=folder==="characters"?(name==="sword.png"?[384,512]:[144,208]):[128,160];
     if(width!==expected[0]||height!==expected[1])throw new Error(`스프라이트 규격 오류: ${folder}/${name} ${width}x${height}`);
   }
 }
 
-const spriteRenderer=fs.readFileSync(path.join(root,"js/render/sprite-remaster-v14-3-16.js"),"utf8");
+const spriteRenderer=fs.readFileSync(path.join(root,"js/render/sprite-remaster-v14-3-18.js"),"utf8");
 if(spriteRenderer.includes("row*fh+split"))throw new Error("상하체 분할 source rect가 남아 있음");
 if(spriteRenderer.includes("fh-split"))throw new Error("상하체 분할 렌더링이 남아 있음");
-for(const required of ["resolvePlayerSheetMeta","img.naturalWidth/playerSpriteSheetLayout.frames","img.naturalHeight/playerSpriteSheetLayout.directionRows","external-png-assets-dynamic-frame-v14316"]){if(!spriteRenderer.includes(required))throw new Error(`동적 프레임 잘림 보정 누락: ${required}`);}
+for(const required of ["resolvePlayerSheetMeta","img.naturalWidth/playerSpriteSheetLayout.frames","img.naturalHeight/playerSpriteSheetLayout.directionRows","sourceScale=52/meta.frameH","external-png-assets-source-normalized-v14318"]){if(!spriteRenderer.includes(required))throw new Error(`동적 프레임 잘림 보정 누락: ${required}`);}
 
 console.log(`정적 검사 통과: JS ${jsFiles.length}개, HTML 참조 ${refs.length}개, 오프라인 참조 ${shellRefs.length}개, HQ WAV ${sfxFiles.length}개 ${(totalBytes/1024/1024).toFixed(2)}MiB`);
