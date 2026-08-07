@@ -131,3 +131,7 @@ body.left-handed.large-ui #ultimateBtn{transform-origin:bottom left}
   #ultimateBtn .ultimate-weapon-img{width:98px!important;height:66px!important}
   body.left-handed #ultimateBtn{right:auto!important;left:calc(env(safe-area-inset-left) + 78px)!important}
 }
+
+/* v14.4.2: restored combat speed control */
+#speedBtn.speed-btn{display:inline-flex;align-items:center;justify-content:center;min-width:42px;padding:0 8px;font-size:12px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;touch-action:manipulation}
+@media(max-width:390px){#speedBtn.speed-btn{min-width:38px;padding:0 6px;font-size:11px}}

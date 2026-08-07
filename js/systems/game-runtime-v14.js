@@ -142,6 +142,14 @@ levelChoice=function levelChoiceQueued(){
   ui.levelUp.classList.add("show");
 };
 
+/** 전투 밖으로 나갈 때 히든 무공 진행 HUD/레벨업 단서를 반드시 정리한다. */
+function clearHiddenProgressUi(){
+  hiddenHudTimer=0;
+  const root=document.getElementById("hiddenProgressHud");
+  if(root){root.classList.remove("show");root.innerHTML="";}
+  if(ui.hiddenBanner)ui.hiddenBanner.innerHTML="";
+}
+
 /** 가장 진행도가 높은 히든 무공 조건을 전투 HUD에 표시한다. */
 function updateHiddenProgressHud(dt){
   hiddenHudTimer-=dt;if(hiddenHudTimer>0)return;hiddenHudTimer=.2;
@@ -171,7 +179,7 @@ resetGame=function(){
   for(const item of projectiles)GamePools.projectile.release(item);
   for(const item of particles)GamePools.particle.release(item);
   runtimeResetGame.apply(this,arguments);
-  pendingLevelUps=0;runFinalized=false;fixedAccumulator=0;renderAccumulatorMs=0;
+  pendingLevelUps=0;runFinalized=false;fixedAccumulator=0;renderAccumulatorMs=0;clearHiddenProgressUi();syncGameSpeedButton();
   runMetrics=createRunMetrics();runMetrics.startedAt=performance.now();
   player.hitRadius=player.r||14;player.collisionRadius=Math.max(8,(player.r||14)-2);
   player.spriteWidth=48;player.spriteHeight=64;player.spriteOffsetY=-12;player.animationState="idle";
@@ -184,6 +192,7 @@ endGame=function(win,reason=""){
   if(runFinalized)return;
   finalizeRunStats(win,reason||(!win?"defeat":"clear"));
   const result=runtimeEndGame.apply(this,arguments);
+  clearHiddenProgressUi();
   appendRunMetrics();
   return result;
 };
@@ -312,6 +321,8 @@ loop=function fixedTimestepLoop(now){
 
 // 중도 포기도 정상 원정으로 집계한다. 캡처 단계에서 기존 메뉴 이동 리스너보다 먼저 실행한다.
 document.getElementById("quitBtn")?.addEventListener("click",()=>finalizeRunStats(false,"quit"),{capture:true});
+document.getElementById("quitBtn")?.addEventListener("click",clearHiddenProgressUi,{capture:true});
+document.getElementById("menuBtn")?.addEventListener("click",clearHiddenProgressUi,{capture:true});
 
 function syncGameSpeedButton(){
   const button=document.getElementById("speedBtn");

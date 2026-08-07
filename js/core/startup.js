@@ -15,14 +15,15 @@
       if(loaderText)loaderText.textContent=`${done}/${total} · ${src.split("/").pop()}`;
     });
     if(result.failed.length){
-      console.error("누락된 외부 PNG 에셋",result.failed);
-      showSystemToast(`외부 PNG ${result.failed.length}개를 불러오지 못했습니다. 구형 생성 캐릭터는 사용하지 않습니다.`,true);
+      console.error("외부 이미지 에셋 로드 실패",result.failed);
+      const names=result.failed.map(path=>path.split("/").pop()).join(", ");
+      showSystemToast(`이미지 에셋 ${result.failed.length}개 로드 실패: ${names}`,true);
     }else{
-      console.info(`[에셋 렌더러] ${GameAssets.BUILD} · 캐릭터/VFX PNG ${result.total}개 준비 완료`);
+      console.info(`[에셋 렌더러] ${GameAssets.BUILD} · 캐릭터/VFX 이미지 ${result.total}개 준비 완료`);
     }
   }catch(error){
     console.error("에셋 로딩 실패",error);
-    showSystemToast("외부 PNG 에셋 로딩에 실패했습니다. 캐시를 지우고 다시 접속해 주세요.",true);
+    showSystemToast("외부 이미지 에셋 로딩에 실패했습니다. 캐시를 지우고 다시 접속해 주세요.",true);
   }
 
   buildDifficultyMenu();buildWeaponMenu();buildCodex();loadRecords();updateStartButton();updateHud();

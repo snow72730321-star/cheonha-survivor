@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.4.1-hud-forge-weapon-trigger";
+  const BUILD="v14.4.2-speed-hidden-asset-hotfix";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -120,16 +120,25 @@ const GameAssets=(()=>{
     if(pending.has(src))return pending.get(src);
     const instance=image(src);
     const task=new Promise(resolve=>{
+      let settled=false;
+      let retriedRaw=false;
       const finish=ok=>{
-        const result={ok,width:instance.naturalWidth||0,height:instance.naturalHeight||0,url:instance.currentSrc||instance.src};
+        if(settled)return;settled=true;
+        const result={ok,width:instance.naturalWidth||0,height:instance.naturalHeight||0,url:instance.currentSrc||instance.src,path:src,retriedRaw};
         status.set(src,result);
         resolve(result);
       };
-      instance.addEventListener("load",()=>finish(instance.naturalWidth>0),{once:true});
-      instance.addEventListener("error",()=>finish(false),{once:true});
+      const onLoad=()=>finish(instance.naturalWidth>0);
+      const onError=()=>{
+        // Safari/PWA가 assetBuild 쿼리가 붙은 이미지 요청만 간헐적으로 실패하는 경우
+        // 실제 파일의 상대경로를 동일 Image 객체에서 한 번 더 요청한다.
+        if(!retriedRaw){retriedRaw=true;instance.src=src;return;}
+        finish(false);
+      };
+      instance.addEventListener("load",onLoad,{once:false});
+      instance.addEventListener("error",onError,{once:false});
       instance.src=url(src);
-      // 메모리 캐시에서 동기 완료된 브라우저도 처리한다.
-      if(instance.complete)queueMicrotask(()=>finish(instance.naturalWidth>0));
+      if(instance.complete&&instance.naturalWidth)queueMicrotask(onLoad);
     });
     pending.set(src,task);
     return task;
