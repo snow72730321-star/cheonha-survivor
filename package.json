@@ -1,9 +1,0 @@
-{
-  "name": "cheonha-survivor-v14-4",
-  "version": "14.5.0",
-  "private": true,
-  "scripts": {
-    "test": "node tests/static-audit.mjs && node tests/vfx-audit.mjs && node tests/smoke-load.mjs",
-    "check": "find js -name '*.js' -type f -print0 | xargs -0 -n1 node --check && node --check service-worker.js"
-  }
-}
