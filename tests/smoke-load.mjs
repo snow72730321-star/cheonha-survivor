@@ -119,7 +119,7 @@ const assertions=vm.runInContext(`({
   fixed:typeof GameRuntimeV14==="object",
   accountVersion:account.saveVersion
 })`,context);
-if(assertions.version!==14||assertions.skills!==8||assertions.bosses!==1||!assertions.fixed||assertions.accountVersion!==14){
+if(assertions.version!==15||assertions.skills!==8||assertions.bosses!==1||!assertions.fixed||assertions.accountVersion!==15){
   throw new Error(`부팅 검증 실패: ${JSON.stringify(assertions)}`);
 }
 

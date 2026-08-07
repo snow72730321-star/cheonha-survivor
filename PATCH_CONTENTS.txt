@@ -1,0 +1,21 @@
+v14.4.0 changed files
+service-worker.js
+package.json
+README.md
+index.html
+PATCH_V14_4_0_WEAPON_IDENTITY_KO.md
+css/v14-improvements.css
+tests/smoke-load.mjs
+assets/weapons/bow.svg
+assets/weapons/poison.svg
+assets/weapons/katana.svg
+assets/weapons/tao.svg
+assets/weapons/fist.svg
+assets/weapons/saber.svg
+assets/weapons/sword.svg
+assets/weapons/spear.svg
+js/core/save-manager.js
+js/core/asset-loader.js
+js/systems/forge-v13.js
+js/systems/storage-forge.js
+js/render/weapon-visuals-v14-4.js

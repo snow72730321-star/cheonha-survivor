@@ -8,7 +8,7 @@ const SaveManager=(()=>{
   const SAVE_KEY="murimAccountV1";
   const BACKUP_KEY="murimAccountV1.backup";
   const RECORD_KEY="murimSurvivorV2";
-  const VERSION=14;
+  const VERSION=15;
   let lastToastTimer=0;
 
   const finite=(value,fallback=0,min=-Infinity,max=Infinity)=>{
@@ -61,6 +61,8 @@ const SaveManager=(()=>{
     return {
       id:safeId(item?.id,`recovered-${Date.now()}-${index}`),
       weapon,
+      visualId:safeId(item?.visualId,weapon),
+      element:safeId(item?.element,ability),
       grade,
       name:safeString(item?.name,`${oreTypes[ability].name} ${weaponDefs[weapon].name}`,80),
       damageMul:finite(item?.damageMul,1,0.1,100),

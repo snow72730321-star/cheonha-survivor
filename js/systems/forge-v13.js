@@ -15,7 +15,7 @@
  * - menu-codex.js: applyForgedWeapon
  */
 (function installForgeV13(){
-  const BUILD = 14;
+  const BUILD = 15;
   const ENHANCE_CHANCE = [1, .95, .90, .85, .80, .70, .60, .50, .40, .30, .22, .16, .11, .07, .04];
   const POTENTIAL_ORDER = ["rare", "epic", "unique", "legendary"];
   const POTENTIAL_NAMES = {rare:"희귀",epic:"서사",unique:"고유",legendary:"전설"};
@@ -48,6 +48,8 @@
       item.baseDamageMul = (Number(item.damageMul)||1) / enhancementMultiplier(item.level);
     }
     item.damageMul = item.baseDamageMul * enhancementMultiplier(item.level);
+    item.visualId = (window.WeaponVisuals?.families?.[item.visualId] ? item.visualId : item.weapon);
+    item.element = (window.WeaponVisuals?.elements?.[item.element] ? item.element : item.ability);
     item.potentialGrade = POTENTIAL_ORDER.includes(item.potentialGrade) ? item.potentialGrade : "rare";
     const maxGrade = maxPotentialGrade(item);
     if(POTENTIAL_ORDER.indexOf(item.potentialGrade) > POTENTIAL_ORDER.indexOf(maxGrade)) item.potentialGrade = maxGrade;
@@ -156,7 +158,7 @@
         <button class="forge-tab" data-forge-tab="codex">단조 도감</button>
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
-        <div class="anvil-scene" id="anvilScene"><div class="forge-fire"></div><div class="anvil-body"></div><div class="anvil-weapon" id="anvilWeapon">무기</div><div class="anvil-hammer"></div><div class="forge-sparks"></div></div>
+        <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="forge-fire"></div><div class="anvil-weapon" id="anvilWeapon"><img class="anvil-weapon-img" alt="무기"></div><div class="anvil-hammer asset-hammer"></div><div class="forge-sparks"></div><div class="forge-impact-flash"></div></div>
         <div class="forge-rate-card"><div><b id="enhanceLevel">+0 → +1</b><small>강화 단계</small></div><div><b id="enhanceRate">100%</b><small>최종 성공률</small></div><div><b id="enhanceCost">80</b><small>필요 금자</small></div></div>
         <div class="forge-result-message" id="enhanceMessage">무기를 모루 위에 올렸다.</div>
         <button class="primary" id="enhanceExecute" type="button">망치를 내리친다</button>
@@ -199,7 +201,8 @@
     const root=detailOverlay(), gd=gradeDefs.find(g=>g.id===item.grade);
     root.querySelector("#forgeDetailName").innerHTML=`<span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span>`;
     root.querySelector("#forgeDetailPower").textContent=`${item.damageMul.toFixed(2)}x · +${item.level}`;
-    root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
+    if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
+    else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
     root.querySelector("#enhanceLevel").textContent=item.level>=15?"최대 강화":`+${item.level} → +${item.level+1}`;
     root.querySelector("#enhanceRate").textContent=item.level>=15?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
     root.querySelector("#enhanceCost").textContent=item.level>=15?"-":enhanceCost(item);
@@ -275,7 +278,7 @@
     const before=new Set((account.weapons||[]).map(x=>x.id));
     legacyForgeWeapon();
     const made=(account.weapons||[]).find(x=>!before.has(x.id));
-    if(made){normalizeWeapon(made);account.forgeCodex[made.ability]=true;saveAccountData();refreshForge();GameAudio.playUI("forge-complete");setTimeout(()=>GameAudio.playUI("forge-complete-tail"),85)}
+    if(made){normalizeWeapon(made);made.visualId=made.visualId||made.weapon;made.element=made.element||made.ability;account.forgeCodex[made.ability]=true;saveAccountData();refreshForge();GameAudio.playUI("forge-complete");setTimeout(()=>GameAudio.playUI("forge-complete-tail"),85)}
   };
 
   // 단조 버튼은 meta-menus-events.js에서 현재 window.forgeWeapon을 호출하도록 연결된다.

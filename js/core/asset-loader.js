@@ -8,9 +8,10 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.3.24-directional-forge-reward-balance";
+  const BUILD="v14.4.0-weapon-identity";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
+  const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const vfxFiles=[
     "assets/vfx/common/beam_blue.png",
     "assets/vfx/common/beam_red.png",
@@ -79,6 +80,7 @@ const GameAssets=(()=>{
     ...characterIds.map(id=>`assets/characters/${id}.png`),
     ...characterIds.map(id=>`assets/portraits/${id}.png`),
     ...enemyIds.map(id=>`assets/enemies/${id}.png`),
+    ...weaponVisualIds.map(id=>`assets/weapons/${id}.svg`),
     // 발동형 무공과 보스 패턴도 캐릭터와 동일한 공유 Image 저장소를 사용한다.
     ...vfxFiles
   ];
