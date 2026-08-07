@@ -1,10 +1,14 @@
 "use strict";
-/** v14.4 무기 아이덴티티 비주얼 레이어 */
+/** v14.5 무기 아이덴티티 · 고해상도 마스터 아트 레이어 */
 const WeaponVisuals=(()=>{
   const families={
     sword:{name:"검",asset:"assets/weapons/sword.svg"},spear:{name:"창",asset:"assets/weapons/spear.svg"},bow:{name:"활",asset:"assets/weapons/bow.svg"},
     poison:{name:"암기",asset:"assets/weapons/poison.svg"},tao:{name:"법기",asset:"assets/weapons/tao.svg"},saber:{name:"박도",asset:"assets/weapons/saber.svg"},
     katana:{name:"왜도",asset:"assets/weapons/katana.svg"},fist:{name:"권갑",asset:"assets/weapons/fist.svg"}
+  };
+  const rarities={
+    common:{name:"일반",color:"#c7cbd0",glow:3},rare:{name:"희귀",color:"#63b9ff",glow:5},epic:{name:"서사",color:"#b77cff",glow:7},
+    unique:{name:"고유",color:"#ffd86b",glow:9},legendary:{name:"전설",color:"#ff9c4a",glow:12},mythic:{name:"신화",color:"#ff5c78",glow:15},eternal:{name:"영원",color:"#f4f0ff",glow:18}
   };
   const elements={
     han:{name:"한철",color:"#e8f0f7",filter:"brightness(1.05) saturate(.72)"},
@@ -33,6 +37,7 @@ const WeaponVisuals=(()=>{
     const id=typeof itemOrFamily==="string"?itemOrFamily:normalize(itemOrFamily)?.visualId;
     return family(id||selectedWeapon||"sword").asset;
   }
+  function rarity(item){return rarities[item?.grade]||rarities.common}
   function resonance(item){
     const lines=item?.potentials||[];let off=0,def=0,score=0;
     const offensive=new Set(["damage","crit","critDamage","boss","attackSpeed","cooldown","area","projectile","pierce"]);
@@ -42,9 +47,9 @@ const WeaponVisuals=(()=>{
   }
   function decorate(node,item,fallbackFamily){
     if(!node)return;
-    item=normalize(item);const el=element(item),lv=tier(item),wid=item?.visualId||fallbackFamily||selectedWeapon||"sword";
-    node.style.setProperty("--weapon-aura",el.color);node.dataset.weaponTier=String(lv);node.dataset.weaponElement=item?.element||"han";node.dataset.weaponFamily=wid;
-    const img=node.querySelector("img");if(img){img.src=asset(item||wid);img.alt=`${family(wid).name} 무기`;img.style.filter=el.filter+` drop-shadow(0 0 ${4+lv*4}px ${el.color})`}
+    item=normalize(item);const el=element(item),lv=tier(item),wid=item?.visualId||fallbackFamily||selectedWeapon||"sword",rar=rarity(item);
+    node.style.setProperty("--weapon-aura",el.color);node.style.setProperty("--weapon-rarity",rar.color);node.dataset.weaponTier=String(lv);node.dataset.weaponElement=item?.element||"han";node.dataset.weaponFamily=wid;node.dataset.weaponRarity=item?.grade||"common";
+    const img=node.querySelector("img");if(img){img.src=asset(item||wid);img.alt=`${family(wid).name} 무기`;img.style.filter=el.filter+` drop-shadow(0 5px 4px rgba(0,0,0,.68)) drop-shadow(0 0 ${4+rar.glow+lv*3}px ${el.color})`}
   }
   function renderAnvilWeapon(node,item){
     if(!node||!item)return;normalize(item);const el=element(item),lv=tier(item),res=resonance(item);
@@ -79,7 +84,7 @@ const WeaponVisuals=(()=>{
     }
     ctx.restore();
   }
-  return {families,elements,normalize,equipped,family,element,tier,asset,resonance,decorate,renderAnvilWeapon,updateUltimateButton,drawAuraLayer};
+  return {families,elements,rarities,normalize,equipped,family,element,rarity,tier,asset,resonance,decorate,renderAnvilWeapon,updateUltimateButton,drawAuraLayer};
 })();
 
 // 기존 절기 HUD와 플레이어 렌더러를 파괴하지 않고 비주얼만 덧씌운다.

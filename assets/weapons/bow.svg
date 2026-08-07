@@ -1,9 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256" viewBox="0 0 512 256">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512" role="img" aria-label="활 마스터 무기">
 <defs>
- <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#707a86"/><stop offset=".25" stop-color="#e9edf2"/><stop offset=".55" stop-color="#aeb8c4"/><stop offset=".8" stop-color="#f7f8f9"/><stop offset="1" stop-color="#65717e"/></linearGradient>
- <linearGradient id="darksteel" x1="0" x2="1"><stop stop-color="#242a31"/><stop offset=".48" stop-color="#7d8793"/><stop offset=".7" stop-color="#2e343b"/><stop offset="1" stop-color="#111519"/></linearGradient>
- <linearGradient id="gold" x1="0" x2="1"><stop stop-color="#725223"/><stop offset=".35" stop-color="#e4c06a"/><stop offset=".62" stop-color="#fff0a3"/><stop offset="1" stop-color="#8c6628"/></linearGradient>
- <linearGradient id="wood" x1="0" x2="1"><stop stop-color="#2d1a11"/><stop offset=".5" stop-color="#74503a"/><stop offset="1" stop-color="#25150e"/></linearGradient>
- <filter id="shadow"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feOffset dy="5"/><feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-<g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-8 256 128)"><path d="M118 43 C275 63 350 92 409 128 C350 164 275 193 118 213" fill="none" stroke="url(#wood)" stroke-width="22"/><path d="M122 49 C250 73 335 99 397 128 C335 157 250 183 122 207" fill="none" stroke="url(#gold)" stroke-width="5"/><path d="M120 49 L202 128 L120 207" fill="none" stroke="#d9d6c6" stroke-width="3"/><path d="M202 128 L442 128" stroke="url(#steel)" stroke-width="6"/><path d="M442 128 L417 117 L421 128 L417 139 Z" fill="url(#steel)"/><path d="M193 110 L219 128 L193 146" fill="none" stroke="url(#gold)" stroke-width="8"/></g></g></svg>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#161d24"/><stop offset=".12" stop-color="#7c8997"/><stop offset=".29" stop-color="#f7fbff"/><stop offset=".43" stop-color="#8996a4"/><stop offset=".58" stop-color="#dce5ed"/><stop offset=".76" stop-color="#4a5663"/><stop offset="1" stop-color="#11171d"/></linearGradient>
+  <linearGradient id="steelEdge" x1="0" x2="1"><stop stop-color="#7f8d9a"/><stop offset=".18" stop-color="#fff"/><stop offset=".5" stop-color="#b9c6d0"/><stop offset=".8" stop-color="#f9fbff"/><stop offset="1" stop-color="#596574"/></linearGradient>
+  <linearGradient id="blackSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07090d"/><stop offset=".2" stop-color="#313a45"/><stop offset=".46" stop-color="#0d1218"/><stop offset=".72" stop-color="#4e5964"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c270c"/><stop offset=".17" stop-color="#9d6c25"/><stop offset=".38" stop-color="#f2cf70"/><stop offset=".55" stop-color="#fff0a8"/><stop offset=".75" stop-color="#b77a28"/><stop offset="1" stop-color="#42290c"/></linearGradient>
+  <linearGradient id="jade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123329"/><stop offset=".35" stop-color="#3e8e70"/><stop offset=".62" stop-color="#9adac0"/><stop offset="1" stop-color="#16382c"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#140b08"/><stop offset=".18" stop-color="#4f2b1d"/><stop offset=".5" stop-color="#99603a"/><stop offset=".72" stop-color="#4d2a1a"/><stop offset="1" stop-color="#130a07"/></linearGradient>
+  <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#180b08"/><stop offset=".3" stop-color="#743b28"/><stop offset=".54" stop-color="#b06a47"/><stop offset=".8" stop-color="#4c241a"/><stop offset="1" stop-color="#130908"/></linearGradient>
+  <radialGradient id="gem"><stop stop-color="#fffbe4"/><stop offset=".18" stop-color="#9ee9ff"/><stop offset=".45" stop-color="#3f8fb1"/><stop offset="1" stop-color="#163244"/></radialGradient>
+  <pattern id="damascus" width="36" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><path d="M-8 5 Q8 -2 24 5 T56 5M-8 15 Q8 8 24 15 T56 15" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2"/></pattern>
+  <pattern id="wrap" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V20" stroke="#d5a570" stroke-width="5"/><path d="M8 0V20" stroke="#5b2e21" stroke-width="5"/></pattern>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+</defs><ellipse cx="512" cy="420" rx="370" ry="38" fill="#000" opacity=".22" filter="url(#soft)"/><g filter="url(#shadow)" transform="rotate(-6 512 256)">
+<path d="M246 78 C521 107 690 169 805 256 C689 343 520 405 246 434" fill="none" stroke="#160d08" stroke-width="52"/>
+<path d="M250 84 C508 115 673 174 792 256 C673 338 508 397 250 428" fill="none" stroke="url(#wood)" stroke-width="43"/>
+<path d="M258 94 C495 124 650 178 769 256 C650 334 495 388 258 418" fill="none" stroke="url(#gold)" stroke-width="8"/>
+<path d="M255 95 L412 256 L255 417" fill="none" stroke="#e7e1d0" stroke-width="5"/><path d="M411 256 H904" stroke="url(#steelEdge)" stroke-width="11"/>
+<path d="M904 256 L852 233 L866 256 L852 279 Z" fill="url(#steel)" stroke="#f6fbff" stroke-width="4"/>
+<path d="M391 218 L444 256 L391 294" fill="none" stroke="url(#gold)" stroke-width="18"/><circle cx="410" cy="256" r="14" fill="url(#gem)" stroke="#e9c66f" stroke-width="6"/>
+<path d="M311 130 C471 157 625 202 729 256" fill="none" stroke="#f0d783" stroke-width="3" stroke-dasharray="14 13" opacity=".58"/>
+<path d="M311 382 C471 355 625 310 729 256" fill="none" stroke="#f0d783" stroke-width="3" stroke-dasharray="14 13" opacity=".58"/>
+</g></svg>

@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.4.2 무기 아이덴티티·강화 오오라 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-4-2-speed-hidden-asset-hotfix";
+/** v14.5.0 마스터 아트 리마스터 오프라인 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-5-0-master-art-remaster";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",

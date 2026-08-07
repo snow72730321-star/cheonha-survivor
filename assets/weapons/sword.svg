@@ -1,9 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256" viewBox="0 0 512 256">
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512" role="img" aria-label="검 마스터 무기">
 <defs>
- <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#707a86"/><stop offset=".25" stop-color="#e9edf2"/><stop offset=".55" stop-color="#aeb8c4"/><stop offset=".8" stop-color="#f7f8f9"/><stop offset="1" stop-color="#65717e"/></linearGradient>
- <linearGradient id="darksteel" x1="0" x2="1"><stop stop-color="#242a31"/><stop offset=".48" stop-color="#7d8793"/><stop offset=".7" stop-color="#2e343b"/><stop offset="1" stop-color="#111519"/></linearGradient>
- <linearGradient id="gold" x1="0" x2="1"><stop stop-color="#725223"/><stop offset=".35" stop-color="#e4c06a"/><stop offset=".62" stop-color="#fff0a3"/><stop offset="1" stop-color="#8c6628"/></linearGradient>
- <linearGradient id="wood" x1="0" x2="1"><stop stop-color="#2d1a11"/><stop offset=".5" stop-color="#74503a"/><stop offset="1" stop-color="#25150e"/></linearGradient>
- <filter id="shadow"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feOffset dy="5"/><feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-<g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-13 256 128)"><path d="M96 150 L350 78 L410 76 L361 107 L112 176 Z" fill="url(#steel)" stroke="#dfe7ee" stroke-width="3"/><path d="M112 157 L353 91" stroke="#fff" opacity=".55" stroke-width="3"/><path d="M91 143 L131 181" stroke="url(#gold)" stroke-width="14"/><rect x="62" y="155" width="62" height="24" rx="9" fill="url(#wood)" stroke="#bc9153" stroke-width="3"/><circle cx="64" cy="167" r="10" fill="url(#gold)"/><path d="M342 83 L394 80 L352 99 Z" fill="#fff" opacity=".38"/></g></g></svg>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#161d24"/><stop offset=".12" stop-color="#7c8997"/><stop offset=".29" stop-color="#f7fbff"/><stop offset=".43" stop-color="#8996a4"/><stop offset=".58" stop-color="#dce5ed"/><stop offset=".76" stop-color="#4a5663"/><stop offset="1" stop-color="#11171d"/></linearGradient>
+  <linearGradient id="steelEdge" x1="0" x2="1"><stop stop-color="#7f8d9a"/><stop offset=".18" stop-color="#fff"/><stop offset=".5" stop-color="#b9c6d0"/><stop offset=".8" stop-color="#f9fbff"/><stop offset="1" stop-color="#596574"/></linearGradient>
+  <linearGradient id="blackSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07090d"/><stop offset=".2" stop-color="#313a45"/><stop offset=".46" stop-color="#0d1218"/><stop offset=".72" stop-color="#4e5964"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c270c"/><stop offset=".17" stop-color="#9d6c25"/><stop offset=".38" stop-color="#f2cf70"/><stop offset=".55" stop-color="#fff0a8"/><stop offset=".75" stop-color="#b77a28"/><stop offset="1" stop-color="#42290c"/></linearGradient>
+  <linearGradient id="jade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123329"/><stop offset=".35" stop-color="#3e8e70"/><stop offset=".62" stop-color="#9adac0"/><stop offset="1" stop-color="#16382c"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#140b08"/><stop offset=".18" stop-color="#4f2b1d"/><stop offset=".5" stop-color="#99603a"/><stop offset=".72" stop-color="#4d2a1a"/><stop offset="1" stop-color="#130a07"/></linearGradient>
+  <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#180b08"/><stop offset=".3" stop-color="#743b28"/><stop offset=".54" stop-color="#b06a47"/><stop offset=".8" stop-color="#4c241a"/><stop offset="1" stop-color="#130908"/></linearGradient>
+  <radialGradient id="gem"><stop stop-color="#fffbe4"/><stop offset=".18" stop-color="#9ee9ff"/><stop offset=".45" stop-color="#3f8fb1"/><stop offset="1" stop-color="#163244"/></radialGradient>
+  <pattern id="damascus" width="36" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><path d="M-8 5 Q8 -2 24 5 T56 5M-8 15 Q8 8 24 15 T56 15" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2"/></pattern>
+  <pattern id="wrap" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V20" stroke="#d5a570" stroke-width="5"/><path d="M8 0V20" stroke="#5b2e21" stroke-width="5"/></pattern>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+</defs><ellipse cx="512" cy="420" rx="370" ry="38" fill="#000" opacity=".22" filter="url(#soft)"/><g filter="url(#shadow)" transform="rotate(-12 512 256)">
+<path d="M176 335 L690 164 Q720 147 758 150 L884 161 L774 211 L207 370 Z" fill="url(#steel)" stroke="#dce7f2" stroke-width="5"/>
+<path d="M217 343 L717 184 L846 171 L762 201 L224 359 Z" fill="url(#damascus)"/>
+<path d="M230 344 L711 190" stroke="#fff" stroke-opacity=".62" stroke-width="5"/>
+<path d="M183 321 L245 385" stroke="url(#gold)" stroke-width="27"/><path d="M192 326 L236 375" stroke="#fff0aa" stroke-opacity=".35" stroke-width="5"/>
+<rect x="87" y="337" width="131" height="45" rx="18" fill="url(#leather)" stroke="#2a140e" stroke-width="5"/><rect x="91" y="340" width="122" height="39" rx="16" fill="url(#wrap)" opacity=".82"/>
+<circle cx="91" cy="359" r="22" fill="url(#gold)" stroke="#281805" stroke-width="5"/><circle cx="91" cy="359" r="8" fill="url(#gem)"/>
+<path d="M320 322 C405 286 513 255 600 231" stroke="#d7b75e" stroke-width="3" stroke-dasharray="18 13" opacity=".65"/>
+<path d="M625 210 l25 8 -18 17 -26-5z" fill="url(#gold)" opacity=".9"/><path d="M653 201 l22 7 -16 16 -23-5z" fill="url(#gold)" opacity=".65"/>
+</g></svg>
