@@ -37,7 +37,7 @@ const CombatProgressionV1431=(()=>{
   resetGame=function(){
     baseResetGame.apply(this,arguments);
     player.forgedCombatPower=forgedPower(player.forgedWeapon);
-    player.dynamicThreat=1+Math.min(.58,(player.forgedCombatPower-1)*.34);
+    player.dynamicThreat=1+Math.min(.24,(player.forgedCombatPower-1)*.14);
     player.skillWarmup=0;
     player.metrics.eliteTraitKills=0;
     const extra=Math.round((player.dynamicThreat-1)*100);
@@ -69,7 +69,7 @@ const CombatProgressionV1431=(()=>{
     const before=enemies.length,result=baseSpawnEnemy.apply(this,arguments),entity=enemies[before];
     if(!entity||["midboss","boss"].includes(type))return result;
     const rank=difficultyDefs[selectedDifficulty].rank,late=latePhase();
-    const extraChance=.012+late*(.08+rank*.012)+(threatFactor()-1)*.035;
+    const extraChance=.012+late*(.08+rank*.012)+(threatFactor()-1)*.02;
     if(Math.random()<extraChance){
       const trait=TRAITS[Math.floor(Math.random()*TRAITS.length)];
       applyTrait(entity,trait);

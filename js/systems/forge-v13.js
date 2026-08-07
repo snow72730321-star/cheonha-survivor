@@ -15,7 +15,7 @@
  * - menu-codex.js: applyForgedWeapon
  */
 (function installForgeV13(){
-  const BUILD = 13;
+  const BUILD = 14;
   const ENHANCE_CHANCE = [1, .95, .90, .85, .80, .70, .60, .50, .40, .30, .22, .16, .11, .07, .04];
   const POTENTIAL_ORDER = ["rare", "epic", "unique", "legendary"];
   const POTENTIAL_NAMES = {rare:"희귀",epic:"서사",unique:"고유",legendary:"전설"};
@@ -26,7 +26,7 @@
   /** 강화 단계에 따른 총 피해 배율. 기존 제작 품질과 곱해진다. */
   function enhancementMultiplier(level){
     let value = 1;
-    for(let i=1;i<=level;i++) value *= 1 + (i%5===0 ? .065 : .038);
+    for(let i=1;i<=level;i++) value *= 1 + (i%5===0 ? .085 : .044);
     return value;
   }
 
@@ -198,7 +198,7 @@
     const item=selectedItem(); if(!item)return;
     const root=detailOverlay(), gd=gradeDefs.find(g=>g.id===item.grade);
     root.querySelector("#forgeDetailName").innerHTML=`<span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span>`;
-    root.querySelector("#forgeDetailPower").textContent=`${item.damageMul.toFixed(2)}x`;
+    root.querySelector("#forgeDetailPower").textContent=`${item.damageMul.toFixed(2)}x · +${item.level}`;
     root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
     root.querySelector("#enhanceLevel").textContent=item.level>=15?"최대 강화":`+${item.level} → +${item.level+1}`;
     root.querySelector("#enhanceRate").textContent=item.level>=15?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
@@ -206,7 +206,7 @@
     root.querySelector("#enhanceExecute").disabled=item.level>=15;
     root.querySelector("#potentialGrade").textContent=`${POTENTIAL_NAMES[item.potentialGrade]} 잠재 · 최대 ${POTENTIAL_NAMES[maxPotentialGrade(item)]}`;
     root.querySelector("#potentialGrade").style.color=POTENTIAL_COLORS[item.potentialGrade];
-    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("");
+    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 효과 발동</p>`;
     root.querySelector("#normalRefine").textContent=`일반 정련 · ${refineCost(item,false)}금자`;
     root.querySelector("#blackRefine").textContent=`흑옥 정련 · ${refineCost(item,true)}금자`;
     root.querySelector("#potentialCompare").innerHTML="";
@@ -299,17 +299,39 @@
     }));
   };
 
+  /** 강화 단계가 단순 피해 배율에 그치지 않도록 +5/+10/+15에서 전투 체감 보너스를 준다. */
+  function applyEnhanceMilestones(item){
+    const lv=Math.max(0,Number(item.level)||0);
+    player.forgeMilestones=[];
+    if(lv>=5){player.damageMul*=1.05;player.ultimateGain*=1.08;player.speed*=1.03;player.forgeMilestones.push("+5 개봉 · 피해 +5% / 절기 충전 +8% / 이동 +3%")}
+    if(lv>=10){player.critChance+=.05;player.cooldownRate*=1.08;player.forgeMilestones.push("+10 진명 · 치명 +5% / 부가 무공 재사용 +8%")}
+    if(lv>=15){player.eliteDamageMul*=1.15;player.ultimateGain*=1.12;player.areaMul*=1.08;player.forgeMilestones.push("+15 신병 · 정예·보스 피해 +15% / 절기 충전 +12% / 범위 +8%")}
+  }
+
+  /** 3줄 잠재의 조합 자체에도 보상을 주어 좋은 잠재를 맞춘 체감이 전투에서 드러나게 한다. */
+  function applyPotentialResonance(item){
+    const lines=item.potentials||[], offensive=new Set(["damage","crit","critDamage","boss","attackSpeed","cooldown","area","projectile","pierce"]), defensive=new Set(["hp","reduction","speed"]);
+    const off=lines.filter(x=>offensive.has(x.key)).length,def=lines.filter(x=>defensive.has(x.key)).length;
+    const gradeScore={rare:1,epic:2,unique:3,legendary:4};
+    const score=lines.reduce((n,x)=>n+(gradeScore[x.grade]||1),0);
+    player.potentialResonance="";
+    if(off>=3){player.damageMul*=1.06;player.ultimateGain*=1.10;player.potentialResonance="살기 공명 · 피해 +6% / 절기 충전 +10%"}
+    else if(def>=2){player.damageReduction=Math.min(.65,player.damageReduction+.04);player.speed*=1.05;player.killHeal+=.2;player.potentialResonance="호신 공명 · 피해 감소 +4% / 이동 +5% / 격파 회복 +0.2"}
+    else if(off>=2){player.critChance+=.035;player.cooldownRate*=1.05;player.potentialResonance="무예 공명 · 치명 +3.5% / 재사용 +5%"}
+    if(score>=10){player.damageMul*=1.04;player.luck+=.10;player.potentialResonance+=(player.potentialResonance?" · ":"")+"고급 잠재 3줄 보너스: 피해 +4% / 행운 +10%"}
+  }
+
   /** 잠재옵션을 실제 플레이어 능력치에 반영한다. */
   function applyPotentialStats(item){
     for(const line of item.potentials||[]){
       switch(line.key){
-        case "damage":player.damageMul*=1+line.value;break;
+        case "damage":player.damageMul*=1+line.value*1.15;break;
         case "crit":player.critChance+=line.value;break;
         case "critDamage":player.critDamage+=line.value;break;
-        case "boss":player.eliteDamageMul*=1+line.value;break;
+        case "boss":player.eliteDamageMul*=1+line.value*1.18;break;
         case "attackSpeed":player.attackSpeedMul*=Math.max(.55,1-line.value);break;
         case "cooldown":player.cooldownRate*=1+line.value;break;
-        case "area":player.areaMul*=1+line.value;break;
+        case "area":player.areaMul*=1+line.value*1.12;break;
         case "hp":player.maxHp+=line.value;player.hp+=line.value;break;
         case "reduction":player.damageReduction=Math.min(.65,player.damageReduction+line.value);break;
         case "projectile":player.projectileBonus+=line.value;break;
@@ -322,7 +344,7 @@
   const legacyApplyForgedWeapon=window.applyForgedWeapon;
   window.applyForgedWeapon=function(){
     legacyApplyForgedWeapon();
-    if(player.forgedWeapon){normalizeWeapon(player.forgedWeapon);applyPotentialStats(player.forgedWeapon)}
+    if(player.forgedWeapon){normalizeWeapon(player.forgedWeapon);applyPotentialStats(player.forgedWeapon);applyEnhanceMilestones(player.forgedWeapon);applyPotentialResonance(player.forgedWeapon)}
   };
 
   // 저장 데이터를 불러오기 전 기본 계정을 덮어쓰지 않는다.
