@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256" viewBox="0 0 512 256">
-<defs>
- <linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#707a86"/><stop offset=".25" stop-color="#e9edf2"/><stop offset=".55" stop-color="#aeb8c4"/><stop offset=".8" stop-color="#f7f8f9"/><stop offset="1" stop-color="#65717e"/></linearGradient>
- <linearGradient id="darksteel" x1="0" x2="1"><stop stop-color="#242a31"/><stop offset=".48" stop-color="#7d8793"/><stop offset=".7" stop-color="#2e343b"/><stop offset="1" stop-color="#111519"/></linearGradient>
- <linearGradient id="gold" x1="0" x2="1"><stop stop-color="#725223"/><stop offset=".35" stop-color="#e4c06a"/><stop offset=".62" stop-color="#fff0a3"/><stop offset="1" stop-color="#8c6628"/></linearGradient>
- <linearGradient id="wood" x1="0" x2="1"><stop stop-color="#2d1a11"/><stop offset=".5" stop-color="#74503a"/><stop offset="1" stop-color="#25150e"/></linearGradient>
- <filter id="shadow"><feGaussianBlur in="SourceAlpha" stdDeviation="4"/><feOffset dy="5"/><feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-</defs>
-<g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round"><g><circle cx="260" cy="128" r="77" fill="#151a20" stroke="url(#gold)" stroke-width="9"/><circle cx="260" cy="128" r="56" fill="none" stroke="url(#steel)" stroke-width="5" opacity=".75"/><path d="M260 69 C226 69 211 100 235 124 C251 140 251 160 230 177 C271 192 309 164 291 134 C279 114 280 92 301 78 C288 72 275 69 260 69Z" fill="url(#darksteel)" stroke="#dde2e8" stroke-width="3"/><circle cx="252" cy="106" r="9" fill="url(#gold)"/><circle cx="274" cy="151" r="9" fill="#d8dde5"/><path d="M161 98 L193 128 L161 158" fill="none" stroke="url(#gold)" stroke-width="10"/><path d="M359 98 L327 128 L359 158" fill="none" stroke="url(#gold)" stroke-width="10"/></g></g></svg>
