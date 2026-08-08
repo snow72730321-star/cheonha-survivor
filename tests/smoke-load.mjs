@@ -234,6 +234,38 @@ console.log("브라우저 스모크 로드 통과",assertions);
 console.log("전투 스모크 테스트 통과",gameplay);
 console.log("신규 무공·동적 난이도 테스트 통과",skillGate);
 
+
+// v14.5.2 후반 안정성 회귀: hazard 수명, XP 병합, 장수명 객체 강제 회수, profiler를 검증한다.
+const lifecycleStress=vm.runInContext(`(()=>{
+  state="playing";GamePerf.reset();
+  hazards=[];fields=[];visuals=[];delayed=[];gems=[];
+  for(let i=0;i<300;i++)hazards.push({type:"puddle",x:player.x+500,y:player.y+500,r:50,life:.04,damage:1,tick:.01,dead:false});
+  updateHazards(.08);compactActive(hazards,h=>!h.dead);
+  const puddlesAfter=hazards.length;
+
+  let xpTotal=0;
+  for(let i=0;i<1800;i++){const value=1+(i%4);xpTotal+=value;gems.push({kind:"xp",x:(i%90)*22,y:Math.floor(i/90)*22,r:5,value,vx:0,vy:0,dead:false})}
+  mergeXpGemsIfNeeded();compactActive(gems,g=>!g.dead);
+  const mergedTotal=gems.reduce((sum,g)=>sum+(g.kind==="xp"?g.value:0),0);
+  const xpCount=gems.filter(g=>g.kind==="xp").length;
+
+  fields.push({x:0,y:0,r:10,life:999,tick:999,damage:0,age:GAME_OBJECT_LIMITS.fieldMaxLife+.01});
+  delayed.push({type:"aoe",x:0,y:0,r:1,damage:0,time:999,age:GAME_OBJECT_LIMITS.delayedMaxLife+.01});
+  addVisual({type:"ring",x:0,y:0,r:1,life:999,max:999});
+  visuals[visuals.length-1].age=GAME_OBJECT_LIMITS.visualMaxLife+.01;
+  hazards.push({type:"unknown",x:0,y:0,dead:false});
+  updateFields(1/60);updateDelayed(1/60);updateVisuals(1/60);updateHazards(1/60);
+  compactActive(fields,f=>f.life>0);compactActive(delayed,d=>d.time>0);compactActive(visuals,v=>v.life>0);compactActive(hazards,h=>!h.dead);
+  GamePerf.tick(.6);
+  return {puddlesAfter,xpCount,xpTotal,mergedTotal,fields:fields.length,delayed:delayed.length,visuals:visuals.length,hazards:hazards.length,perf:GamePerf.snapshot()};
+})()`,context);
+if(lifecycleStress.puddlesAfter!==0||lifecycleStress.xpCount>700||lifecycleStress.xpTotal!==lifecycleStress.mergedTotal||
+   lifecycleStress.fields!==0||lifecycleStress.delayed!==0||lifecycleStress.visuals!==0||lifecycleStress.hazards!==0||
+   lifecycleStress.perf.mergedXp<1||lifecycleStress.perf.culled.fields<1||lifecycleStress.perf.culled.delayed<1||lifecycleStress.perf.culled.visuals<1||lifecycleStress.perf.culled.hazards<1){
+  throw new Error(`후반 객체 수명·XP 병합 스트레스 검증 실패: ${JSON.stringify(lifecycleStress)}`);
+}
+console.log("후반 객체 수명·XP 병합 스트레스 테스트 통과",lifecycleStress);
+
 // v14.3.1 회귀: 전체 절기 컷신이 공개되지 않은 GameAudio.play()를 호출해 즉시 중단되던 오류를 검증한다.
 const ultimateRegression=vm.runInContext(`(()=>{
   state="playing";account.settings.cutsceneMode="full";account.settings.reducedMotion=false;

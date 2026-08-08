@@ -3,6 +3,21 @@ const $=id=>document.getElementById(id),canvas=$("game"),ctx=canvas.getContext("
 const ui={menu:$("menu"),levelUp:$("levelUp"),augment:$("augment"),augmentChoices:$("augmentChoices"),pause:$("pause"),codex:$("codex"),result:$("result"),difficultyGrid:$("difficultyGrid"),weaponGrid:$("weaponGrid"),choices:$("choices"),hiddenBanner:$("hiddenBanner"),pauseContent:$("pauseContent"),codexContent:$("codexContent"),weaponHud:$("weaponHud"),levelText:$("levelText"),timeText:$("timeText"),killText:$("killText"),hpFill:$("hpFill"),xpFill:$("xpFill"),bossWrap:$("bossWrap"),bossFill:$("bossFill"),bossText:$("bossText"),message:$("message"),joystick:$("joystick"),stick:$("stick"),bestKills:$("bestKills"),bestLevel:$("bestLevel"),bestTime:$("bestTime"),pauseWeapon:$("pauseWeapon"),pauseRun:$("pauseRun"),finalStats:$("finalStats"),resultTitle:$("resultTitle"),soundBtn:$("soundBtn"),startBtn:$("startBtn"),goldHud:$("goldHud"),oreHud:$("oreHud"),dodgeHud:$("dodgeHud"),dodgeBtn:$("dodgeBtn"),dodgeCd:$("dodgeCd"),forge:$("forge"),forgeWeapon:$("forgeWeapon"),oreInventory:$("oreInventory"),forgePreview:$("forgePreview"),weaponInventory:$("weaponInventory"),accountGold:$("accountGold"),accountOre:$("accountOre"),accountWeapons:$("accountWeapons"),combatPortrait:$("combatPortrait"),combatPortraitName:$("combatPortraitName")};
 let W=0,H=0,DPR=1,state="menu",last=performance.now(),elapsed=0,spawnTimer=0,bossSpawned=false,boss=null,screenShake=0,flash=0,messageTimer=0,selectedWeapon=null,selectedDifficulty="chuchul",runDuration=300,finalBossAt=240,nextMiniBossAt=60,miniBossCount=0,soundOn=true;
 let enemies=[],projectiles=[],gems=[],particles=[],visuals=[],fields=[],delayed=[],hazards=[],chests=[];
+const GAME_OBJECT_LIMITS=Object.freeze({xpGemsSoft:700,hazardMaxLife:12,fieldMaxLife:12,visualMaxLife:5,delayedMaxLife:8});
+const GamePerf=(()=>{
+  let sampleTimer=0,mergedXp=0;
+  const peaks={enemies:0,projectiles:0,gems:0,particles:0,visuals:0,fields:0,delayed:0,hazards:0,chests:0};
+  const culled={hazards:0,fields:0,visuals:0,delayed:0};
+  function counts(){return {enemies:enemies.length,projectiles:projectiles.length,gems:gems.length,particles:particles.length,visuals:visuals.length,fields:fields.length,delayed:delayed.length,hazards:hazards.length,chests:chests.length}}
+  function sample(){const now=counts();for(const key of Object.keys(peaks))peaks[key]=Math.max(peaks[key],now[key]||0);return now}
+  function tick(dt){sampleTimer-=dt;if(sampleTimer<=0){sampleTimer=.5;sample()}}
+  function noteCull(kind,count=1){if(kind in culled)culled[kind]+=count}
+  function noteXpMerged(count=1){mergedXp+=count}
+  function snapshot(){return {current:sample(),peaks:{...peaks},mergedXp,culled:{...culled}}}
+  function reset(){sampleTimer=0;mergedXp=0;for(const key of Object.keys(peaks))peaks[key]=0;for(const key of Object.keys(culled))culled[key]=0;sample()}
+  return {tick,noteCull,noteXpMerged,snapshot,reset,limits:GAME_OBJECT_LIMITS};
+})();
+window.GamePerf=GamePerf;
 const keys={},pointer={active:false,id:null,ox:0,oy:0,x:0,y:0},move={x:0,y:0};
 const C={sword:"#d8e4e8",spear:"#e2bd77",bow:"#8fc596",poison:"#a47bc0",tao:"#74b9d8",saber:"#d7795f",katana:"#d3d3e9",fist:"#d7aa74"};
 // 난이도 수치는 js/data/balance-v14.js에서 관리한다.
