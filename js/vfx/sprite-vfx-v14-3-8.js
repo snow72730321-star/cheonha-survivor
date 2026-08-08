@@ -277,7 +277,11 @@ drawVisuals=function(){
     const progress=(1-alpha)*Math.max(.18,v.max||.3);
     if(customCentered[v.type]){
       const id=customCentered[v.type],divisor=id==="skillKatanaNameless"?150:id==="skillBowRicochetSeal"?220:id==="skillPoisonLifeDeath"?175:id==="skillTaoFiveThunder"?190:96,scale=Math.max(.34,(v.r||105)/divisor);
-      VFXSprites.draw(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha,blend:id==="skillPoisonMiasma"?"source-over":null});
+      const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.32)*(v.visibilityBoost||1)):Math.min(1,alpha*(v.visibilityBoost||1));
+      VFXSprites.draw(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha:vis,blend:id==="skillPoisonMiasma"?"source-over":null});
+    }else if(v.type==="skillTaoFireDragon"&&v.burst){
+      const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.35)*(v.visibilityBoost||1)):alpha;
+      VFXSprites.draw("skillTaoFireDragon",v.x,v.y,{age:progress,scale:Math.max(.72,(v.r||90)/105),alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.draw("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});

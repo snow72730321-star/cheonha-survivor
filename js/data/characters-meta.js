@@ -3,7 +3,7 @@
 const characterDefs={
  sword:{name:"백소린",title:"화산검희",ultimate:"천검개벽",quote:"일검이 만검을 부른다.",hair:"#22252e",robe:"#e5e7df",accent:"#78aebc"},
  spear:{name:"연하진",title:"철혈창군",ultimate:"파천관일",quote:"창끝이 닿는 곳이 곧 전장이다.",hair:"#4b2c27",robe:"#8b3432",accent:"#d5b46b"},
- bow:{name:"설아린",title:"천산궁녀",ultimate:"일월낙천",quote:"해와 달도 내 시위를 따른다.",hair:"#d9d7ce",robe:"#3e6758",accent:"#e3c06b"},
+ bow:{name:"설아린",title:"천산궁녀",ultimate:"적궁백시",quote:"떨어트린다. 해와 달도, 하늘도.",hair:"#d9d7ce",robe:"#3e6758",accent:"#e3c06b"},
  poison:{name:"당유화",title:"당문독희",ultimate:"만독천라",quote:"보이지 않는 독이 가장 깊다.",hair:"#32243e",robe:"#5c3c68",accent:"#9fc76b"},
  tao:{name:"제갈청",title:"천문도사",ultimate:"구천뇌겁",quote:"하늘의 뜻을 부적으로 명한다.",hair:"#283b49",robe:"#d9ddd6",accent:"#65b6d4"},
  saber:{name:"마련화",title:"녹림도후",ultimate:"천마참",quote:"한 번 휘두르면 산도 갈라진다.",hair:"#3c211e",robe:"#6f302b",accent:"#d77b52"},
@@ -139,7 +139,7 @@ function ultimateAttack(){
    addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 일점 돌파",life:.75,max:.75,color:"#fff0b8"});
  }else if(selectedWeapon==="bow"){
    // v14.5.6: 단발 다중 폭격 대신 10초간 화면 경계를 반사하는 절기 화살장으로 변경.
-   addVisual({type:"skillBowRicochetSeal",x:player.x,y:player.y,r:210,life:1.11,max:1.11,color:"#f6e77d"});
+   addVisual({type:"skillBowRicochetSeal",x:player.x+Math.cos(a)*34,y:player.y+Math.sin(a)*34,a,r:315,life:1.11,max:1.11,color:"#f6e77d",visibilityBoost:1.18,holdAlpha:true});
    delayed.push({time:.72,type:"ricochetVolley",a,count:6,damage:38});
  }else if(selectedWeapon==="poison"){
    fields.push({source:"ultimate",x:player.x,y:player.y,r:Math.max(W,H)*.58,damage:24,life:6.2,tick:.05,color:"#ae72c0"});
