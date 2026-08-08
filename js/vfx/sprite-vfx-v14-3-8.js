@@ -121,11 +121,16 @@ globalThis.VFXSprites=(()=>{
    * 한 프레임을 그린다. age를 넘기면 효과마다 독립적인 프레임 진행을 사용한다.
    * screen=true이면 이미 화면 좌표인 UI/VFX에 사용하고, 기본값은 월드 좌표다.
    */
-  function draw(id,x,y,{age=elapsed,angle=0,scale=1,scaleX=1,scaleY=1,alpha=1,screen=false,frame=null,blend=null,flipX=false,flipY=false}={}){
+  function draw(id,x,y,{age=elapsed,angle=0,scale=1,scaleX=1,scaleY=1,alpha=1,screen=false,frame=null,blend=null,flipX=false,flipY=false,loop=true,fpsOverride=null}={}){
     const def=definitions[id],image=imageFor(id);
     if(!def||!image)return false;
+    const fps=Number.isFinite(fpsOverride)&&fpsOverride>0?fpsOverride:def.fps;
+    const safeAge=Math.max(0,age);
+    const cycle=def.frames/Math.max(.001,fps);
+    if(!loop&&frame===null&&safeAge>=cycle)return false;
     const position=screen?{x,y}:ws(x,y);
-    const index=frame===null?Math.floor(Math.max(0,age)*def.fps)%def.frames:Math.max(0,Math.min(def.frames-1,frame));
+    const rawIndex=Math.floor(safeAge*fps);
+    const index=frame===null?(loop?rawIndex%def.frames:Math.min(def.frames-1,rawIndex)):Math.max(0,Math.min(def.frames-1,frame));
     const z=screen?1:mobileCameraScale();
     const width=def.frameW*scale*scaleX*z;
     const height=def.frameH*scale*scaleY*z;
@@ -139,6 +144,14 @@ globalThis.VFXSprites=(()=>{
     ctx.drawImage(image,index*def.frameW,0,def.frameW,def.frameH,-width/2,-height/2,width,height);
     ctx.restore();
     return true;
+  }
+
+  /**
+   * 스킬용 Flipbook 기본 규칙: 첫 프레임부터 마지막 프레임까지 정확히 한 번만 재생한다.
+   * 연출 시간을 늘릴 때는 fpsOverride(또는 definitions의 fps)를 낮춰 프레임 간격을 늘린다.
+   */
+  function drawOneShot(id,x,y,options={}){
+    return draw(id,x,y,{...options,loop:false});
   }
 
   /** 길이 방향으로 한 장의 텍스처를 늘여 검로·번개 경로·경고선을 표현한다. */
@@ -177,7 +190,7 @@ globalThis.VFXSprites=(()=>{
     }
   }
 
-  return Object.freeze({definitions,files,load,preload,draw,beam,spawn,update,drawEffects,isRed,isPoison,isGold,imageFor});
+  return Object.freeze({definitions,files,load,preload,draw,drawOneShot,beam,spawn,update,drawEffects,isRed,isPoison,isGold,imageFor});
 })();
 
 /* -------------------------------------------------------------------------- */
@@ -288,30 +301,30 @@ drawVisuals=function(){
     if(customCentered[v.type]){
       const id=customCentered[v.type],divisor=id==="skillKatanaNameless"?150:id==="skillBowRicochetSeal"?220:id==="skillPoisonLifeDeath"?175:id==="skillTaoFiveThunder"?190:96,scale=Math.max(.34,(v.r||105)/divisor);
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.32)*(v.visibilityBoost||1)):Math.min(1,alpha*(v.visibilityBoost||1));
-      VFXSprites.draw(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha:vis,blend:id==="skillPoisonMiasma"?"source-over":null});
+      VFXSprites.drawOneShot(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha:vis,blend:id==="skillPoisonMiasma"?"source-over":null});
     }else if(v.type==="skillTaoFireDragon"&&v.burst){
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.35)*(v.visibilityBoost||1)):alpha;
-      VFXSprites.draw("skillTaoFireDragon",v.x,v.y,{age:progress,scale:Math.max(.72,(v.r||90)/105),alpha:vis});
+      VFXSprites.drawOneShot("skillTaoFireDragon",v.x,v.y,{age:progress,scale:Math.max(.72,(v.r||90)/105),alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
-      VFXSprites.draw("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});
+      VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});
     }else if(v.type==="skillPoisonThousand"){
       const a=v.a||0,r=v.r||130,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
-      VFXSprites.draw("skillPoisonThousand",x,y,{age:progress,angle:a,scale:Math.max(.48,r/128),alpha});
+      VFXSprites.drawOneShot("skillPoisonThousand",x,y,{age:progress,angle:a,scale:Math.max(.48,r/128),alpha});
     }else if(v.type==="skillSwordMeteor"){
-      VFXSprites.draw("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.52,(v.r||80)/100),alpha});
+      VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.52,(v.r||80)/100),alpha});
     }else if(v.type==="skillSpearStarfall"){
-      VFXSprites.draw("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.5,(v.r||75)/95),alpha});
+      VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.5,(v.r||75)/95),alpha});
     }else if(["skillSpearOverlord","skillTaoFireDragon","skillKatanaMoonChain","skillFistHundredStep","skillFistDragonReturn"].includes(v.type)){
       const map={skillSpearOverlord:"skillSpearOverlord",skillTaoFireDragon:"skillTaoFireDragon",skillKatanaMoonChain:"skillKatanaMoonChain",skillFistHundredStep:"skillFistHundredStep",skillFistDragonReturn:"skillFistDragonReturn"};
       const id=map[v.type],a=v.a||0,r=v.r||190,x=v.x+Math.cos(a)*r*.4,y=v.y+Math.sin(a)*r*.4;
-      VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.62,r/240),scaleY:Math.max(.65,(v.width||28)/42),alpha,flipX:v.type==="skillSpearOverlord"});
+      VFXSprites.drawOneShot(id,x,y,{age:progress,angle:a,scaleX:Math.max(.62,r/240),scaleY:Math.max(.65,(v.width||28)/42),alpha,flipX:v.type==="skillSpearOverlord"});
     }else if(v.type==="skillSaberMountain"){
       const a=v.a||0,r=v.r||250,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
-      VFXSprites.draw("skillSaberMountain",x,y,{age:progress,angle:a-Math.PI/2,scaleX:Math.max(.52,(v.width||32)/54),scaleY:Math.max(.72,r/260),alpha});
+      VFXSprites.drawOneShot("skillSaberMountain",x,y,{age:progress,angle:a-Math.PI/2,scaleX:Math.max(.52,(v.width||32)/54),scaleY:Math.max(.72,r/260),alpha});
     }else if(v.type==="skillFistIronMountain"){
       const a=v.a||0,r=v.r||95,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
-      VFXSprites.draw("skillFistIronMountain",x,y,{age:progress,angle:a,scale:Math.max(.5,r/115),alpha});
+      VFXSprites.drawOneShot("skillFistIronMountain",x,y,{age:progress,angle:a,scale:Math.max(.5,r/115),alpha});
     }else if(v.type==="namelessCutV1454"){
       // v14.5.4: 구형 무명신풍류 스프라이트 대신 얇고 빠른 발도 참격을 직접 그린다.
       const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),mid=ws((v.x1+v.x2)/2,(v.y1+v.y2)/2);
@@ -324,64 +337,64 @@ drawVisuals=function(){
     }else if(v.type==="line"){
       if(v.source==="mountain"){
         const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2;
-        VFXSprites.draw("skillSaberMountain",x,y,{age:progress,angle:a-Math.PI/2,scaleX:Math.max(.5,(v.width||28)/55),scaleY:Math.max(.7,len/250),alpha});
+        VFXSprites.drawOneShot("skillSaberMountain",x,y,{age:progress,angle:a-Math.PI/2,scaleX:Math.max(.5,(v.width||28)/55),scaleY:Math.max(.7,len/250),alpha});
       }else if(v.source==="moonchain"){
         const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2;
-        VFXSprites.draw("skillKatanaMoonChain",x,y,{age:progress,angle:a,scaleX:Math.max(.45,len/190),scaleY:.72,alpha});
+        VFXSprites.drawOneShot("skillKatanaMoonChain",x,y,{age:progress,angle:a,scaleX:Math.max(.45,len/190),scaleY:.72,alpha});
       }else if(v.source==="nameless"){
         const x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2,a=Math.atan2(v.y2-v.y1,v.x2-v.x1);
-        VFXSprites.draw("skillKatanaNameless",x,y,{age:progress,angle:a,scale:Math.max(.7,Math.hypot(v.x2-v.x1,v.y2-v.y1)/620),alpha});
+        VFXSprites.drawOneShot("skillKatanaNameless",x,y,{age:progress,angle:a,scale:Math.max(.7,Math.hypot(v.x2-v.x1,v.y2-v.y1)/620),alpha});
       }else if(v.source==="overlord"||v.source==="dragonreturn"){
         const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2,id=v.source==="overlord"?"skillSpearOverlord":"skillFistDragonReturn";
-        VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.65,len/300),scaleY:Math.max(.7,(v.width||30)/44),alpha,flipX:id==="skillSpearOverlord"});
+        VFXSprites.drawOneShot(id,x,y,{age:progress,angle:a,scaleX:Math.max(.65,len/300),scaleY:Math.max(.7,(v.width||30)/44),alpha,flipX:id==="skillSpearOverlord"});
       }else VFXSprites.beam(red?"beamRed":"beamBlue",v.x1,v.y1,v.x2,v.y2,Math.max(3,v.width||4),alpha);
     }else if(v.type==="lightning"){
       VFXSprites.beam("beamBlue",v.x1,v.y1,v.x2,v.y2,Math.max(3,(v.width||2)*2.2),alpha);
-      VFXSprites.draw("lightning",v.x2,v.y2,{age:progress,scale:.52+Math.min(.55,(v.width||2)/5),alpha});
+      VFXSprites.drawOneShot("lightning",v.x2,v.y2,{age:progress,scale:.52+Math.min(.55,(v.width||2)/5),alpha});
     }else if(v.type==="cone"){
       // 벽력도법의 실제 부채꼴 판정 VFX. 창기 PNG를 사용하지 않아 화살 모양이 다시 나타나지 않는다.
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
-      VFXSprites.draw("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),scaleY:Math.max(.72,(v.half||.72)/.72),alpha});
+      VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),scaleY:Math.max(.72,(v.half||.72)/.72),alpha});
     }else if(v.type==="marker"&&v.source==="starfall"){
-      VFXSprites.draw("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||35)/42),alpha});
+      VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||35)/42),alpha});
     }else if(v.type==="ring"&&v.source){
       const sourceMap={dragonspin:"skillSpearSpin",lifedeath:"skillPoisonLifeDeath",sunmoon:"skillBowSunMoon",whirlwind:"skillSaberWhirlwind",demon:"skillSaberDemon",zanshin:"skillKatanaZanshin",taijifist:"skillFistTaiji",icearray:"skillTaoIceArray"};
       const id=sourceMap[v.source];
-      if(id){const divisor=id==="skillPoisonLifeDeath"?175:id==="skillTaoIceArray"?118:96;VFXSprites.draw(id,v.x,v.y,{age:progress,scale:Math.max(.38,(v.r||80)/divisor),alpha});}
-      else VFXSprites.draw(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.72});
+      if(id){const divisor=id==="skillPoisonLifeDeath"?175:id==="skillTaoIceArray"?118:96;VFXSprites.drawOneShot(id,v.x,v.y,{age:progress,scale:Math.max(.38,(v.r||80)/divisor),alpha});}
+      else VFXSprites.drawOneShot(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.72});
     }else if(circleTypes.has(v.type)){
       const id=red?"circleRed":"circleBlue";
-      VFXSprites.draw(id,v.x,v.y,{age:elapsed*(v.type==="spiral"||v.type==="helix"?.75:.4),angle:v.a||0,scale:Math.max(.25,(v.r||42)/96),alpha:alpha*(v.type==="marker"?.48:.78)});
-      if(v.type==="ring"||v.type==="marker")VFXSprites.draw(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.62});
+      VFXSprites.drawOneShot(id,v.x,v.y,{age:elapsed*(v.type==="spiral"||v.type==="helix"?.75:.4),angle:v.a||0,scale:Math.max(.25,(v.r||42)/96),alpha:alpha*(v.type==="marker"?.48:.78)});
+      if(v.type==="ring"||v.type==="marker")VFXSprites.drawOneShot(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.62});
     }else if(v.type==="heavyArc"){
-      VFXSprites.draw("skillSaberThunderFan",v.x+Math.cos(v.a||0)*(v.r||72)*.35,v.y+Math.sin(v.a||0)*(v.r||72)*.35,{age:progress,angle:v.a||0,scale:Math.max(.42,(v.r||72)/86),alpha});
+      VFXSprites.drawOneShot("skillSaberThunderFan",v.x+Math.cos(v.a||0)*(v.r||72)*.35,v.y+Math.sin(v.a||0)*(v.r||72)*.35,{age:progress,angle:v.a||0,scale:Math.max(.42,(v.r||72)/86),alpha});
     }else if(slashTypes.has(v.type)){
-      VFXSprites.draw(red?"slashRed":"slashCyan",v.x,v.y,{age:progress,angle:v.a||0,scale:Math.max(.3,(v.r||45)/82),alpha});
+      VFXSprites.drawOneShot(red?"slashRed":"slashCyan",v.x,v.y,{age:progress,angle:v.a||0,scale:Math.max(.3,(v.r||45)/82),alpha});
     }else if(spearTypes.has(v.type)){
-      VFXSprites.draw("spearGold",v.x+Math.cos(v.a||0)*(v.r||70)*.42,v.y+Math.sin(v.a||0)*(v.r||70)*.42,{age:elapsed*.5,angle:v.a||0,scaleX:Math.max(.55,(v.r||70)/120),scaleY:Math.max(.6,(v.width||18)/30),alpha});
+      VFXSprites.drawOneShot("spearGold",v.x+Math.cos(v.a||0)*(v.r||70)*.42,v.y+Math.sin(v.a||0)*(v.r||70)*.42,{age:elapsed*.5,angle:v.a||0,scaleX:Math.max(.55,(v.r||70)/120),scaleY:Math.max(.6,(v.width||18)/30),alpha});
     }else if(v.type==="cross"||v.type==="screenCut"){
       const n=v.count||2;
-      for(let i=0;i<n;i++){const offset=(i-(n-1)/2)*18,angle=(v.a||0)+(i%2?Math.PI/2:0),x=v.x+Math.cos(angle+Math.PI/2)*offset,y=v.y+Math.sin(angle+Math.PI/2)*offset;VFXSprites.draw(red?"slashRed":"slashCyan",x,y,{age:progress,angle,scale:Math.max(.45,(v.r||85)/100),alpha})}
+      for(let i=0;i<n;i++){const offset=(i-(n-1)/2)*18,angle=(v.a||0)+(i%2?Math.PI/2:0),x=v.x+Math.cos(angle+Math.PI/2)*offset,y=v.y+Math.sin(angle+Math.PI/2)*offset;VFXSprites.drawOneShot(red?"slashRed":"slashCyan",x,y,{age:progress,angle,scale:Math.max(.45,(v.r||85)/100),alpha})}
     }else if(v.type==="dragon"||v.type==="dragonBreath"){
-      VFXSprites.draw("dragon",v.x,v.y,{age:elapsed*.45,angle:v.a||0,scaleX:Math.max(.55,(v.r||180)/230),scaleY:.85,alpha});
+      VFXSprites.drawOneShot("dragon",v.x,v.y,{age:elapsed*.45,angle:v.a||0,scaleX:Math.max(.55,(v.r||180)/230),scaleY:.85,alpha});
     }else if(v.type==="cloud"||v.type==="poisonVein"){
-      VFXSprites.draw("skillPoisonMiasma",v.x,v.y,{age:elapsed*.34,scale:Math.max(.28,(v.r||50)/88),alpha:alpha*.74,blend:"source-over"});
+      VFXSprites.drawOneShot("skillPoisonMiasma",v.x,v.y,{age:elapsed*.34,scale:Math.max(.28,(v.r||50)/88),alpha:alpha*.74,blend:"source-over"});
     }else if(v.type==="bowstring"){
-      const a=v.a||0,length=v.r||70;VFXSprites.beam("trailGold",v.x-Math.cos(a)*length*.35,v.y-Math.sin(a)*length*.35,v.x+Math.cos(a)*length*.35,v.y+Math.sin(a)*length*.35,5,alpha*.8);VFXSprites.draw("arrowGreen",v.x+Math.cos(a)*length*.28,v.y+Math.sin(a)*length*.28,{angle:a,scale:.62,alpha});
+      const a=v.a||0,length=v.r||70;VFXSprites.beam("trailGold",v.x-Math.cos(a)*length*.35,v.y-Math.sin(a)*length*.35,v.x+Math.cos(a)*length*.35,v.y+Math.sin(a)*length*.35,5,alpha*.8);VFXSprites.drawOneShot("arrowGreen",v.x+Math.cos(a)*length*.28,v.y+Math.sin(a)*length*.28,{angle:a,scale:.62,alpha});
     }else if(v.type==="feather"){
-      VFXSprites.draw("arrowGreen",v.x,v.y,{angle:v.a||0,scale:Math.max(.25,(v.r||20)/48),alpha});VFXSprites.draw("spark",v.x,v.y,{age:progress,scale:.3,alpha:alpha*.7});
+      VFXSprites.drawOneShot("arrowGreen",v.x,v.y,{angle:v.a||0,scale:Math.max(.25,(v.r||20)/48),alpha});VFXSprites.drawOneShot("spark",v.x,v.y,{age:progress,scale:.3,alpha:alpha*.7});
     }else if(bladeTypes.has(v.type)){
-      if(v.type==="fallingSword"&&v.source==="meteor")VFXSprites.draw("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||30)/44),alpha});
-      else if(v.type==="fallingSword"&&v.source==="starfall")VFXSprites.draw("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||38)/48),alpha});
-      else if(v.type==="fallingSword")VFXSprites.draw("blade",v.x,v.y-(alpha*80),{angle:Math.PI/2,scale:Math.max(.6,(v.width||5)/6),alpha});
+      if(v.type==="fallingSword"&&v.source==="meteor")VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||30)/44),alpha});
+      else if(v.type==="fallingSword"&&v.source==="starfall")VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||38)/48),alpha});
+      else if(v.type==="fallingSword")VFXSprites.drawOneShot("blade",v.x,v.y-(alpha*80),{angle:Math.PI/2,scale:Math.max(.6,(v.width||5)/6),alpha});
       else drawBladeRing(v,alpha);
     }else if(v.type==="impact"||v.type==="crack"||v.type==="earthSplit"||v.type==="fanBurst"){
-      VFXSprites.draw(red?"explosionBlood":gold?"explosionFire":"hitBlue",v.x,v.y,{age:progress,angle:v.a||0,scale:Math.max(.35,(v.r||35)/70),alpha});
+      VFXSprites.drawOneShot(red?"explosionBlood":gold?"explosionFire":"hitBlue",v.x,v.y,{age:progress,angle:v.a||0,scale:Math.max(.35,(v.r||35)/70),alpha});
     }else if(v.type==="focusLine"||v.type==="streak"){
       const length=v.r||100,a=v.a||0;VFXSprites.beam(red?"beamRed":"beamBlue",v.x,v.y,v.x+Math.cos(a)*length,v.y+Math.sin(a)*length,Math.max(3,v.width||3),alpha);
-    }else if(v.type==="poisonMote")VFXSprites.draw("poisonCloud",v.x,v.y,{age:progress,scale:.18+Math.min(.25,(v.r||4)/14),alpha:alpha*.7,blend:"source-over"});
-    else if(v.type==="ember"||v.type==="pressureDot")VFXSprites.draw("spark",v.x,v.y,{age:progress,scale:.22+Math.min(.4,(v.r||4)/12),alpha});
-    else if(v.type==="afterimage")VFXSprites.draw(poison?"poisonCloud":"smoke",v.x,v.y,{age:progress,scale:Math.max(.18,(v.r||16)/48),alpha:alpha*.4,blend:"source-over"});
+    }else if(v.type==="poisonMote")VFXSprites.drawOneShot("poisonCloud",v.x,v.y,{age:progress,scale:.18+Math.min(.25,(v.r||4)/14),alpha:alpha*.7,blend:"source-over"});
+    else if(v.type==="ember"||v.type==="pressureDot")VFXSprites.drawOneShot("spark",v.x,v.y,{age:progress,scale:.22+Math.min(.4,(v.r||4)/12),alpha});
+    else if(v.type==="afterimage")VFXSprites.drawOneShot(poison?"poisonCloud":"smoke",v.x,v.y,{age:progress,scale:Math.max(.18,(v.r||16)/48),alpha:alpha*.4,blend:"source-over"});
     else if(v.type==="text"){const pos=ws(v.x,v.y);ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=v.color||"#fff";ctx.font="bold 13px system-ui";ctx.textAlign="center";ctx.fillText(v.text||"!",pos.x,pos.y-(1-alpha)*22);ctx.restore()}
   }
   VFXSprites.drawEffects();
