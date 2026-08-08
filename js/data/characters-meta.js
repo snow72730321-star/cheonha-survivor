@@ -80,27 +80,84 @@ const baseStartGame=startGame;startGame=function(){baseStartGame();ui.ultimateBt
 const baseEndGame=endGame;endGame=function(win,reason=""){return baseEndGame(win,reason)};
 
 function updateUltimateHud(){if(!ui.ultimateBtn)return;const pct=Math.min(100,Math.floor(player.ultimate||0));ui.ultimateFill.style.height=pct+"%";ui.ultimateCd.textContent=pct+"%";const ratio=pct/100;ui.ultimateBtn.style.setProperty("--ult-progress",String(ratio));ui.ultimateBtn.style.setProperty("--ult-pct",pct+"%");ui.ultimateBtn.style.setProperty("--ult-scale",String(.94+ratio*.08));ui.ultimateBtn.style.setProperty("--ult-brightness",String(.7+ratio*.38));ui.ultimateBtn.style.setProperty("--ult-saturation",String(.72+ratio*.34));ui.ultimateBtn.style.setProperty("--ult-glow-size",(4+ratio*10)+"px");ui.ultimateBtn.style.setProperty("--ult-halo-opacity",String(.28+ratio*.55));ui.ultimateBtn.classList.toggle("ready",pct>=100)}
-function gainUltimate(v){player.ultimate=Math.min(player.ultimateMax,(player.ultimate||0)+v*(player.ultimateGain||1));updateUltimateHud()}
-const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){const before=Math.max(0,e.hp),vi=visuals.length;baseDamageEnemy(e,dmg,source,opt);if(account.settings&&!account.settings.damageNumbers&&visuals.length>vi)for(let i=visuals.length-1;i>=vi;i--)if(visuals[i].type==="text"&&visuals[i].text==="치명")visuals.splice(i,1);const dealt=Math.max(0,before-Math.max(0,e.hp));gainUltimate(Math.min(1.15,dealt*.012))};
-const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){const wasDead=e.dead;baseKillEnemy(e,source,opt);if(!wasDead&&e.dead){gainUltimate(e.type==="boss"?20:e.type==="midboss"?12:e.elitePrefix?3.2:.75);if(e.elitePrefix&&!e.type.includes("boss")){dropGold(e.x,e.y,4+Math.floor(5*player.luck));if(Math.random()<.24+player.luck*.1)dropOre(e.x+7,e.y,1)}}};
+// v14.5.3 절기 충전: 후반 밀집전에서 킬 수가 폭증해도 절기 난사가 되지 않도록
+// 일반 전투 충전은 런 진행도에 따라 완만하게 감쇠하고, 절기 자체 피해/처치는 재충전에 포함하지 않는다.
+function ultimateChargeScale(){
+ const progress=Math.max(0,Math.min(1,elapsed/Math.max(1,runDuration)));
+ if(progress<=.2)return 1;
+ const t=(progress-.2)/.8;
+ return 1-.64*t; // 초반 100% → 종료 직전 36%
+}
+function gainUltimate(v,{ignoreScaling=false}={}){
+ const scale=ignoreScaling?1:ultimateChargeScale();
+ player.ultimate=Math.min(player.ultimateMax,(player.ultimate||0)+v*scale*(player.ultimateGain||1));
+ updateUltimateHud();
+}
+function isUltimateSource(source){return source==="ultimate"||source==="ultimate-dot"}
+const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){
+ const before=Math.max(0,e.hp),vi=visuals.length;
+ baseDamageEnemy(e,dmg,source,opt);
+ if(account.settings&&!account.settings.damageNumbers&&visuals.length>vi)for(let i=visuals.length-1;i>=vi;i--)if(visuals[i].type==="text"&&visuals[i].text==="치명")visuals.splice(i,1);
+ const dealt=Math.max(0,before-Math.max(0,e.hp));
+ // 피해 기반 충전은 보조 수단만 남긴다. 절기 타격으로 절기를 다시 채우는 순환은 금지.
+ if(!isUltimateSource(source)&&dealt>0)gainUltimate(Math.min(.12,dealt*.0012));
+};
+const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
+ const wasDead=e.dead;
+ baseKillEnemy(e,source,opt);
+ if(!wasDead&&e.dead){
+   if(!isUltimateSource(source)){
+     if(e.type==="boss")gainUltimate(18,{ignoreScaling:true});
+     else if(e.type==="midboss")gainUltimate(9,{ignoreScaling:true});
+     else if(e.elitePrefix)gainUltimate(2.4);
+     else gainUltimate(.70);
+   }
+   if(e.elitePrefix&&!e.type.includes("boss")){dropGold(e.x,e.y,4+Math.floor(5*player.luck));if(Math.random()<.24+player.luck*.1)dropOre(e.x+7,e.y,1)}
+ }
+};
 
 // 정예 부여는 combat-progression-v14-3-1.js 한 곳에서만 처리한다. 이중 배율 적용을 방지한다.
 
 function threatNear(){for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y),closing=e.speed*(e.chargeTime>0?2.5:1);if(d<player.r+e.r+36+closing*.12)return true}for(const h of hazards){if(h.dead)continue;if(h.type==="blast"&&h.time<.42&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+35)return true;if(h.type==="orb"&&Math.hypot(h.x-player.x,h.y-player.y)<65)return true;if(h.type==="puddle"&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+18)return true;if(h.type==="cross"&&h.time<.38&&(Math.abs(player.x-h.x)<(h.w||38)+player.r||Math.abs(player.y-h.y)<(h.w||38)+player.r))return true}return false}
-const basePerformDodge=performDodge;performDodge=function(){const can=state==="playing"&&player.dodgeCooldown<=0&&player.dodgeTimer<=0,perfect=can&&threatNear();basePerformDodge();if(perfect){player.metrics.perfectDodges++;player.perfectWindow=1.2;slowTimer=.42;slowScale=.33;gainUltimate(12);showMessage("정밀 회피 · 찰나의 경지",1.1);addVisual({type:"text",x:player.x,y:player.y-30,text:"PERFECT",life:.55,max:.55,color:"#bdeeff"});GameAudio.playSFX("perfect-dodge")}};
+const basePerformDodge=performDodge;performDodge=function(){const can=state==="playing"&&player.dodgeCooldown<=0&&player.dodgeTimer<=0,perfect=can&&threatNear();basePerformDodge();if(perfect){player.metrics.perfectDodges++;player.perfectWindow=1.2;slowTimer=.42;slowScale=.33;gainUltimate(10,{ignoreScaling:true});showMessage("정밀 회피 · 찰나의 경지",1.1);addVisual({type:"text",x:player.x,y:player.y-30,text:"PERFECT",life:.55,max:.55,color:"#bdeeff"});GameAudio.playSFX("perfect-dodge")}};
 const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}baseHurtPlayer(amount)};
 
 function checkEvolution(){const evo=evolutionDefs[selectedWeapon];if(!evo||player.evolutions[selectedWeapon]||!evo.check(player))return;player.evolutions[selectedWeapon]=evo.name;evo.apply(player);showMessage(`무공 진화 · ${evo.name}`,3);screenShake=Math.max(screenShake,shakeValue(14));addVisual({type:"ring",x:player.x,y:player.y,r:180,life:.8,max:.8,color:"#fff0a0",width:10});GameAudio.playUI("evolution")}
 const baseCheckHidden=checkHidden;checkHidden=function(){baseCheckHidden();checkEvolution()};
 
-function ultimateAttack(){const a=facingAngle(),len=Math.max(W,H)*1.25,ch=characterDefs[selectedWeapon];if(selectedWeapon==="sword"){for(let i=0;i<24;i++){const ang=i*Math.PI*2/24,x=player.x+Math.cos(ang)*480,y=player.y+Math.sin(ang)*480;projectile({x,y,vx:-Math.cos(ang)*740,vy:-Math.sin(ang)*740,damage:54,r:7,pierce:7,shape:"sword",color:"#f4fbff",source:"ultimate",ignorePassive:true})}aoe(player.x,player.y,220,88,"ultimate",{color:"#eaf7ff",shake:13})}
- else if(selectedWeapon==="spear"){const sx=player.x-Math.cos(a)*70,sy=player.y-Math.sin(a)*70,ex=player.x+Math.cos(a)*len,ey=player.y+Math.sin(a)*len;lineHit(sx,sy,ex,ey,66,360,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});lineHit(player.x+Math.cos(a)*85,player.y+Math.sin(a)*85,ex,ey,28,185,"ultimate",{color:"#fff4c8",knock:240,shake:8,life:.55});addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 정면 관통 강화",life:.75,max:.75,color:"#fff0b8"})}
- else if(selectedWeapon==="bow"){for(const e of visibleEnemies(10).slice(0,38))delayed.push({time:Math.random()*.68,type:"strike",x:e.x,y:e.y,r:45,damage:78,source:"ultimate",color:"#ffe98a"})}
- else if(selectedWeapon==="poison"){fields.push({x:player.x,y:player.y,r:Math.max(W,H)*.64,damage:34,life:7.5,tick:.05,color:"#ae72c0"});aoe(player.x,player.y,260,68,"poison",{poison:30,poisonTime:8,color:"#ae72c0"})}
- else if(selectedWeapon==="tao"){const targets=visibleEnemies(0);for(let i=0;i<Math.min(34,targets.length);i++){const e=targets[i];delayed.push({time:i*.038,type:"strike",x:e.x,y:e.y,r:40,damage:88,source:"elemental",color:"#9eeaff"})}}
- else if(selectedWeapon==="saber"){for(let i=0;i<6;i++){const ang=i*Math.PI/3;lineHit(player.x-Math.cos(ang)*len*.5,player.y-Math.sin(ang)*len*.5,player.x+Math.cos(ang)*len*.5,player.y+Math.sin(ang)*len*.5,30,102,"ultimate",{color:"#ff7f70",knock:300,shake:10,life:.52})}}
- else if(selectedWeapon==="katana"){for(let i=0;i<16;i++){const ang=(i%6)*Math.PI/3+.12*Math.floor(i/6),off=(i-8)*22,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.038,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:82,damage:56,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}}
- else{addVisual({type:"dragon",x:player.x,y:player.y,a,r:len,life:1,max:1,color:"#ffd86f"});lineHit(player.x,player.y,player.x+Math.cos(a)*len,player.y+Math.sin(a)*len,82,350,"ultimate",{color:"#ffd86f",knock:650,shake:20,life:.85});coneHit(a,Math.min(len*.72,720),.36,170,"ultimate",{color:"#ffeaa8",knock:340,shake:10});aoe(player.x,player.y,145,72,"ultimate",{color:"#ffd86f",knock:220});addVisual({type:"text",x:player.x+Math.cos(a)*95,y:player.y+Math.sin(a)*95-24,text:"항룡 · 정면 적중 강화",life:.75,max:.75,color:"#ffe9a0"})}showMessage(ch.ultimate,1.5)}
+function ultimateAttack(){
+ const a=facingAngle(),len=Math.max(W,H)*1.25,ch=characterDefs[selectedWeapon];
+ // v14.5.3 역할별 절기 밸런스: 검=전방위, 창=직선 폭딜, 활=정밀 다중타격, 독=지속 장악,
+ // 도술=연쇄 섬멸, 박도=광역 횡단, 왜도=연속 참격, 권=근중거리 정면 폭발.
+ if(selectedWeapon==="sword"){
+   for(let i=0;i<20;i++){const ang=i*Math.PI*2/20,x=player.x+Math.cos(ang)*470,y=player.y+Math.sin(ang)*470;projectile({x,y,vx:-Math.cos(ang)*720,vy:-Math.sin(ang)*720,damage:48,r:7,pierce:5,shape:"sword",color:"#f4fbff",source:"ultimate",ignorePassive:true})}
+   aoe(player.x,player.y,235,96,"ultimate",{color:"#eaf7ff",shake:13});
+ }else if(selectedWeapon==="spear"){
+   const sx=player.x-Math.cos(a)*70,sy=player.y-Math.sin(a)*70,ex=player.x+Math.cos(a)*len,ey=player.y+Math.sin(a)*len;
+   lineHit(sx,sy,ex,ey,62,330,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});
+   lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,25,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
+   addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 일점 돌파",life:.75,max:.75,color:"#fff0b8"});
+ }else if(selectedWeapon==="bow"){
+   for(const e of visibleEnemies(10).slice(0,26))delayed.push({time:Math.random()*.72,type:"strike",x:e.x,y:e.y,r:42,damage:82,source:"ultimate",color:"#ffe98a"});
+ }else if(selectedWeapon==="poison"){
+   fields.push({source:"ultimate",x:player.x,y:player.y,r:Math.max(W,H)*.58,damage:24,life:6.2,tick:.05,color:"#ae72c0"});
+   aoe(player.x,player.y,245,72,"ultimate",{poison:24,poisonTime:7,color:"#ae72c0"});
+ }else if(selectedWeapon==="tao"){
+   const targets=visibleEnemies(0);
+   for(let i=0;i<Math.min(24,targets.length);i++){const e=targets[i];delayed.push({time:i*.045,type:"strike",x:e.x,y:e.y,r:38,damage:96,source:"ultimate",color:"#9eeaff"})}
+ }else if(selectedWeapon==="saber"){
+   for(let i=0;i<5;i++){const ang=i*Math.PI/5;lineHit(player.x-Math.cos(ang)*len*.5,player.y-Math.sin(ang)*len*.5,player.x+Math.cos(ang)*len*.5,player.y+Math.sin(ang)*len*.5,32,96,"ultimate",{color:"#ff7f70",knock:300,shake:10,life:.52})}
+ }else if(selectedWeapon==="katana"){
+   for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
+ }else{
+   addVisual({type:"dragon",x:player.x,y:player.y,a,r:len,life:1,max:1,color:"#ffd86f"});
+   lineHit(player.x,player.y,player.x+Math.cos(a)*len,player.y+Math.sin(a)*len,78,300,"ultimate",{color:"#ffd86f",knock:620,shake:20,life:.85});
+   coneHit(a,Math.min(len*.72,720),.36,150,"ultimate",{color:"#ffeaa8",knock:340,shake:10});
+   aoe(player.x,player.y,150,88,"ultimate",{color:"#ffd86f",knock:220});
+   addVisual({type:"text",x:player.x+Math.cos(a)*95,y:player.y+Math.sin(a)*95-24,text:"항룡 · 정면 붕괴",life:.75,max:.75,color:"#ffe9a0"});
+ }
+ showMessage(ch.ultimate,1.5);
+}
 
 const ultimatePalettes={sword:["#e9fbff","#78d7ff"],spear:["#ffe0a3","#c44c39"],bow:["#fff3a5","#5dbd95"],poison:["#d497ff","#69d06e"],tao:["#dff7ff","#64cfff"],saber:["#ff9b7b","#a71928"],katana:["#f6efff","#9f8dff"],fist:["#ffe69b","#d18a27"]};
 function useUltimate(){if(state!=="playing"||player.ultimate<100)return;player.ultimate=0;player.ultimateUses++;player.metrics.ultimateUses++;updateUltimateHud();state="cutscene";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";const pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];ui.cutscene.style.setProperty("--ult",pal[0]);ui.cutscene.style.setProperty("--ult2",pal[1]);ui.cutsceneName.textContent=characterDefs[selectedWeapon].ultimate;ui.cutsceneLine.textContent=characterDefs[selectedWeapon].name+" · "+characterDefs[selectedWeapon].quote;drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());ui.cutscene.classList.remove("show");void ui.cutscene.offsetWidth;ui.cutscene.classList.add("show");GameAudio.playSFX("ultimate-rise");setTimeout(()=>GameAudio.playSFX("ultimate-mid"),360);setTimeout(()=>GameAudio.playSFX("ultimate-hit"),720);setTimeout(()=>{ui.cutscene.classList.remove("show");state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ultimateAttack();last=performance.now()},1450)}
