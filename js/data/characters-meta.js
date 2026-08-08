@@ -90,7 +90,10 @@ function ultimateChargeScale(){
 }
 function gainUltimate(v,{ignoreScaling=false}={}){
  const scale=ignoreScaling?1:ultimateChargeScale();
- player.ultimate=Math.min(player.ultimateMax,(player.ultimate||0)+v*scale*(player.ultimateGain||1));
+ // 천마합일 지속 중에는 모든 절기 게이지 획득량을 절반으로 제한한다.
+ // 보스 처치/정밀 회피처럼 ignoreScaling인 보상도 이 절기 자체 감쇠는 적용한다.
+ const unityGain=((player.saberUnityTimer||0)>0&&selectedWeapon==="saber")?.5:1;
+ player.ultimate=Math.min(player.ultimateMax,(player.ultimate||0)+v*scale*(player.ultimateGain||1)*unityGain);
  updateUltimateHud();
 }
 function isUltimateSource(source){return source==="ultimate"||source==="ultimate-dot"}
@@ -99,6 +102,12 @@ const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){
  baseDamageEnemy(e,dmg,source,opt);
  if(account.settings&&!account.settings.damageNumbers&&visuals.length>vi)for(let i=visuals.length-1;i>=vi;i--)if(visuals[i].type==="text"&&visuals[i].text==="치명")visuals.splice(i,1);
  const dealt=Math.max(0,before-Math.max(0,e.hp));
+ // 천마합일: 15초 동안 실제 가한 피해의 8%를 흡혈한다.
+ // 다수 타격 스킬의 순간 완전회복을 막기 위해 1회 타격당 최대 4 HP로 제한한다.
+ if(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0&&!isUltimateSource(source)&&dealt>0){
+   const heal=Math.min(4,dealt*.08);
+   if(heal>0)player.hp=Math.min(player.maxHp,player.hp+heal);
+ }
  // 피해 기반 충전은 보조 수단만 남긴다. 절기 타격으로 절기를 다시 채우는 순환은 금지.
  if(!isUltimateSource(source)&&dealt>0)gainUltimate(Math.min(.12,dealt*.0012));
 };

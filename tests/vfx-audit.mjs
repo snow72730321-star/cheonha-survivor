@@ -40,7 +40,7 @@ for(const required of ["skillSwordMeteor","skillSpearSpin","skillBowArrowRain","
 
 const skillPngs=pngs.filter(file=>file.includes(`${path.sep}skills${path.sep}`));
 const hashes=new Set(skillPngs.map(file=>fs.readFileSync(file).toString("base64")));
-if(skillPngs.length!==20||hashes.size!==20)throw new Error(`무공 전용 VFX가 누락되었거나 중복됨: ${skillPngs.length}개 / 고유 ${hashes.size}개`);
+if(skillPngs.length!==19||hashes.size!==19)throw new Error(`무공 전용 VFX가 누락되었거나 중복됨: ${skillPngs.length}개 / 고유 ${hashes.size}개`);
 
 for(const required of ["drawProjectiles=function","drawVisuals=function","drawHazards=function","drawFields=function","VFXSprites.spawn","GameAssets.load"]){
   if(!renderer.includes(required))throw new Error(`VFX 렌더러 필수 구현 누락: ${required}`);

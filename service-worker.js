@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-7-1-saber-sword-balance";
+const CACHE="cheonha-v14-7-2-saber-unity-lifesteal";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -68,7 +68,6 @@ const APP_SHELL=[
   "assets/vfx/skills/katana_zanshin.png",
   "assets/vfx/skills/poison_miasma_bloom.png",
   "assets/vfx/skills/poison_thousand_fan.png",
-  "assets/vfx/skills/saber_demon_wheel.png",
   "assets/vfx/skills/saber_mountain_split.png",
   "assets/vfx/skills/saber_thunder_fan.png",
   "assets/vfx/skills/spear_dragon_spin.png",

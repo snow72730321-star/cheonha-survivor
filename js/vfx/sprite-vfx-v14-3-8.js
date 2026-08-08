@@ -41,7 +41,6 @@ globalThis.VFXSprites=(()=>{
     moonOrb:{src:"assets/vfx/magic/moon_orb.png",frameW:64,frameH:64,frames:8,fps:18,blend:"lighter"},
     skillSaberThunderFan:{src:"assets/vfx/skills/saber_thunder_fan.png",frameW:192,frameH:160,frames:8,fps:28,blend:"lighter"},
     skillSaberMountain:{src:"assets/vfx/skills/saber_mountain_split.png",frameW:192,frameH:192,frames:8,fps:25,blend:"lighter"},
-    skillSaberDemon:{src:"assets/vfx/skills/saber_demon_wheel.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
     skillSaberUnityThunder:{src:"assets/vfx/user_batch02/vfx_01.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
     // 하위 호환 alias
     skillSaberSocheon:{src:"assets/vfx/user_batch02/vfx_01.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
@@ -293,7 +292,7 @@ drawVisuals=function(){
     skillSwordTaiji:"skillSwordTaiji",skillSwordTenk:"skillSwordTenk",skillSpearSpin:"skillSpearSpin",
     skillBowArrowRain:"skillBowArrowRain",skillBowSunMoon:"skillBowSunMoon",skillBowRicochetSeal:"skillBowRicochetSeal",skillPoisonMiasma:"skillPoisonMiasma",
     skillPoisonLifeDeath:"skillPoisonLifeDeath",skillTaoIceArray:"skillTaoIceArray",skillTaoFiveThunder:"skillTaoFiveThunder",
-    skillSaberDemon:"skillSaberDemon",skillKatanaZanshin:"skillKatanaZanshin",
+    skillKatanaZanshin:"skillKatanaZanshin",
     skillKatanaNameless:"skillKatanaNameless",skillFistTaiji:"skillFistTaiji"
   };
   for(const v of visuals){
@@ -369,7 +368,7 @@ drawVisuals=function(){
     }else if(v.type==="marker"&&v.source==="starfall"){
       VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||35)/42),alpha});
     }else if(v.type==="ring"&&v.source){
-      const sourceMap={dragonspin:"skillSpearSpin",sunmoon:"skillBowSunMoon",demon:"skillSaberDemon",zanshin:"skillKatanaZanshin",taijifist:"skillFistTaiji",icearray:"skillTaoIceArray"};
+      const sourceMap={dragonspin:"skillSpearSpin",sunmoon:"skillBowSunMoon",zanshin:"skillKatanaZanshin",taijifist:"skillFistTaiji",icearray:"skillTaoIceArray"};
       const id=sourceMap[v.source];
       if(id){const divisor=id==="skillPoisonLifeDeath"?175:id==="skillTaoIceArray"?118:96;VFXSprites.drawOneShot(id,v.x,v.y,{age:progress,scale:Math.max(.38,(v.r||80)/divisor),alpha});}
       else VFXSprites.drawOneShot(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.72});

@@ -53,7 +53,6 @@ const GameAssets=(()=>{
     "assets/vfx/skills/katana_zanshin.png",
     "assets/vfx/skills/poison_miasma_bloom.png",
     "assets/vfx/skills/poison_thousand_fan.png",
-    "assets/vfx/skills/saber_demon_wheel.png",
     "assets/vfx/skills/saber_mountain_split.png",
     "assets/vfx/skills/saber_thunder_fan.png",
     "assets/vfx/skills/spear_dragon_spin.png",
