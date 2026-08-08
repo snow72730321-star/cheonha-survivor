@@ -6,7 +6,7 @@ const characterDefs={
  bow:{name:"설아린",title:"천산궁녀",ultimate:"적궁백시",quote:"떨어트린다. 해와 달도, 하늘도.",hair:"#d9d7ce",robe:"#3e6758",accent:"#e3c06b"},
  poison:{name:"당유화",title:"당문독희",ultimate:"만독천라",quote:"보이지 않는 독이 가장 깊다.",hair:"#32243e",robe:"#5c3c68",accent:"#9fc76b"},
  tao:{name:"제갈청",title:"천문도사",ultimate:"구천뇌겁",quote:"하늘의 뜻을 부적으로 명한다.",hair:"#283b49",robe:"#d9ddd6",accent:"#65b6d4"},
- saber:{name:"마련화",title:"녹림도후",ultimate:"천마참",quote:"한 번 휘두르면 산도 갈라진다.",hair:"#3c211e",robe:"#6f302b",accent:"#d77b52"},
+ saber:{name:"마련화",title:"소천마도",ultimate:"천마합일",quote:"한 번 휘두르면 산도 갈라진다.",hair:"#3c211e",robe:"#6f302b",accent:"#d77b52"},
  katana:{name:"카구라 린",title:"월영낭인",ultimate:"무념일섬",quote:"검이 보였다면 이미 늦었다.",hair:"#171a22",robe:"#2f3043",accent:"#c8c9e8"},
  fist:{name:"소명진",title:"금강권희",ultimate:"항룡진천",quote:"한 걸음, 한 장으로 천하를 울린다.",hair:"#543a2c",robe:"#c59b6b",accent:"#e2c56c"}
 };
@@ -148,7 +148,10 @@ function ultimateAttack(){
    const targets=visibleEnemies(0);
    for(let i=0;i<Math.min(24,targets.length);i++){const e=targets[i];delayed.push({time:i*.045,type:"strike",x:e.x,y:e.y,r:38,damage:96,source:"ultimate",color:"#9eeaff"})}
  }else if(selectedWeapon==="saber"){
+   // v14.6.4 천마합일: 절기 직후 8초간 벽력도법/단악참의 형상과 성능이 일시 강화된다.
+   player.saberUnityTimer=8;
    for(let i=0;i<5;i++){const ang=i*Math.PI/5;lineHit(player.x-Math.cos(ang)*len*.5,player.y-Math.sin(ang)*len*.5,player.x+Math.cos(ang)*len*.5,player.y+Math.sin(ang)*len*.5,32,96,"ultimate",{color:"#ff7f70",knock:300,shake:10,life:.52})}
+   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 8초",life:1.1,max:1.1,color:"#ffd1cf"});
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{

@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.6.2 전용 VFX/절기 메커니즘 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-6-1-pacheon-double";
+/** v14.6.4 전용 VFX/절기 메커니즘 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-6-4-cheonma-unity";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -81,7 +81,10 @@ const APP_SHELL=[
   "assets/vfx/skills/sword_ten_thousand.png",
   "assets/vfx/skills/tao_fire_dragon.png",
   "assets/vfx/skills/tao_five_thunder.png",
-  "assets/vfx/skills/tao_ice_array.png"
+  "assets/vfx/skills/tao_ice_array.png",
+  "assets/vfx/user_batch02/vfx_01.png",
+  "assets/vfx/user_batch02/vfx_03.png",
+  "assets/vfx/user_batch02/vfx_04.png"
 ];
 
 self.addEventListener("install",event=>{
