@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.5.4 전투 정지·검 밸런스·VFX 가독성 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-5-4-combat-clarity";
+/** v14.5.5 전용 절기 GIF 컷씬 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-5-5-ultimate-cutscene";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -111,7 +111,7 @@ self.addEventListener("fetch",event=>{
   if(url.pathname.endsWith("/assets/audio/battle-bgm.mp3")){event.respondWith(fetch(request));return}
 
   // 시험용 26MB 절기 GIF도 Cache Storage에 복제하지 않는다.
-  if(url.pathname.endsWith("/assets/vfx/cutscenes/katana-munen-issen-test.gif")){event.respondWith(fetch(request));return}
+  if(url.pathname.includes("/assets/vfx/cutscenes/")&&url.pathname.endsWith(".gif")){event.respondWith(fetch(request));return}
 
   const isCode=/\.(?:js|css|webmanifest)$/i.test(url.pathname);
 

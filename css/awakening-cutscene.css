@@ -48,14 +48,14 @@
 
 /* v14.5.3 GIF 시험 — 왜도 무념일섬 전용 애니메이션 레이어.
  * 원본 GIF는 26MB이므로 full 컷신에서만 요청하며 PWA 캐시에서는 제외한다. */
-#cutscene .katana-ultimate-gif{display:none;position:absolute;z-index:3;left:50%;top:50%;width:100vw;height:64vh;max-width:none;object-fit:cover;object-position:center;transform:translate(-50%,-50%) scale(1.04);opacity:0;filter:saturate(1.12) contrast(1.06);pointer-events:none}
-#cutscene.katana-gif-active.show .katana-ultimate-gif{display:block;animation:katanaGifCutin 2.05s cubic-bezier(.16,.75,.18,1) both}
-#cutscene.katana-gif-active .awakening-band{opacity:.48}
-#cutscene.katana-gif-active #cutsceneCanvas{opacity:0!important;animation:none!important}
-#cutscene.katana-gif-active .awakening-ink{z-index:2;opacity:.18}
-#cutscene.katana-gif-active .awakening-speed{z-index:5}
-#cutscene.katana-gif-active .cutscene-title-wrap{z-index:8}
-#cutscene.katana-gif-active .awakening-symbol{z-index:7}
-#cutscene.katana-gif-active .awakening-whiteout,#cutscene.katana-gif-active .cutscene-flash,#cutscene.katana-gif-active .cutscene-slash{z-index:9}
-@keyframes katanaGifCutin{0%{opacity:0;transform:translate(-50%,-50%) scale(1.12)}8%{opacity:.92}72%{opacity:.92;transform:translate(-50%,-50%) scale(1.02)}88%{opacity:.72}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
-@media(max-width:520px){#cutscene .katana-ultimate-gif{height:58vh;width:112vw}}
+#cutscene .ultimate-cutin-gif{display:none;position:absolute;z-index:3;left:50%;top:50%;width:100vw;height:64vh;max-width:none;object-fit:cover;object-position:center;transform:translate(-50%,-50%) scale(1.04);opacity:0;filter:saturate(1.12) contrast(1.06);pointer-events:none}
+#cutscene.ultimate-gif-active.show .ultimate-cutin-gif{display:block;animation:ultimateGifCutin 2.05s cubic-bezier(.16,.75,.18,1) both}
+#cutscene.ultimate-gif-active .awakening-band{opacity:.48}
+#cutscene.ultimate-gif-active #cutsceneCanvas{opacity:0!important;animation:none!important}
+#cutscene.ultimate-gif-active .awakening-ink{z-index:2;opacity:.18}
+#cutscene.ultimate-gif-active .awakening-speed{z-index:5}
+#cutscene.ultimate-gif-active .cutscene-title-wrap{z-index:8}
+#cutscene.ultimate-gif-active .awakening-symbol{z-index:7}
+#cutscene.ultimate-gif-active .awakening-whiteout,#cutscene.ultimate-gif-active .cutscene-flash,#cutscene.ultimate-gif-active .cutscene-slash{z-index:9}
+@keyframes ultimateGifCutin{0%{opacity:0;transform:translate(-50%,-50%) scale(1.12)}8%{opacity:.92}72%{opacity:.92;transform:translate(-50%,-50%) scale(1.02)}88%{opacity:.72}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:520px){#cutscene .ultimate-cutin-gif{height:58vh;width:112vw}}
