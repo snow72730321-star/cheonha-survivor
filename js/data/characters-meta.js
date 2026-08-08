@@ -148,10 +148,13 @@ function ultimateAttack(){
    const targets=visibleEnemies(0);
    for(let i=0;i<Math.min(24,targets.length);i++){const e=targets[i];delayed.push({time:i*.045,type:"strike",x:e.x,y:e.y,r:38,damage:96,source:"ultimate",color:"#9eeaff"})}
  }else if(selectedWeapon==="saber"){
-   // v14.6.4 천마합일: 절기 직후 8초간 벽력도법/단악참의 형상과 성능이 일시 강화된다.
-   player.saberUnityTimer=8;
+   // v14.6.6 천마합일: 절기 직후 15초간 벽력도법/단악참의 형상과 성능이 일시 강화된다.
+   player.saberUnityTimer=15;
+   // v14.6.5: 강화 직후 오래 남은 기존 쿨다운 때문에 변신이 체감되지 않는 문제를 막는다.
+   player.fireTimer=Math.min(player.fireTimer||.12,.12);
+   if(player.cooldowns)player.cooldowns.mountain=Math.min(player.cooldowns.mountain||.18,.18);
    for(let i=0;i<5;i++){const ang=i*Math.PI/5;lineHit(player.x-Math.cos(ang)*len*.5,player.y-Math.sin(ang)*len*.5,player.x+Math.cos(ang)*len*.5,player.y+Math.sin(ang)*len*.5,32,96,"ultimate",{color:"#ff7f70",knock:300,shake:10,life:.52})}
-   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 8초",life:1.1,max:1.1,color:"#ffd1cf"});
+   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 벽력도법/단악참 강화 15초",life:1.1,max:1.1,color:"#ffd1cf"});
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{

@@ -43,6 +43,11 @@ globalThis.VFXSprites=(()=>{
     skillSaberWhirlwind:{src:"assets/vfx/skills/saber_whirlwind.png",frameW:192,frameH:192,frames:8,fps:25,blend:"lighter"},
     skillSaberMountain:{src:"assets/vfx/skills/saber_mountain_split.png",frameW:192,frameH:192,frames:8,fps:25,blend:"lighter"},
     skillSaberDemon:{src:"assets/vfx/skills/saber_demon_wheel.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
+    skillSaberUnityThunder:{src:"assets/vfx/user_batch02/vfx_01.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
+    // 하위 호환 alias
+    skillSaberSocheon:{src:"assets/vfx/user_batch02/vfx_01.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
+    skillSaberWhirlwindUser:{src:"assets/vfx/user_batch02/vfx_03.png",frameW:500,frameH:500,frames:32,cols:8,fps:20,blend:"lighter"},
+    skillSaberUnityMountain:{src:"assets/vfx/user_batch02/vfx_04.png",frameW:741,frameH:200,frames:6,cols:6,fps:11.11,blend:"lighter"},
     skillSwordMeteor:{src:"assets/vfx/skills/sword_meteor_rain.png",frameW:160,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSwordTaiji:{src:"assets/vfx/skills/sword_taiji_array.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
     skillSwordTenk:{src:"assets/vfx/skills/sword_ten_thousand.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
@@ -141,7 +146,8 @@ globalThis.VFXSprites=(()=>{
     ctx.globalAlpha=Math.max(0,Math.min(1,alpha));
     ctx.globalCompositeOperation=blend||def.blend||"source-over";
     ctx.imageSmoothingEnabled=true;
-    ctx.drawImage(image,index*def.frameW,0,def.frameW,def.frameH,-width/2,-height/2,width,height);
+    const cols=Math.max(1,def.cols||def.frames),sx=(index%cols)*def.frameW,sy=Math.floor(index/cols)*def.frameH;
+    ctx.drawImage(image,sx,sy,def.frameW,def.frameH,-width/2,-height/2,width,height);
     ctx.restore();
     return true;
   }
@@ -305,6 +311,16 @@ drawVisuals=function(){
     }else if(v.type==="skillTaoFireDragon"&&v.burst){
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.35)*(v.visibilityBoost||1)):alpha;
       VFXSprites.drawOneShot("skillTaoFireDragon",v.x,v.y,{age:progress,scale:Math.max(.72,(v.r||90)/105),alpha:vis});
+    }else if(v.type==="skillSaberUnityThunder"||v.type==="skillSaberSocheon"){
+      const a=v.a||0,r=v.r||130,x=v.x+Math.cos(a)*r*.34,y=v.y+Math.sin(a)*r*.34;
+      const vis=Math.min(1,alpha*(v.visibilityBoost||1));
+      VFXSprites.drawOneShot("skillSaberUnityThunder",x,y,{age:progress,angle:a,scaleX:Math.max(.58,r/165),scaleY:Math.max(.68,(v.half||.75)/.72),alpha:vis});
+    }else if(v.type==="skillSaberWhirlwindUser"){
+      VFXSprites.drawOneShot("skillSaberWhirlwindUser",v.x,v.y,{age:progress,scale:Math.max(.5,(v.r||110)/170),alpha});
+    }else if(v.type==="skillSaberUnityMountain"){
+      const a=v.a||0,r=v.r||270,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
+      const vis=Math.min(1,alpha*(v.visibilityBoost||1));
+      VFXSprites.drawOneShot("skillSaberUnityMountain",x,y,{age:progress,angle:a,scaleX:Math.max(.58,r/300),scaleY:Math.max(.68,(v.width||36)/46),alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});
