@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.5.3 절기 HUD·충전·밸런스 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-5-3-ultimate-balance";
+const CACHE="cheonha-v14-5-3-gif-test";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -109,6 +109,9 @@ self.addEventListener("fetch",event=>{
 
   // 80MB 이상의 전투 BGM은 Cache Storage에 복제하지 않고 Range 스트리밍만 사용한다.
   if(url.pathname.endsWith("/assets/audio/battle-bgm.mp3")){event.respondWith(fetch(request));return}
+
+  // 시험용 26MB 절기 GIF도 Cache Storage에 복제하지 않는다.
+  if(url.pathname.endsWith("/assets/vfx/cutscenes/katana-munen-issen-test.gif")){event.respondWith(fetch(request));return}
 
   const isCode=/\.(?:js|css|webmanifest)$/i.test(url.pathname);
 

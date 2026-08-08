@@ -21,6 +21,14 @@
     const el=document.createElement(tag);el.className=cls;
     cutscene.prepend(el);
   }
+  // v14.5.3 GIF 시험: 왜도 절기에서 사용자가 제공한 애니메이션을 실제 컷인 레이어로 재생한다.
+  let katanaGif=cutscene.querySelector(".katana-ultimate-gif");
+  if(!katanaGif){
+    katanaGif=document.createElement("img");
+    katanaGif.className="katana-ultimate-gif";
+    katanaGif.alt="";katanaGif.decoding="async";katanaGif.draggable=false;
+    cutscene.prepend(katanaGif);
+  }
   const titleWrap=cutscene.querySelector(".cutscene-title-wrap");
   if(titleWrap&&!titleWrap.querySelector(".awakening-rank")){
     const rank=document.createElement("span");rank.className="awakening-rank";rank.textContent="절정 오의 · AWAKENING";titleWrap.prepend(rank);
@@ -67,6 +75,17 @@
     cutscene.style.setProperty("--crest-url",`url('${crest}?assetBuild=v14.3.9-handcrafted-heraldry')`);
     drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());
 
+    const useKatanaGif=selectedWeapon==="katana";
+    cutscene.classList.toggle("katana-gif-active",useKatanaGif);
+    if(useKatanaGif){
+      // src를 비웠다가 다시 지정해 매 절기 사용마다 GIF가 첫 프레임부터 재생되게 한다.
+      if(typeof katanaGif.removeAttribute==="function")katanaGif.removeAttribute("src");else katanaGif.src="";
+      void katanaGif.offsetWidth;
+      katanaGif.src="assets/vfx/cutscenes/katana-munen-issen-test.gif?assetBuild=v14.5.3-gif-test";
+    }else{
+      if(typeof katanaGif.removeAttribute==="function")katanaGif.removeAttribute("src");else katanaGif.src="";
+    }
+
     cutscene.classList.remove("show");cutscene.classList.add("awakening");void cutscene.offsetWidth;cutscene.classList.add("show");
 
     // 절기 컷신은 등장과 해방 사운드 두 축으로 정리한다.
@@ -76,6 +95,8 @@
 
     setTimeout(()=>{
       cutscene.classList.remove("show");
+      cutscene.classList.remove("katana-gif-active");
+      if(katanaGif)if(typeof katanaGif.removeAttribute==="function")katanaGif.removeAttribute("src");else katanaGif.src="";
       state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";
       ultimateAttack();screenShake=Math.max(screenShake,18);flash=Math.max(flash,.82);last=performance.now();
     },duration);
