@@ -158,10 +158,10 @@ const vfxRegression=vm.runInContext(`(()=>{
   spawnEnemy("bandit",player.x+110,player.y);enemies[0].speed=0;GameSpatial.rebuild(enemies);fireBasic();
   return {emitted,saberTypes:visuals.map(v=>v.type),customCount:new Set(emitted.map(v=>v.type)).size};
 })()`,context);
-if(vfxRegression.customCount<15||!vfxRegression.saberTypes.includes("cone")||!vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill")&&item.type!=="namelessCutV1454")){
-  throw new Error(`무공별 VFX·벽력도법 부채꼴 회귀 검증 실패: ${JSON.stringify(vfxRegression)}`);
+if(vfxRegression.customCount<15||!vfxRegression.saberTypes.includes("cone")||vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill")&&item.type!=="namelessCutV1454")){
+  throw new Error(`무공별 VFX·벽력도법 중복 방지 회귀 검증 실패: ${JSON.stringify(vfxRegression)}`);
 }
-console.log("무공별 전용 VFX·벽력도법 부채꼴 회귀 테스트 통과",vfxRegression);
+console.log("무공별 전용 VFX·벽력도법 중복 방지 회귀 테스트 통과",vfxRegression);
 
 
 // v14.6.5 회귀: 천마합일을 실제 런타임에서 발동한 뒤 벽력도법/단악참/선풍참의 VFX와 강화 상태를 검증한다.
