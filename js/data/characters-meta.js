@@ -134,8 +134,8 @@ function ultimateAttack(){
    aoe(player.x,player.y,235,96,"ultimate",{color:"#eaf7ff",shake:13});
  }else if(selectedWeapon==="spear"){
    const sx=player.x-Math.cos(a)*70,sy=player.y-Math.sin(a)*70,ex=player.x+Math.cos(a)*len,ey=player.y+Math.sin(a)*len;
-   lineHit(sx,sy,ex,ey,90,330,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});
-   lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,40,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
+   lineHit(sx,sy,ex,ey,180,330,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});
+   lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,80,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
    addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 일점 돌파",life:.75,max:.75,color:"#fff0b8"});
  }else if(selectedWeapon==="bow"){
    // v14.5.6: 단발 다중 폭격 대신 10초간 화면 경계를 반사하는 절기 화살장으로 변경.

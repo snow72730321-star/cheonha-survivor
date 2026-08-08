@@ -13,6 +13,6 @@ ok(meta.includes('fields.push({source:"ultimate"'),'poison ultimate field is not
 ok((meta.match(/source:"ultimate"/g)||[]).length>=4,'ultimate delayed/projectile sources not consistently tagged');
 ok(css.includes('width:88px;height:122px'),'ultimate slot is not enlarged/tall');
 ok(css.includes('rotate(-90deg)'),'weapon icon is not presented vertically');
-const expected={sword:'damage:48',spear:'90,330',bow:'type:"ricochetVolley"',poison:'damage:24,life:6.2',tao:'Math.min(24,targets.length)',saber:'i<5',katana:'i<12',fist:'78,300'};
+const expected={sword:'damage:48',spear:'180,330',bow:'type:"ricochetVolley"',poison:'damage:24,life:6.2',tao:'Math.min(24,targets.length)',saber:'i<5',katana:'i<12',fist:'78,300'};
 for(const [k,needle] of Object.entries(expected))ok(meta.includes(needle),`missing ${k} ultimate balance signature`);
 console.log('ultimate balance audit: ok');

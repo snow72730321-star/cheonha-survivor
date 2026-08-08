@@ -13,5 +13,5 @@ if(!combat.includes('shape:"ultimateArrow"')||!vfx.includes('p.shape==="ultimate
 if(!combat.includes('fireDragonChain')||!combat.includes('Math.floor(lv/2)'))throw new Error("fire dragon chain explosions missing");
 if(!combat.includes('52+a.fivethunder*7'))throw new Error("five thunder splash damage missing");
 if(!combat.includes('stun:.22')||!combat.includes('e.stunTime'))throw new Error("thunder seal stun missing");
-if(!meta.includes('lineHit(sx,sy,ex,ey,90,330'))throw new Error("spear ultimate width buff missing");
+if(!meta.includes('lineHit(sx,sy,ex,ey,180,330'))throw new Error("spear ultimate width buff missing");
 console.log("bow/fire-dragon audit: ok");
