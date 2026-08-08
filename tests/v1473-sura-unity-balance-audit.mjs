@@ -1,0 +1,15 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const chars=fs.readFileSync("js/data/characters-meta.js","utf8");
+const bal=fs.readFileSync("js/data/balance-v14.js","utf8");
+const prog=fs.readFileSync("js/systems/combat-progression-v14-3-1.js","utf8");
+assert.match(chars,/unityDamage=.*\?1\.25:1/);
+assert.match(chars,/dealt\*\.08/);
+assert.match(chars,/unityGain=.*\?\.5:1/);
+assert.match(bal,/enemyHp:2\.45/);
+assert.match(bal,/bossHp:36000/);
+assert.match(bal,/권장: 신화 이상 또는 전설 \+15/);
+assert.match(prog,/gi>=5\|\|\(gi===4&&lv>=15\)/);
+assert.match(prog,/damageTakenMul=.*\.72/);
+assert.match(prog,/suraLate=.*\.28/);
+console.log("v14.7.3 sura/unity balance audit: ok");

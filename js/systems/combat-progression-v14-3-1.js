@@ -30,6 +30,13 @@ const CombatProgressionV1431=(()=>{
   }
 
   function threatFactor(){return player.dynamicThreat||1}
+  // 수라 적정 장비선: 신화 이상은 무강도 인정, 전설은 +15에서 인정한다.
+  // 입장 자체를 막지는 않고 미달 시 최종 보스에 '수라 위압'을 적용하는 소프트 게이트다.
+  function suraGearReady(item){
+    if(!item)return false;
+    const gi=gradeIndex(item.grade),lv=Math.max(0,Number(item.level)||0);
+    return gi>=5||(gi===4&&lv>=15);
+  }
   function progress(){return runDuration>0?clamp(elapsed/runDuration,0,1):0}
   function latePhase(){return clamp((progress()-.52)/.48,0,1)}
 
@@ -38,10 +45,15 @@ const CombatProgressionV1431=(()=>{
     baseResetGame.apply(this,arguments);
     player.forgedCombatPower=forgedPower(player.forgedWeapon);
     player.dynamicThreat=1+Math.min(.24,(player.forgedCombatPower-1)*.14);
+    player.suraGearReady=selectedDifficulty!=="sura"||suraGearReady(player.forgedWeapon);
     player.skillWarmup=0;
     player.metrics.eliteTraitKills=0;
     const extra=Math.round((player.dynamicThreat-1)*100);
     if(extra>0)ui.weaponHud.textContent+=` · 위협 +${extra}%`;
+    if(selectedDifficulty==="sura"&&!player.suraGearReady){
+      ui.weaponHud.textContent+=" · 수라 위압";
+      showMessage("수라 위압 · 권장 장비 미달 (신화 이상 / 전설 +15)",2.6);
+    }
   };
 
   const baseEnemyDef=enemyDef;
@@ -50,9 +62,10 @@ const CombatProgressionV1431=(()=>{
     const lateHp=1+Math.pow(late,1.75)*(.58+rank*.12);
     const lateDamage=1+Math.pow(late,1.45)*(.26+rank*.075);
     const lateSpeed=1+Math.pow(late,1.2)*(.045+rank*.012);
-    def.hp*=lateHp*dynamic;
-    def.damage*=lateDamage*(1+(dynamic-1)*.48);
-    def.speed*=lateSpeed;
+    const suraLate=rank===4?1+Math.pow(late,1.7)*.28:1;
+    def.hp*=lateHp*dynamic*suraLate;
+    def.damage*=lateDamage*(1+(dynamic-1)*.48)*(rank===4?1+Math.pow(late,1.45)*.10:1);
+    def.speed*=lateSpeed*(rank===4?1+late*.025:1);
     return def;
   };
 
@@ -69,7 +82,7 @@ const CombatProgressionV1431=(()=>{
     const before=enemies.length,result=baseSpawnEnemy.apply(this,arguments),entity=enemies[before];
     if(!entity||["midboss","boss"].includes(type))return result;
     const rank=difficultyDefs[selectedDifficulty].rank,late=latePhase();
-    const extraChance=.012+late*(.08+rank*.012)+(threatFactor()-1)*.02;
+    const extraChance=.012+late*(.08+rank*.012)+(threatFactor()-1)*.02+(rank===4?(.018+late*.025):0);
     if(Math.random()<extraChance){
       const trait=TRAITS[Math.floor(Math.random()*TRAITS.length)];
       applyTrait(entity,trait);
@@ -109,10 +122,20 @@ const CombatProgressionV1431=(()=>{
     const result=baseSpawnBoss.apply(this,arguments);
     if(boss){
       const dynamic=threatFactor(),rank=difficultyDefs[selectedDifficulty].rank;
-      boss.hp*=1.24+rank*.04;boss.hp*=1+(dynamic-1)*.9;boss.maxHp=boss.hp;
-      boss.damage*=1.14+rank*.025;boss.damage*=1+(dynamic-1)*.4;boss.speed*=1.07;
+      boss.hp*=1.24+rank*.04;boss.hp*=1+(dynamic-1)*.9;
+      if(rank===4){
+        boss.hp*=1.12;
+        if(!player.suraGearReady){
+          boss.hp*=1.18;boss.damageTakenMul=(boss.damageTakenMul||1)*.72;boss.suraPressure=true;
+        }
+      }
+      boss.maxHp=boss.hp;
+      boss.damage*=1.14+rank*.025;boss.damage*=1+(dynamic-1)*.4;
+      if(rank===4)boss.damage*=player.suraGearReady?1.08:1.22;
+      boss.speed*=rank===4?1.10:1.07;
       boss.summon*=.88;boss.blast*=.88;if(boss.dash)boss.dash*=.88;if(boss.orbs)boss.orbs*=.88;
       boss.finalRage=false;
+      if(rank===4&&boss.suraPressure)showMessage("수라 위압 · 장비 격차로 혈마의 마기가 압도한다",2.4);
     }
     return result;
   };

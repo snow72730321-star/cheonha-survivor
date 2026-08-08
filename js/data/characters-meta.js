@@ -99,7 +99,9 @@ function gainUltimate(v,{ignoreScaling=false}={}){
 function isUltimateSource(source){return source==="ultimate"||source==="ultimate-dot"}
 const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){
  const before=Math.max(0,e.hp),vi=visuals.length;
- baseDamageEnemy(e,dmg,source,opt);
+ // 천마합일 변신 자체의 전역 화력 상승. 기존 벽력도법/단악참 전용 강화와 곱연산된다.
+ const unityDamage=(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0)?1.25:1;
+ baseDamageEnemy(e,dmg*unityDamage,source,opt);
  if(account.settings&&!account.settings.damageNumbers&&visuals.length>vi)for(let i=visuals.length-1;i>=vi;i--)if(visuals[i].type==="text"&&visuals[i].text==="치명")visuals.splice(i,1);
  const dealt=Math.max(0,before-Math.max(0,e.hp));
  // 천마합일: 15초 동안 실제 가한 피해의 8%를 흡혈한다.
@@ -162,7 +164,7 @@ function ultimateAttack(){
    // v14.6.5: 강화 직후 오래 남은 기존 쿨다운 때문에 변신이 체감되지 않는 문제를 막는다.
    player.fireTimer=Math.min(player.fireTimer||.12,.12);
    if(player.cooldowns)player.cooldowns.mountain=Math.min(player.cooldowns.mountain||.18,.18);
-   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 벽력도법/단악참 강화 15초",life:1.1,max:1.1,color:"#ffd1cf"});
+   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 피해 +25% / 흡혈 / 도법 강화 15초",life:1.1,max:1.1,color:"#ffd1cf"});
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
