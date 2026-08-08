@@ -1,9 +1,0 @@
-{
-  "name": "cheonha-survivor-v14-4",
-  "version": "14.7.0",
-  "private": true,
-  "scripts": {
-    "test": "node tests/static-audit.mjs && node tests/vfx-audit.mjs && node tests/smoke-load.mjs && node tests/ultimate-balance-audit.mjs && node tests/combat-clarity-audit.mjs && node tests/skill-vfx-mechanics-audit.mjs && node tests/bow-fire-dragon-audit.mjs && node tests/vfx-one-cycle-audit.mjs && node tests/saber-vfx-transform-audit.mjs && node tests/saber-unity-runtime-audit.mjs && node tests/legacy-vfx-cleanup-audit.mjs && node tests/procedural-vfx-removal-audit.mjs && node tests/sprite-first-vfx-policy-audit.mjs",
-    "check": "find js -name '*.js' -type f -print0 | xargs -0 -n1 node --check && node --check service-worker.js"
-  }
-}
