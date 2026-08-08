@@ -1,7 +1,7 @@
 "use strict";
 
-/** v14.5.5 전용 절기 GIF 컷씬 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-5-5-ultimate-cutscene";
+/** v14.5.6 전용 VFX/절기 메커니즘 캐시. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
+const CACHE="cheonha-v14-5-6-skill-vfx-mechanics";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -58,6 +58,7 @@ const APP_SHELL=[
   "assets/vfx/weapons/sword_cyan.png",
   "assets/vfx/skills/bow_arrow_rain.png",
   "assets/vfx/skills/bow_sunmoon_burst.png",
+  "assets/vfx/user/user_vfx_01.png","assets/vfx/user/user_vfx_02.png","assets/vfx/user/user_vfx_03.png","assets/vfx/user/user_vfx_04.png","assets/vfx/user/user_vfx_05.png",
   "assets/vfx/skills/fist_dragon_return.png",
   "assets/vfx/skills/fist_hundred_step.png",
   "assets/vfx/skills/fist_iron_mountain.png",

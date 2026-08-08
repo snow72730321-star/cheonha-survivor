@@ -138,7 +138,9 @@ function ultimateAttack(){
    lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,25,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
    addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 일점 돌파",life:.75,max:.75,color:"#fff0b8"});
  }else if(selectedWeapon==="bow"){
-   for(const e of visibleEnemies(10).slice(0,26))delayed.push({time:Math.random()*.72,type:"strike",x:e.x,y:e.y,r:42,damage:82,source:"ultimate",color:"#ffe98a"});
+   // v14.5.6: 단발 다중 폭격 대신 10초간 화면 경계를 반사하는 절기 화살장으로 변경.
+   addVisual({type:"skillBowRicochetSeal",x:player.x,y:player.y,r:210,life:1.11,max:1.11,color:"#f6e77d"});
+   delayed.push({time:.72,type:"ricochetVolley",a,count:6,damage:38});
  }else if(selectedWeapon==="poison"){
    fields.push({source:"ultimate",x:player.x,y:player.y,r:Math.max(W,H)*.58,damage:24,life:6.2,tick:.05,color:"#ae72c0"});
    aoe(player.x,player.y,245,72,"ultimate",{poison:24,poisonTime:7,color:"#ae72c0"});

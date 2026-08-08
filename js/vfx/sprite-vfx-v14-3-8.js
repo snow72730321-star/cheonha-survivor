@@ -48,22 +48,27 @@ globalThis.VFXSprites=(()=>{
     skillSwordTenk:{src:"assets/vfx/skills/sword_ten_thousand.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSpearSpin:{src:"assets/vfx/skills/spear_dragon_spin.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSpearStarfall:{src:"assets/vfx/skills/spear_starfall.png",frameW:160,frameH:192,frames:8,fps:24,blend:"lighter"},
-    skillSpearOverlord:{src:"assets/vfx/skills/spear_overlord.png",frameW:256,frameH:128,frames:8,fps:24,blend:"lighter"},
+    skillSpearOverlord:{src:"assets/vfx/user/user_vfx_02.png",frameW:386,frameH:277,frames:16,fps:16.67,blend:"lighter"},
     skillBowArrowRain:{src:"assets/vfx/skills/bow_arrow_rain.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
     skillBowSunMoon:{src:"assets/vfx/skills/bow_sunmoon_burst.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
+    skillBowRicochetSeal:{src:"assets/vfx/user/user_vfx_03.png",frameW:400,frameH:300,frames:37,fps:33.33,blend:"lighter"},
     skillPoisonThousand:{src:"assets/vfx/skills/poison_thousand_fan.png",frameW:192,frameH:160,frames:8,fps:25,blend:"lighter"},
     skillPoisonMiasma:{src:"assets/vfx/skills/poison_miasma_bloom.png",frameW:192,frameH:192,frames:8,fps:16,blend:"source-over"},
-    skillPoisonLifeDeath:{src:"assets/vfx/skills/poison_lifedeath_seal.png",frameW:192,frameH:192,frames:8,fps:21,blend:"lighter"},
-    skillTaoFireDragon:{src:"assets/vfx/skills/tao_fire_dragon.png",frameW:256,frameH:128,frames:8,fps:25,blend:"lighter"},
+    skillPoisonLifeDeath:{src:"assets/vfx/user/user_vfx_05.png",frameW:334,frameH:292,frames:7,fps:11.11,blend:"lighter"},
+    skillTaoFireDragon:{src:"assets/vfx/user/user_vfx_01.png",frameW:257,frameH:258,frames:6,fps:11.11,blend:"lighter"},
     skillTaoIceArray:{src:"assets/vfx/skills/tao_ice_array.png",frameW:192,frameH:192,frames:8,fps:18,blend:"lighter"},
-    skillTaoFiveThunder:{src:"assets/vfx/skills/tao_five_thunder.png",frameW:192,frameH:192,frames:8,fps:26,blend:"lighter"},
+    skillTaoFiveThunder:{src:"assets/vfx/user/user_vfx_04.png",frameW:420,frameH:288,frames:12,fps:9.76,blend:"lighter"},
     skillKatanaMoonChain:{src:"assets/vfx/skills/katana_moon_chain.png",frameW:192,frameH:128,frames:8,fps:28,blend:"lighter"},
     skillKatanaZanshin:{src:"assets/vfx/skills/katana_zanshin.png",frameW:192,frameH:160,frames:8,fps:22,blend:"lighter"},
     skillKatanaNameless:{src:"assets/vfx/skills/katana_nameless_cuts.png",frameW:256,frameH:192,frames:8,fps:27,blend:"lighter"},
     skillFistIronMountain:{src:"assets/vfx/skills/fist_iron_mountain.png",frameW:192,frameH:160,frames:8,fps:26,blend:"lighter"},
     skillFistHundredStep:{src:"assets/vfx/skills/fist_hundred_step.png",frameW:256,frameH:128,frames:8,fps:25,blend:"lighter"},
     skillFistTaiji:{src:"assets/vfx/skills/fist_taiji_vortex.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
-    skillFistDragonReturn:{src:"assets/vfx/skills/fist_dragon_return.png",frameW:256,frameH:128,frames:8,fps:24,blend:"lighter"}
+    skillFistDragonReturn:{src:"assets/vfx/skills/fist_dragon_return.png",frameW:256,frameH:128,frames:8,fps:24,blend:"lighter"},
+    legacySpearOverlord:{src:"assets/vfx/skills/spear_overlord.png",frameW:256,frameH:128,frames:8,fps:24,blend:"lighter"},
+    legacyPoisonLifeDeath:{src:"assets/vfx/skills/poison_lifedeath_seal.png",frameW:192,frameH:192,frames:8,fps:21,blend:"lighter"},
+    legacyTaoFireDragon:{src:"assets/vfx/skills/tao_fire_dragon.png",frameW:256,frameH:128,frames:8,fps:25,blend:"lighter"},
+    legacyTaoFiveThunder:{src:"assets/vfx/skills/tao_five_thunder.png",frameW:192,frameH:192,frames:8,fps:26,blend:"lighter"}
   });
 
   const effects=[];
@@ -262,7 +267,7 @@ drawVisuals=function(){
   const bladeTypes=new Set(["fallingSword","swordHalo","bladeStorm","iceShardRing"]);
   const customCentered={
     skillSwordTaiji:"skillSwordTaiji",skillSwordTenk:"skillSwordTenk",skillSpearSpin:"skillSpearSpin",
-    skillBowArrowRain:"skillBowArrowRain",skillBowSunMoon:"skillBowSunMoon",skillPoisonMiasma:"skillPoisonMiasma",
+    skillBowArrowRain:"skillBowArrowRain",skillBowSunMoon:"skillBowSunMoon",skillBowRicochetSeal:"skillBowRicochetSeal",skillPoisonMiasma:"skillPoisonMiasma",
     skillPoisonLifeDeath:"skillPoisonLifeDeath",skillTaoIceArray:"skillTaoIceArray",skillTaoFiveThunder:"skillTaoFiveThunder",
     skillSaberWhirlwind:"skillSaberWhirlwind",skillSaberDemon:"skillSaberDemon",skillKatanaZanshin:"skillKatanaZanshin",
     skillKatanaNameless:"skillKatanaNameless",skillFistTaiji:"skillFistTaiji"
@@ -271,7 +276,7 @@ drawVisuals=function(){
     const alpha=Math.max(0,Math.min(1,v.life/Math.max(.001,v.max||v.life||.2))),red=VFXSprites.isRed(v.color),poison=VFXSprites.isPoison(v.color),gold=VFXSprites.isGold(v.color);
     const progress=(1-alpha)*Math.max(.18,v.max||.3);
     if(customCentered[v.type]){
-      const id=customCentered[v.type],scale=Math.max(.34,(v.r||105)/(id==="skillKatanaNameless"?150:96));
+      const id=customCentered[v.type],divisor=id==="skillKatanaNameless"?150:id==="skillBowRicochetSeal"?220:id==="skillPoisonLifeDeath"?175:id==="skillTaoFiveThunder"?190:96,scale=Math.max(.34,(v.r||105)/divisor);
       VFXSprites.draw(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha,blend:id==="skillPoisonMiasma"?"source-over":null});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
@@ -328,7 +333,7 @@ drawVisuals=function(){
     }else if(v.type==="ring"&&v.source){
       const sourceMap={dragonspin:"skillSpearSpin",lifedeath:"skillPoisonLifeDeath",sunmoon:"skillBowSunMoon",whirlwind:"skillSaberWhirlwind",demon:"skillSaberDemon",zanshin:"skillKatanaZanshin",taijifist:"skillFistTaiji",icearray:"skillTaoIceArray"};
       const id=sourceMap[v.source];
-      if(id)VFXSprites.draw(id,v.x,v.y,{age:progress,scale:Math.max(.38,(v.r||80)/96),alpha});
+      if(id){const divisor=id==="skillPoisonLifeDeath"?175:id==="skillTaoIceArray"?118:96;VFXSprites.draw(id,v.x,v.y,{age:progress,scale:Math.max(.38,(v.r||80)/divisor),alpha});}
       else VFXSprites.draw(red?"shockRed":"shockBlue",v.x,v.y,{age:progress,scale:Math.max(.25,(v.r||42)/80),alpha:alpha*.72});
     }else if(circleTypes.has(v.type)){
       const id=red?"circleRed":"circleBlue";

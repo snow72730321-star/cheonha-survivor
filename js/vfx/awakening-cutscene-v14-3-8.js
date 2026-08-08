@@ -91,7 +91,7 @@
       // src를 비웠다가 다시 지정해 매 사용마다 애니메이션이 첫 프레임부터 재생된다.
       if(typeof ultimateGif.removeAttribute==="function")ultimateGif.removeAttribute("src");else ultimateGif.src="";
       void ultimateGif.offsetWidth;
-      ultimateGif.src=gifSrc+"?assetBuild=v14.5.5-ultimate-cutscene";
+      ultimateGif.src=gifSrc+"?assetBuild=v14.5.6-skill-vfx-mechanics";
     }
 
     cutscene.classList.remove("show");cutscene.classList.add("awakening");void cutscene.offsetWidth;cutscene.classList.add("show");
