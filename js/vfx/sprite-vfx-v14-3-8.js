@@ -121,7 +121,7 @@ globalThis.VFXSprites=(()=>{
    * 한 프레임을 그린다. age를 넘기면 효과마다 독립적인 프레임 진행을 사용한다.
    * screen=true이면 이미 화면 좌표인 UI/VFX에 사용하고, 기본값은 월드 좌표다.
    */
-  function draw(id,x,y,{age=elapsed,angle=0,scale=1,scaleX=1,scaleY=1,alpha=1,screen=false,frame=null,blend=null,flipY=false}={}){
+  function draw(id,x,y,{age=elapsed,angle=0,scale=1,scaleX=1,scaleY=1,alpha=1,screen=false,frame=null,blend=null,flipX=false,flipY=false}={}){
     const def=definitions[id],image=imageFor(id);
     if(!def||!image)return false;
     const position=screen?{x,y}:ws(x,y);
@@ -132,7 +132,7 @@ globalThis.VFXSprites=(()=>{
     ctx.save();
     ctx.translate(position.x,position.y);
     ctx.rotate(angle);
-    ctx.scale(1,flipY?-1:1);
+    ctx.scale(flipX?-1:1,flipY?-1:1);
     ctx.globalAlpha=Math.max(0,Math.min(1,alpha));
     ctx.globalCompositeOperation=blend||def.blend||"source-over";
     ctx.imageSmoothingEnabled=true;
@@ -291,7 +291,7 @@ drawVisuals=function(){
     }else if(["skillSpearOverlord","skillTaoFireDragon","skillKatanaMoonChain","skillFistHundredStep","skillFistDragonReturn"].includes(v.type)){
       const map={skillSpearOverlord:"skillSpearOverlord",skillTaoFireDragon:"skillTaoFireDragon",skillKatanaMoonChain:"skillKatanaMoonChain",skillFistHundredStep:"skillFistHundredStep",skillFistDragonReturn:"skillFistDragonReturn"};
       const id=map[v.type],a=v.a||0,r=v.r||190,x=v.x+Math.cos(a)*r*.4,y=v.y+Math.sin(a)*r*.4;
-      VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.62,r/240),scaleY:Math.max(.65,(v.width||28)/42),alpha});
+      VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.62,r/240),scaleY:Math.max(.65,(v.width||28)/42),alpha,flipX:v.type==="skillSpearOverlord"});
     }else if(v.type==="skillSaberMountain"){
       const a=v.a||0,r=v.r||250,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.draw("skillSaberMountain",x,y,{age:progress,angle:a-Math.PI/2,scaleX:Math.max(.52,(v.width||32)/54),scaleY:Math.max(.72,r/260),alpha});
@@ -319,7 +319,7 @@ drawVisuals=function(){
         VFXSprites.draw("skillKatanaNameless",x,y,{age:progress,angle:a,scale:Math.max(.7,Math.hypot(v.x2-v.x1,v.y2-v.y1)/620),alpha});
       }else if(v.source==="overlord"||v.source==="dragonreturn"){
         const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2,id=v.source==="overlord"?"skillSpearOverlord":"skillFistDragonReturn";
-        VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.65,len/300),scaleY:Math.max(.7,(v.width||30)/44),alpha});
+        VFXSprites.draw(id,x,y,{age:progress,angle:a,scaleX:Math.max(.65,len/300),scaleY:Math.max(.7,(v.width||30)/44),alpha,flipX:id==="skillSpearOverlord"});
       }else VFXSprites.beam(red?"beamRed":"beamBlue",v.x1,v.y1,v.x2,v.y2,Math.max(3,v.width||4),alpha);
     }else if(v.type==="lightning"){
       VFXSprites.beam("beamBlue",v.x1,v.y1,v.x2,v.y2,Math.max(3,(v.width||2)*2.2),alpha);
