@@ -38,7 +38,7 @@ function emitSkillVfx(id,lv=1){const [c1,c2,c3]=vfxPalette(),x=player.x,y=player
   case "demon": VFX10.push({type:"skillSaberDemon",x,y,r:180+lv*15,life:.86,max:.86,color:"#ff534d"}); break;
   case "moonchain": VFX10.push({type:"skillKatanaMoonChain",x,y,a,r:180+lv*17,life:.56,max:.56,color:c1,width:28}); break;
   case "zanshinDrop": VFX10.push({type:"skillKatanaZanshin",x,y,a,r:75+lv*8,life:.58,max:.58,color:c2}); break;
-  case "nameless": VFX10.push({type:"skillKatanaNameless",x,y,a,r:Math.max(W,H)*1.15,life:.72,max:.72,color:c3}); break;
+  case "nameless": {const len=Math.max(W,H)*1.3;VFX10.push({type:"namelessCutV1454",x1:x-Math.cos(a)*len*.5,y1:y-Math.sin(a)*len*.5,x2:x+Math.cos(a)*len*.5,y2:y+Math.sin(a)*len*.5,width:7+lv*.7,life:.24,max:.24,color:c3,phase:0});break;}
   case "hundredstep": VFX10.push({type:"skillFistHundredStep",x,y,a,r:190+lv*17,life:.48,max:.48,color:c1,width:28}); break;
   case "taijifist": VFX10.push({type:"skillFistTaiji",x,y,r:125+lv*13,life:.68,max:.68,color:c1}); break;
   case "dragonreturn": VFX10.push({type:"skillFistDragonReturn",x,y,a,r:Math.max(W,H),life:.78,max:.78,color:c1,width:36}); break;

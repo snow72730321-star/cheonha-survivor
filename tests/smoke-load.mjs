@@ -158,7 +158,7 @@ const vfxRegression=vm.runInContext(`(()=>{
   spawnEnemy("bandit",player.x+110,player.y);enemies[0].speed=0;GameSpatial.rebuild(enemies);fireBasic();
   return {emitted,saberTypes:visuals.map(v=>v.type),customCount:new Set(emitted.map(v=>v.type)).size};
 })()`,context);
-if(vfxRegression.customCount<20||!vfxRegression.saberTypes.includes("cone")||!vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill"))){
+if(vfxRegression.customCount<20||!vfxRegression.saberTypes.includes("cone")||!vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill")&&item.type!=="namelessCutV1454")){
   throw new Error(`무공별 VFX·벽력도법 부채꼴 회귀 검증 실패: ${JSON.stringify(vfxRegression)}`);
 }
 console.log("무공별 전용 VFX·벽력도법 부채꼴 회귀 테스트 통과",vfxRegression);

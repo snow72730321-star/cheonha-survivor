@@ -40,7 +40,7 @@ for(const [wid,[name,condition]] of Object.entries(extraHidden))weaponDefs[wid].
 universal.push(
  {id:"swiftcycle",name:"진기순환",max:5,tag:"재사용",desc:"부가 무공 재사용 속도 +9%",apply:p=>p.cooldownRate*=1.09},
  {id:"windedge",name:"장풍연성",max:4,tag:"투사체",desc:"투사체 속도 +12%",apply:p=>p.projectileSpeedMul*=1.12},
- {id:"guardian",name:"불괴호신",max:3,tag:"호신",desc:"일정 시간마다 피해를 1회 막는 보호막",apply:p=>{p.shieldMax++;p.shield=p.shieldMax}},
+ {id:"guardian",name:"불괴호신",max:3,tag:"호신",desc:"일정 시간마다 피해를 1회 막는다. 캐릭터 주위 보호막과 구슬로 남은 횟수를 표시한다.",apply:p=>{p.shieldMax++;p.shield=p.shieldMax}},
  {id:"fortune",name:"천운심결",max:5,tag:"행운",desc:"금자와 광석 획득 확률 증가",apply:p=>p.luck+=.12},
  {id:"bossbane",name:"파군심법",max:4,tag:"파진",desc:"정예·보스 피해 +14%",apply:p=>p.eliteDamageMul*=1.14},
  {id:"lifeline",name:"연명공",max:4,tag:"회복",desc:"격파 시 체력 회복 +0.25",apply:p=>p.killHeal+=.25}

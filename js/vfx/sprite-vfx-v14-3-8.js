@@ -293,6 +293,15 @@ drawVisuals=function(){
     }else if(v.type==="skillFistIronMountain"){
       const a=v.a||0,r=v.r||95,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.draw("skillFistIronMountain",x,y,{age:progress,angle:a,scale:Math.max(.5,r/115),alpha});
+    }else if(v.type==="namelessCutV1454"){
+      // v14.5.4: 구형 무명신풍류 스프라이트 대신 얇고 빠른 발도 참격을 직접 그린다.
+      const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),mid=ws((v.x1+v.x2)/2,(v.y1+v.y2)/2);
+      const flare=Math.sin(Math.min(1,progress)*Math.PI),w=Math.max(2,(v.width||5)*(1.35-progress*.65));
+      ctx.save();ctx.translate(mid.x,mid.y);ctx.rotate(a);ctx.globalCompositeOperation="lighter";ctx.lineCap="round";
+      ctx.globalAlpha=alpha*.22;ctx.strokeStyle=v.color||"#e8e2ff";ctx.lineWidth=w*4.2;ctx.shadowColor=v.color||"#e8e2ff";ctx.shadowBlur=18;ctx.beginPath();ctx.moveTo(-len*.5,0);ctx.lineTo(len*.5,0);ctx.stroke();
+      ctx.globalAlpha=Math.min(1,alpha*(1.15+flare*.35));ctx.strokeStyle="#ffffff";ctx.lineWidth=Math.max(1.2,w*.38);ctx.shadowBlur=7;ctx.beginPath();ctx.moveTo(-len*.52,0);ctx.lineTo(len*.52,0);ctx.stroke();
+      ctx.globalAlpha=alpha*.7;ctx.strokeStyle="#b6a8ff";ctx.lineWidth=Math.max(1,w*.22);ctx.beginPath();ctx.moveTo(-len*.42,-w*1.8);ctx.lineTo(len*.46,w*.9);ctx.stroke();
+      ctx.restore();
     }else if(v.type==="line"){
       if(v.source==="mountain"){
         const a=Math.atan2(v.y2-v.y1,v.x2-v.x1),len=Math.hypot(v.x2-v.x1,v.y2-v.y1),x=(v.x1+v.x2)/2,y=(v.y1+v.y2)/2;

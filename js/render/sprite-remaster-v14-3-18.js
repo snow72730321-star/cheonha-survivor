@@ -230,7 +230,15 @@ drawPlayer=function(){
   ctx.restore();
 
   if(player.shield>0){
-    ctx.save();ctx.strokeStyle="rgba(180,235,255,.75)";ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(cx,cy,31*z,0,Math.PI*2);ctx.stroke();ctx.restore();
+    // v14.5.4: 호신강기를 한눈에 읽을 수 있는 다층 보호막 + 남은 충전 구슬로 표시한다.
+    const charges=Math.max(1,Math.floor(player.shield)),maxCharges=Math.max(charges,Math.floor(player.shieldMax||charges));
+    const pulse=.5+.5*Math.sin(elapsed*4.5),radius=(34+pulse*2)*z;
+    ctx.save();ctx.globalCompositeOperation="lighter";
+    ctx.fillStyle=`rgba(116,214,255,${.07+pulse*.035})`;ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=`rgba(198,244,255,${.78+pulse*.18})`;ctx.lineWidth=3*z;ctx.shadowColor="#8ee8ff";ctx.shadowBlur=12*z;ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle="rgba(105,192,255,.6)";ctx.lineWidth=1.4*z;ctx.beginPath();ctx.arc(cx,cy,radius-5*z,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<maxCharges;i++){const ang=-Math.PI/2+(i-(maxCharges-1)/2)*.34,rr=radius+8*z,x=cx+Math.cos(ang)*rr,y=cy+Math.sin(ang)*rr;ctx.fillStyle=i<charges?"#e9fbff":"rgba(130,170,185,.28)";ctx.shadowBlur=i<charges?8*z:0;ctx.beginPath();ctx.arc(x,y,3.2*z,0,Math.PI*2);ctx.fill()}
+    ctx.restore();
   }
 };
 const oldDrawEnemiesV7=drawEnemies;drawEnemies=function(){for(const e of enemies){if(e.dead)continue;const s=ws(e.x,e.y);if(s.x<-110||s.x>W+110||s.y<-110||s.y>H+110)continue;const dir=Math.abs(player.x-e.x)>Math.abs(player.y-e.y)?(player.x>e.x?"right":"left"):(player.y>e.y?"down":"up"),frame=Math.floor(elapsed*(e.type==="assassin"?11:7))%4,key=enemySpriteKey(e),img=spriteImages.enemies[key],scale=e.type==="boss"?3.55:e.type==="midboss"?3.05:e.type==="brute"?2.75:2.35;ctx.save();ctx.fillStyle="rgba(0,0,0,.25)";ctx.beginPath();ctx.ellipse(s.x,s.y+e.r*.75,e.r*.72,e.r*.26,0,0,Math.PI*2);ctx.fill();ctx.restore();if(!spriteFrame(img,dir,frame,s.x,s.y,scale,1,e.hit>0)){
