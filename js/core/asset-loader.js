@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.5.2-stability-audit";
+  const BUILD="v14.5.7-vfx-runtime-link";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -67,6 +67,12 @@ const GameAssets=(()=>{
     "assets/vfx/skills/tao_fire_dragon.png",
     "assets/vfx/skills/tao_five_thunder.png",
     "assets/vfx/skills/tao_ice_array.png",
+    // v14.5.7: 사용자 변환 VFX도 부팅 시 공유 Image 저장소에 반드시 선로딩한다.
+    "assets/vfx/user/user_vfx_01.png",
+    "assets/vfx/user/user_vfx_02.png",
+    "assets/vfx/user/user_vfx_03.png",
+    "assets/vfx/user/user_vfx_04.png",
+    "assets/vfx/user/user_vfx_05.png",
     "assets/vfx/crests/sword_crest.png",
     "assets/vfx/crests/spear_crest.png",
     "assets/vfx/crests/bow_crest.png",
