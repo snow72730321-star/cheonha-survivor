@@ -51,7 +51,7 @@ globalThis.VFXSprites=(()=>{
     skillSpearOverlord:{src:"assets/vfx/user/user_vfx_02.png",frameW:386,frameH:277,frames:16,fps:16.67,blend:"lighter"},
     skillBowArrowRain:{src:"assets/vfx/skills/bow_arrow_rain.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
     skillBowSunMoon:{src:"assets/vfx/skills/bow_sunmoon_burst.png",frameW:192,frameH:192,frames:8,fps:22,blend:"lighter"},
-    skillBowRicochetSeal:{src:"assets/vfx/user/user_vfx_03.png",frameW:400,frameH:300,frames:37,fps:33.33,blend:"lighter"},
+    skillBowRicochetSeal:{src:"assets/vfx/user/user_vfx_03.png",frameW:400,frameH:300,frames:37,fps:20,blend:"lighter"},
     skillPoisonThousand:{src:"assets/vfx/skills/poison_thousand_fan.png",frameW:192,frameH:160,frames:8,fps:25,blend:"lighter"},
     skillPoisonMiasma:{src:"assets/vfx/skills/poison_miasma_bloom.png",frameW:192,frameH:192,frames:8,fps:16,blend:"source-over"},
     skillPoisonLifeDeath:{src:"assets/vfx/user/user_vfx_05.png",frameW:334,frameH:292,frames:7,fps:11.11,blend:"lighter"},
@@ -189,6 +189,16 @@ drawProjectiles=function(){
   for(const p of projectiles){
     const angle=Math.atan2(p.vy,p.vx),speed=Math.hypot(p.vx,p.vy),trailLength=Math.min(90,24+speed*.12);
     const red=VFXSprites.isRed(p.color),gold=VFXSprites.isGold(p.color);
+    if(p.shape==="ultimateArrow"){
+      const pos=ws(p.x,p.y),z=mobileCameraScale(),pulse=.86+Math.sin(elapsed*10)*.12;ctx.save();ctx.translate(pos.x,pos.y);ctx.rotate(angle);ctx.globalCompositeOperation="lighter";ctx.shadowColor="#ffd75f";ctx.shadowBlur=18*z;
+      ctx.globalAlpha=.34;ctx.strokeStyle="#ff6d52";ctx.lineWidth=10*z;ctx.beginPath();ctx.moveTo(-58*z,0);ctx.lineTo(7*z,0);ctx.stroke();
+      ctx.globalAlpha=.92;ctx.strokeStyle="#ffe998";ctx.lineWidth=5.2*z*pulse;ctx.beginPath();ctx.moveTo(-45*z,0);ctx.lineTo(11*z,0);ctx.stroke();
+      ctx.globalAlpha=1;ctx.fillStyle="#fff7cf";ctx.beginPath();ctx.moveTo(24*z,0);ctx.lineTo(7*z,-10*z);ctx.lineTo(11*z,0);ctx.lineTo(7*z,10*z);ctx.closePath();ctx.fill();
+      ctx.fillStyle="#ff7b55";ctx.beginPath();ctx.moveTo(-38*z,0);ctx.lineTo(-54*z,-9*z);ctx.lineTo(-48*z,0);ctx.lineTo(-54*z,9*z);ctx.closePath();ctx.fill();
+      ctx.strokeStyle="#fff5bd";ctx.lineWidth=1.8*z;ctx.globalAlpha=.9;ctx.beginPath();ctx.moveTo(-22*z,-5*z);ctx.lineTo(7*z,-2*z);ctx.moveTo(-22*z,5*z);ctx.lineTo(7*z,2*z);ctx.stroke();ctx.restore();
+      const tx=p.x-Math.cos(angle)*48,ty=p.y-Math.sin(angle)*48;VFXSprites.draw("trailGold",tx,ty,{angle,scaleX:1.05,scaleY:.72,alpha:.72});
+      continue;
+    }
     if(p.trail||["crescent","spear","arrow","sword","fire","sun","moon","fist"].includes(p.shape)){
       const tx=p.x-Math.cos(angle)*trailLength*.45,ty=p.y-Math.sin(angle)*trailLength*.45;
       VFXSprites.draw(gold?"trailGold":"trailBlue",tx,ty,{angle,scaleX:Math.max(.32,trailLength/128),scaleY:.48,alpha:.5});

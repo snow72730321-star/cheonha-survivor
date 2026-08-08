@@ -134,13 +134,13 @@ function ultimateAttack(){
    aoe(player.x,player.y,235,96,"ultimate",{color:"#eaf7ff",shake:13});
  }else if(selectedWeapon==="spear"){
    const sx=player.x-Math.cos(a)*70,sy=player.y-Math.sin(a)*70,ex=player.x+Math.cos(a)*len,ey=player.y+Math.sin(a)*len;
-   lineHit(sx,sy,ex,ey,62,330,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});
-   lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,25,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
+   lineHit(sx,sy,ex,ey,90,330,"ultimate",{color:"#ffe3a0",knock:560,shake:20,life:.72});
+   lineHit(player.x+Math.cos(a)*90,player.y+Math.sin(a)*90,ex,ey,40,145,"ultimate",{color:"#fff4c8",knock:220,shake:8,life:.55});
    addVisual({type:"text",x:player.x+Math.cos(a)*110,y:player.y+Math.sin(a)*110-26,text:"관일 · 일점 돌파",life:.75,max:.75,color:"#fff0b8"});
  }else if(selectedWeapon==="bow"){
    // v14.5.6: 단발 다중 폭격 대신 10초간 화면 경계를 반사하는 절기 화살장으로 변경.
-   addVisual({type:"skillBowRicochetSeal",x:player.x+Math.cos(a)*34,y:player.y+Math.sin(a)*34,a,r:315,life:1.11,max:1.11,color:"#f6e77d",visibilityBoost:1.18,holdAlpha:true});
-   delayed.push({time:.72,type:"ricochetVolley",a,count:6,damage:38});
+   addVisual({type:"skillBowRicochetSeal",x:player.x+Math.cos(a)*34,y:player.y+Math.sin(a)*34,a,r:360,life:1.85,max:1.85,color:"#f6e77d",visibilityBoost:1.18,holdAlpha:true});
+   delayed.push({time:1.30,type:"ricochetVolley",a,count:6,damage:38});
  }else if(selectedWeapon==="poison"){
    fields.push({source:"ultimate",x:player.x,y:player.y,r:Math.max(W,H)*.58,damage:24,life:6.2,tick:.05,color:"#ae72c0"});
    aoe(player.x,player.y,245,72,"ultimate",{poison:24,poisonTime:7,color:"#ae72c0"});
