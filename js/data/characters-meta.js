@@ -203,17 +203,18 @@ function ultimateAttack(){
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
-   const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(112+stacks*2.8)*player.areaMul;
+   const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(130+stacks*3.1)*player.areaMul;
    const castX=player.x,castY=player.y,castA=a;
    setHuanglongStacks(0);
-   addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
+   addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:4.45,max:4.45,color:"#ffd85a",holdAlpha:true});
    // golden_dragon_charge source art faces left. Renderer rotates it by PI so its mouth faces castA.
    // Local source anchor=(562,340), mouth/energy convergence anchor≈(360,382), scale=.62.
    // Transform that local mouth offset with the same render angle so the beam is born at the dragon mouth.
    const chargeScale=.56,chargeRenderA=castA+Math.PI,chargeBack=124;
    const chargeBaseX=castX-Math.cos(castA)*chargeBack,chargeBaseY=castY-Math.sin(castA)*chargeBack;
-   // Energy orb / open-mouth convergence point measured from the charge sprite.
-   const mouthLocalX=(358-562)*chargeScale,mouthLocalY=-(381-340)*chargeScale;
+   // User-marked energy sphere center on the 822×663 source frame: approximately (174,381).
+   // Beam muzzle follows the exact same scale/flip/rotation/back-shift as the charge sprite.
+   const mouthLocalX=(174-562)*chargeScale,mouthLocalY=-(381-340)*chargeScale;
    const x0=chargeBaseX+Math.cos(chargeRenderA)*mouthLocalX-Math.sin(chargeRenderA)*mouthLocalY;
    const y0=chargeBaseY+Math.sin(chargeRenderA)*mouthLocalX+Math.cos(chargeRenderA)*mouthLocalY;
    delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a:castA,len:beamLen,width:beamWidth,damage:24*scale,stacks,castX,castY});
