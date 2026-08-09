@@ -6,7 +6,7 @@ function ok(v,m){if(!v)throw new Error(m)}
 for(let i=1;i<=5;i++)ok(fs.existsSync(`assets/vfx/user/user_vfx_0${i}.png`),`missing user VFX ${i}`);
 ok(vfx.includes('skillTaoFireDragon:{src:"assets/vfx/user/user_vfx_01.png"'),"VFX1 not mapped to tao");
 ok(vfx.includes('skillTaoFiveThunder:{src:"assets/vfx/user/user_vfx_04.png"'),"VFX4 not mapped to tao");
-ok(vfx.includes('skillPoisonLifeDeath:{src:"assets/vfx/user/user_vfx_05.png"'),"VFX5 not mapped to life/death talisman");
+ok(vfx.includes('skillStingrainExplosion:{src:"assets/vfx/user_poison/stingrain_explosion.png"'),"stingrain explosion missing");
 ok(vfx.includes('skillSpearOverlord:{src:"assets/vfx/user/user_vfx_02.png"'),"VFX2 not mapped to overlord spear");
 ok(vfx.includes('skillBowRicochetSeal:{src:"assets/vfx/user/user_vfx_03.png"'),"VFX3 not mapped to bow ultimate");
 ok(combat.includes('type:"overlordThrust"')&&combat.includes('type:"overlordBurst"'),"overlord spear staged mechanics missing");

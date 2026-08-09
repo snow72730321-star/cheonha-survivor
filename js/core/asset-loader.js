@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.6.6-saber-unity-15s";
+  const BUILD="v14.8.3-poison-rework";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -35,6 +35,11 @@ const GameAssets=(()=>{
     "assets/vfx/magic/magic_circle_red.png",
     "assets/vfx/magic/moon_orb.png",
     "assets/vfx/magic/poison_cloud.png",
+    "assets/vfx/user_poison/poison_explosion.png",
+    "assets/vfx/user_poison/poison_demon.png",
+    "assets/vfx/user_poison/stingrain_explosion.png",
+    "assets/vfx/user_poison/poison_butterfly.png",
+    "assets/vfx/user_poison/exploded_butterfly.png",
     "assets/vfx/weapons/arrow_green.png",
     "assets/vfx/weapons/fist_gold.png",
     "assets/vfx/weapons/needle_purple.png",

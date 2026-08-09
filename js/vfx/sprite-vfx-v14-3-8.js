@@ -58,6 +58,11 @@ globalThis.VFXSprites=(()=>{
     skillPoisonThousand:{src:"assets/vfx/skills/poison_thousand_fan.png",frameW:192,frameH:160,frames:8,fps:25,blend:"lighter"},
     skillPoisonMiasma:{src:"assets/vfx/skills/poison_miasma_bloom.png",frameW:192,frameH:192,frames:8,fps:16,blend:"source-over"},
     skillPoisonLifeDeath:{src:"assets/vfx/user/user_vfx_05.png",frameW:334,frameH:292,frames:7,fps:11.11,blend:"lighter"},
+    skillPoisonExplosion:{src:"assets/vfx/user_poison/poison_explosion.png",frameW:222,frameH:224,frames:5,cols:5,fps:10,blend:"lighter"},
+    skillPoisonDemon:{src:"assets/vfx/user_poison/poison_demon.png",frameW:400,frameH:500,frames:25,cols:5,fps:16.67,blend:"source-over"},
+    skillStingrainExplosion:{src:"assets/vfx/user_poison/stingrain_explosion.png",frameW:334,frameH:292,frames:7,cols:4,fps:11.11,blend:"lighter"},
+    skillPoisonButterfly:{src:"assets/vfx/user_poison/poison_butterfly.png",frameW:360,frameH:360,frames:1,cols:1,fps:1,blend:"lighter"},
+    skillExplodedButterfly:{src:"assets/vfx/user_poison/exploded_butterfly.png",frameW:512,frameH:512,frames:21,cols:7,fps:20,blend:"lighter"},
     skillTaoFireDragon:{src:"assets/vfx/user/user_vfx_01.png",frameW:257,frameH:258,frames:6,fps:11.11,blend:"lighter"},
     skillTaoIceArray:{src:"assets/vfx/skills/tao_ice_array.png",frameW:192,frameH:192,frames:8,fps:18,blend:"lighter"},
     skillTaoFiveThunder:{src:"assets/vfx/user/user_vfx_04.png",frameW:420,frameH:288,frames:12,fps:9.76,blend:"lighter"},
@@ -216,7 +221,8 @@ drawProjectiles=function(){
       const tx=p.x-Math.cos(angle)*trailLength*.45,ty=p.y-Math.sin(angle)*trailLength*.45;
       VFXSprites.draw(gold?"trailGold":"trailBlue",tx,ty,{angle,scaleX:Math.max(.32,trailLength/128),scaleY:.48,alpha:.5});
     }
-    if(p.shape==="arrow")VFXSprites.draw("arrowGreen",p.x,p.y,{angle,scale:.72+Math.min(.35,p.r/20)});
+    if(p.shape==="poisonButterfly")VFXSprites.draw("skillPoisonButterfly",p.x,p.y,{angle,scale:.22+Math.min(.12,p.r/80),alpha:.96});
+    else if(p.shape==="arrow")VFXSprites.draw("arrowGreen",p.x,p.y,{angle,scale:.72+Math.min(.35,p.r/20)});
     else if(p.shape==="spear")VFXSprites.draw("spearGold",p.x,p.y,{angle,scale:.58+Math.min(.55,p.r/22)});
     else if(p.shape==="crescent")VFXSprites.draw(red?"slashRed":"slashCyan",p.x,p.y,{angle,scale:.45+Math.min(1.25,p.r/18),age:elapsed*.72});
     else if(p.shape==="needle")VFXSprites.draw("needlePurple",p.x,p.y,{angle,scale:.72+Math.min(.35,p.r/18)});
@@ -291,7 +297,7 @@ drawVisuals=function(){
   const customCentered={
     skillSwordTaiji:"skillSwordTaiji",skillSwordTenk:"skillSwordTenk",skillSpearSpin:"skillSpearSpin",
     skillBowArrowRain:"skillBowArrowRain",skillBowSunMoon:"skillBowSunMoon",skillBowRicochetSeal:"skillBowRicochetSeal",skillPoisonMiasma:"skillPoisonMiasma",
-    skillPoisonLifeDeath:"skillPoisonLifeDeath",skillTaoIceArray:"skillTaoIceArray",skillTaoFiveThunder:"skillTaoFiveThunder",
+    skillPoisonLifeDeath:"skillPoisonLifeDeath",skillPoisonExplosion:"skillPoisonExplosion",skillPoisonDemon:"skillPoisonDemon",skillStingrainExplosion:"skillStingrainExplosion",skillExplodedButterfly:"skillExplodedButterfly",skillTaoIceArray:"skillTaoIceArray",skillTaoFiveThunder:"skillTaoFiveThunder",
     skillKatanaZanshin:"skillKatanaZanshin",
     skillKatanaNameless:"skillKatanaNameless",skillFistTaiji:"skillFistTaiji"
   };
@@ -299,7 +305,7 @@ drawVisuals=function(){
     const alpha=Math.max(0,Math.min(1,v.life/Math.max(.001,v.max||v.life||.2))),red=VFXSprites.isRed(v.color),poison=VFXSprites.isPoison(v.color),gold=VFXSprites.isGold(v.color);
     const progress=(1-alpha)*Math.max(.18,v.max||.3);
     if(customCentered[v.type]){
-      const id=customCentered[v.type],divisor=id==="skillKatanaNameless"?150:id==="skillBowRicochetSeal"?220:id==="skillPoisonLifeDeath"?175:id==="skillTaoFiveThunder"?190:96,scale=Math.max(.34,(v.r||105)/divisor);
+      const id=customCentered[v.type],divisor=id==="skillKatanaNameless"?150:id==="skillBowRicochetSeal"?220:id==="skillPoisonLifeDeath"?175:id==="skillPoisonDemon"?210:id==="skillExplodedButterfly"?190:id==="skillStingrainExplosion"?145:id==="skillPoisonExplosion"?105:id==="skillTaoFiveThunder"?190:96,scale=Math.max(.34,(v.r||105)/divisor);
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.32)*(v.visibilityBoost||1)):Math.min(1,alpha*(v.visibilityBoost||1));
       VFXSprites.drawOneShot(id,v.x,v.y,{age:progress,angle:v.a||0,scale,alpha:vis,blend:id==="skillPoisonMiasma"?"source-over":null});
     }else if(v.type==="skillTaoFireDragon"&&v.burst){

@@ -27,8 +27,6 @@ function emitSkillVfx(id,lv=1){const [c1,c2,c3]=vfxPalette(),x=player.x,y=player
   case "starfall": addVisual({type:"skillSpearStarfall",x,y,r:80+lv*9,life:.6,max:.6,color:c2}); break;
   case "arrowrain": addVisual({type:"skillBowArrowRain",x,y,r:Math.max(W,H)*.48,life:.8,max:.8,color:c1}); break;
   case "sunmoon": addVisual({type:"skillBowSunMoon",x,y,r:84+lv*9,life:.68,max:.68,color:c1}); break;
-  case "thousand": addVisual({type:"skillPoisonThousand",x,y,a,r:135+lv*11,life:.5,max:.5,color:c1}); break;
-  case "miasma": addVisual({type:"skillPoisonMiasma",x,y,r:88+lv*12,life:.82,max:.82,color:c2}); break;
   case "icepulse": addVisual({type:"skillTaoIceArray",x,y,r:118+lv*13,life:.48,max:.48,color:"#9eeaff"}); break;
   case "mountain": if(!((player.saberUnityTimer||0)>0&&player.saberUnityTrue))addVisual({type:"skillSaberMountain",x,y,a,r:260+lv*20,life:.68,max:.68,color:c2,width:30+lv*3}); break;
   case "moonchain": addVisual({type:"skillKatanaMoonChain",x,y,a,r:180+lv*17,life:.56,max:.56,color:c1,width:28}); break;

@@ -33,7 +33,7 @@ for(const file of pngs){
 if(!renderer.includes('skillSaberThunderFan:{src:"assets/vfx/skills/saber_thunder_fan.png"'))throw new Error("벽력도법 부채꼴 전용 스프라이트 누락");
 if(!renderer.includes('v.type==="cone"'))throw new Error("벽력도법 부채꼴 판정 렌더링 분기 누락");
 if(renderer.includes('const spearTypes=new Set(["cone"'))throw new Error("벽력도법 cone이 다시 창기 화살 스프라이트에 연결됨");
-for(const required of ["skillSwordMeteor","skillSpearSpin","skillBowArrowRain","skillPoisonThousand","skillTaoIceArray","skillSaberWhirlwindUser","skillKatanaNameless","skillFistTaiji"]){
+for(const required of ["skillSwordMeteor","skillSpearSpin","skillBowArrowRain","skillPoisonExplosion","skillPoisonDemon","skillStingrainExplosion","skillExplodedButterfly","skillTaoIceArray","skillSaberWhirlwindUser","skillKatanaNameless","skillFistTaiji"]){
   if(!renderer.includes(required))throw new Error(`무공별 전용 VFX 매핑 누락: ${required}`);
 }
 

@@ -4,7 +4,7 @@ const characterDefs={
  sword:{name:"백소린",title:"화산검희",ultimate:"천검개벽",quote:"일검이 만검을 부른다.",hair:"#22252e",robe:"#e5e7df",accent:"#78aebc"},
  spear:{name:"연하진",title:"철혈창군",ultimate:"파천관일",quote:"창끝이 닿는 곳이 곧 전장이다.",hair:"#4b2c27",robe:"#8b3432",accent:"#d5b46b"},
  bow:{name:"설아린",title:"천산궁녀",ultimate:"적궁백시",quote:"떨어트린다. 해와 달도, 하늘도.",hair:"#d9d7ce",robe:"#3e6758",accent:"#e3c06b"},
- poison:{name:"당유화",title:"당문독희",ultimate:"만독천라",quote:"보이지 않는 독이 가장 깊다.",hair:"#32243e",robe:"#5c3c68",accent:"#9fc76b"},
+ poison:{name:"당유화",title:"당문독희",ultimate:"추혼비접",quote:"보이지 않는 독이 가장 깊다.",hair:"#32243e",robe:"#5c3c68",accent:"#9fc76b"},
  tao:{name:"제갈청",title:"천문도사",ultimate:"구천뇌겁",quote:"하늘의 뜻을 부적으로 명한다.",hair:"#283b49",robe:"#d9ddd6",accent:"#65b6d4"},
  saber:{name:"마련화",title:"소천마도",ultimate:"천마합일",quote:"한 번 휘두르면 산도 갈라진다.",hair:"#3c211e",robe:"#6f302b",accent:"#d77b52"},
  katana:{name:"카구라 린",title:"월영낭인",ultimate:"무념일섬",quote:"검이 보였다면 이미 늦었다.",hair:"#171a22",robe:"#2f3043",accent:"#c8c9e8"},
@@ -164,8 +164,10 @@ function ultimateAttack(){
    addVisual({type:"skillBowRicochetSeal",x:player.x+Math.cos(a)*34,y:player.y+Math.sin(a)*34,a,r:360,life:1.85,max:1.85,color:"#f6e77d",visibilityBoost:1.18,holdAlpha:true});
    delayed.push({time:1.30,type:"ricochetVolley",a,count:6,damage:38});
  }else if(selectedWeapon==="poison"){
-   fields.push({source:"ultimate",x:player.x,y:player.y,r:Math.max(W,H)*.58,damage:24,life:6.2,tick:.05,color:"#ae72c0"});
-   aoe(player.x,player.y,245,72,"ultimate",{poison:24,poisonTime:7,color:"#ae72c0"});
+   const targets=visibleEnemies(0).slice(0,28);
+   if(!targets.length){for(let i=0;i<10;i++){const aa=a+(i-4.5)*.28;projectile({x:player.x,y:player.y,vx:Math.cos(aa)*420,vy:Math.sin(aa)*420,damage:42,r:13,life:2.4,pierce:0,shape:"poisonButterfly",color:"#8bdcff",source:"ultimate",homing:4.8,ignorePassive:true})}}
+   else for(let i=0;i<targets.length;i++){const e=targets[i],aa=Math.atan2(e.y-player.y,e.x-player.x)+(i%3-1)*.08;projectile({x:player.x,y:player.y,vx:Math.cos(aa)*(390+(i%4)*18),vy:Math.sin(aa)*(390+(i%4)*18),damage:42,r:13,life:2.8,pierce:0,shape:"poisonButterfly",color:"#8bdcff",source:"ultimate",homing:7.2,targetEnemy:e,ignorePassive:true})}
+   showMessage("추혼비접 · 산공",1.2);
  }else if(selectedWeapon==="tao"){
    const targets=visibleEnemies(0);
    for(let i=0;i<Math.min(24,targets.length);i++){const e=targets[i];delayed.push({time:i*.045,type:"strike",x:e.x,y:e.y,r:38,damage:96,source:"ultimate",color:"#9eeaff"})}

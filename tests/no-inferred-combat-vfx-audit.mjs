@@ -9,11 +9,11 @@ assert.doesNotMatch(sprite,/const\s+aoeBeforeSpriteVFX\s*=\s*aoe/);
 assert.doesNotMatch(sprite,/aoe\s*=\s*function\s*\([^)]*\)\s*\{[\s\S]*?explosionBlood/);
 
 // Dedicated skill paths deliberately suppress generic visual + hit feedback.
-for(const skill of ["skillPoisonLifeDeath","skillTaoFiveThunder","skillSaberWhirlwindUser","skillTaoFireDragon"]){
+for(const skill of ["skillPoisonExplosion","skillPoisonDemon","skillStingrainExplosion","skillTaoFiveThunder","skillSaberWhirlwindUser","skillTaoFireDragon"]){
   assert.match(combat,new RegExp(skill));
 }
 assert.match(combat,/whirlwind[\s\S]*?skipVisual:true[\s\S]*?skillSaberWhirlwindUser/);
-assert.match(combat,/skillPoisonLifeDeath[\s\S]*?skipVisual:true/);
+assert.match(combat,/skillPoisonDemon[\s\S]*?skipVisual:true/);
 assert.match(combat,/skillTaoFiveThunder[\s\S]*?skipVisual:true/);
 assert.match(combat,/skillTaoFireDragon[\s\S]*?skipVisual:true/);
 
