@@ -42,13 +42,6 @@ const WeaponVisuals=(()=>{
     return family(id||selectedWeapon||"sword").hud||family(id||selectedWeapon||"sword").asset;
   }
   function rarity(item){return rarities[item?.grade]||rarities.common}
-  function resonance(item){
-    const lines=item?.potentials||[];let off=0,def=0,score=0;
-    const offensive=new Set(["damage","crit","critDamage","boss","attackSpeed","cooldown","area","projectile","pierce"]);
-    const defensive=new Set(["hp","reduction","speed"]),gs={rare:1,epic:2,unique:3,legendary:4};
-    for(const x of lines){if(offensive.has(x.key))off++;if(defensive.has(x.key))def++;score+=gs[x.grade]||1}
-    if(off>=3)return "killing";if(def>=2)return "guard";if(off>=2)return "martial";if(score>=10)return "refined";return "";
-  }
   function decorate(node,item,fallbackFamily){
     if(!node)return;
     item=normalize(item);const el=element(item),lv=tier(item),wid=item?.visualId||fallbackFamily||selectedWeapon||"sword",rar=rarity(item);
@@ -56,18 +49,17 @@ const WeaponVisuals=(()=>{
     const img=node.querySelector("img");if(img){img.src=asset(item||wid);img.alt=`${family(wid).name} 무기`;img.style.filter=el.filter+` drop-shadow(0 5px 4px rgba(0,0,0,.68)) drop-shadow(0 0 ${4+rar.glow+lv*3}px ${el.color})`}
   }
   function renderAnvilWeapon(node,item){
-    if(!node||!item)return;normalize(item);const el=element(item),lv=tier(item),res=resonance(item);
-    node.innerHTML=`<div class="anvil-weapon-aura"></div><img class="anvil-weapon-img" src="${asset(item)}" alt="${item.name}"><div class="anvil-weapon-meta"><b>+${item.level||0}</b><span>${el.name}${res?" · "+({killing:"살기",guard:"호신",martial:"무예",refined:"고급"}[res]):""}</span></div>`;
-    node.className=`anvil-weapon weapon-tier-${lv} resonance-${res||"none"}`;decorate(node,item,item.weapon);
+    if(!node||!item)return;normalize(item);const el=element(item),lv=tier(item);
+    node.innerHTML=`<div class="anvil-weapon-aura"></div><img class="anvil-weapon-img" src="${asset(item)}" alt="${item.name}"><div class="anvil-weapon-meta"><b>+${item.level||0}</b><span>${el.name}</span></div>`;
+    node.className=`anvil-weapon weapon-tier-${lv}`;decorate(node,item,item.weapon);
   }
   function updateUltimateButton(){
     const btn=document.getElementById("ultimateBtn");if(!btn)return;
     let img=btn.querySelector(".ultimate-weapon-img");if(!img){img=document.createElement("img");img.className="ultimate-weapon-img";img.setAttribute("aria-hidden","true");btn.insertBefore(img,document.getElementById("ultimateCd"));}
     let tag=btn.querySelector(".ultimate-weapon-tag");if(!tag){tag=document.createElement("span");tag.className="ultimate-weapon-tag";btn.insertBefore(tag,document.getElementById("ultimateCd"));}
     const item=equipped(selectedWeapon),wid=selectedWeapon||"sword",el=element(item),lv=tier(item);
-    decorate(btn,item,wid);img.src=hudAsset(item||wid);
+    decorate(btn,item,wid);delete btn.dataset.resonance;img.src=hudAsset(item||wid);
     const enhance=Number(item?.level)||0;tag.textContent=enhance>0?`+${enhance}`:"";tag.style.display=enhance>0?"block":"none";
-    btn.dataset.resonance=resonance(item)||"none";
     if(!item){img.src=hudAsset(wid);img.alt=family(wid).name;img.style.filter=`drop-shadow(0 0 5px ${el.color})`}
   }
   function drawAuraLayer(front){
@@ -84,11 +76,10 @@ const WeaponVisuals=(()=>{
     }else{
       const count=lv===3?7:lv===2?5:lv===1?3:1;ctx.shadowColor=el.color;ctx.shadowBlur=(5+lv*4)*z;
       for(let i=0;i<count;i++){const phase=t*(.62+lv*.11)+i*6.283185307/count;const r=(22+lv*6+(i%2)*5)*z;const yoff=Math.sin(t*1.35+i*1.7)*9*z;ctx.globalAlpha=.24+lv*.07;ctx.beginPath();ctx.arc(cx+Math.cos(phase)*r,cy-13*z+yoff+Math.sin(phase)*8*z,(1.1+lv*.35)*z,0,Math.PI*2);ctx.fill();}
-      const res=resonance(item);if(res){ctx.globalAlpha=.18;ctx.lineWidth=1.4*z;ctx.setLineDash(res==="guard"?[5*z,4*z]:res==="killing"?[2*z,5*z]:[7*z,5*z]);ctx.beginPath();ctx.arc(cx,cy-11*z,(31+lv*3)*z,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
     }
     ctx.restore();
   }
-  return {families,elements,rarities,normalize,equipped,family,element,rarity,tier,asset,hudAsset,resonance,decorate,renderAnvilWeapon,updateUltimateButton,drawAuraLayer};
+  return {families,elements,rarities,normalize,equipped,family,element,rarity,tier,asset,hudAsset,decorate,renderAnvilWeapon,updateUltimateButton,drawAuraLayer};
 })();
 
 // 기존 절기 HUD와 플레이어 렌더러를 파괴하지 않고 비주얼만 덧씌운다.

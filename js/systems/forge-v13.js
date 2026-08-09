@@ -212,7 +212,7 @@
     const equipBtn=root.querySelector("#forgeDetailEquip"),isEq=account.equipped[item.weapon]===item.id;equipBtn.textContent=isEq?"장착 해제":"이 무기 장착";equipBtn.classList.toggle("is-equipped",isEq);
     root.querySelector("#potentialGrade").textContent=`${POTENTIAL_NAMES[item.potentialGrade]} 잠재 · 최대 ${POTENTIAL_NAMES[maxPotentialGrade(item)]}`;
     root.querySelector("#potentialGrade").style.color=POTENTIAL_COLORS[item.potentialGrade];
-    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 효과 발동</p>`;
+    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 능력치 보너스 발동</p>`;
     root.querySelector("#normalRefine").textContent=`일반 정련 · ${refineCost(item,false)}금자`;
     root.querySelector("#blackRefine").textContent=`흑옥 정련 · ${refineCost(item,true)}금자`;
     root.querySelector("#potentialCompare").innerHTML="";
