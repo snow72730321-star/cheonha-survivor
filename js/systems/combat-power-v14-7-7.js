@@ -5,7 +5,7 @@
  * 핵심 캘리브레이션: 전설 +15(무옵션 기준) ~= 신화 +0 = 수라 권장 전투력 20,000.
  */
 const CombatPowerSystem=(()=>{
-  const RECOMMENDED=Object.freeze({chuchul:5000,beombu:8500,gosu:13000,sura:20000});
+  const RECOMMENDED=Object.freeze({chuchul:5000,beombu:8500,gosu:13000,sura:20000,abyss:100000});
   const GRADE_BASE={common:.32,rare:.42,epic:.56,unique:.74,legendary:1,mythic:0,eternal:2.36};
   const GRADE_EXPECTED_BASE={common:1.06,rare:1.18,epic:1.30,unique:1.42,legendary:1.54,mythic:1.66,eternal:1.78};
   const OFFENSIVE=new Set(["damage","crit","critDamage","boss","attackSpeed","cooldown","area","projectile","pierce"]);

@@ -149,7 +149,9 @@ const SaveManager=(()=>{
         paths:plainObject(stats.paths),
         runs:Math.floor(finite(stats.runs,0,0,1e9)),
         quits:Math.floor(finite(stats.quits,0,0,1e9)),
-        bestDifficulty:Math.floor(finite(stats.bestDifficulty,0,0,4)),
+        bestDifficulty:Math.floor(finite(stats.bestDifficulty,0,0,5)),
+        bestAbyssTime:finite(stats.bestAbyssTime,0,0,1e9),
+        bestAbyssKills:Math.floor(finite(stats.bestAbyssKills,0,0,1e12)),
         totalDamage:finite(stats.totalDamage,0,0,1e18)
       },
       settings:sanitizeSettings(source.settings),

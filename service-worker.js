@@ -1,13 +1,13 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-8-6-enhancement-economy";
+const CACHE="cheonha-v14-8-7-endless-abyss";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
   "js/core/runtime-state.js","js/core/game-events.js","js/core/save-manager.js","js/core/asset-loader.js","js/core/pwa.js","js/core/startup.js",
   "js/data/balance-v14.js","js/data/characters-meta.js",
-  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/combat-power-v14-7-7.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js",
+  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/combat-power-v14-7-7.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js","js/systems/abyss-mode-v14-8-7.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster-v14-3-18.js","js/render/weapon-visuals-v14-4.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js",
   "js/audio/audio-manager-v14-3-8.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-8.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-8.js",
