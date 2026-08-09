@@ -430,7 +430,9 @@ damageEnemy=function(enemy,damage,source,options={}){
   const hpBefore=enemy.hp;
   const result=damageEnemyBeforeSpriteVFX(enemy,damage,source,options);
   const dealt=Math.max(0,hpBefore-Math.max(0,enemy.hp));
-  if(dealt>0){
+  // Dedicated skill sprites use skipVisual:true so their art remains visually exclusive.
+  // Generic hit feedback is kept only for attacks that did not explicitly suppress visuals.
+  if(dealt>0&&!options.skipVisual&&!options.skipImpactVfx){
     const color=options.color||C[selectedWeapon]||"#8fe8ff";
     const id=VFXSprites.isRed(color)?"hitRed":VFXSprites.isGold(color)?"hitGold":"hitBlue";
     VFXSprites.spawn(id,enemy.x,enemy.y,{scale:.40+Math.min(1.1,dealt/85),angle:Math.random()*Math.PI*2});
@@ -446,14 +448,9 @@ hurtPlayer=function(amount){
   return result;
 };
 
-const aoeBeforeSpriteVFX=aoe;
-aoe=function(x,y,r,damage,source,options={}){
-  const result=aoeBeforeSpriteVFX(x,y,r,damage,source,options);
-  const color=options.color||C[selectedWeapon]||"#8fe8ff";
-  const id=VFXSprites.isRed(color)?"explosionBlood":VFXSprites.isGold(color)?"explosionFire":"shockBlue";
-  VFXSprites.spawn(id,x,y,{scale:Math.max(.35,Math.min(2.25,r/68)),angle:Math.random()*Math.PI*2});
-  return result;
-};
+// v14.7.9: aoe() is gameplay-only. It must never infer or inject attack art.
+// The base aoe() may create its own legacy ring when skipVisual is false; reworked skills
+// create their dedicated sprite explicitly at the skill call site.
 
 const updateBeforeSpriteVFX=update;
 update=function(dt){
