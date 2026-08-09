@@ -16,17 +16,29 @@
  */
 (function installForgeV13(){
   const BUILD = 15;
-  const ENHANCE_CHANCE = [1, .95, .90, .85, .80, .70, .60, .50, .40, .30, .22, .16, .11, .07, .04];
+  const MAX_ENHANCE = 25;
+  // 현재 단계에서 다음 단계로 올라갈 기본 성공률(+0→+1 ... +24→+25).
+  const ENHANCE_CHANCE = [1,.95,.90,.85,.80,.70,.60,.50,.40,.30,.22,.16,.11,.07,.04,.035,.03,.026,.022,.018,.015,.012,.010,.008,.006];
+  // 높은 등급일수록 같은 강화 단계에서 얻는 상대 피해 증가량이 더 크다.
+  const GRADE_ENHANCE_SCALE = {common:.82,rare:.90,epic:.98,unique:1.07,legendary:1.17,mythic:1.30,eternal:1.46};
   const POTENTIAL_ORDER = ["rare", "epic", "unique", "legendary"];
   const POTENTIAL_NAMES = {rare:"희귀",epic:"서사",unique:"고유",legendary:"전설"};
   const POTENTIAL_COLORS = {rare:"#68a7ff",epic:"#bd79ff",unique:"#ef9c4c",legendary:"#ff5d57"};
   const TIER_UP_NORMAL = {rare:.08,epic:.04,unique:.015};
   const TIER_UP_BLACK = {rare:.12,epic:.06,unique:.025};
 
-  /** 강화 단계에 따른 총 피해 배율. 기존 제작 품질과 곱해진다. */
-  function enhancementMultiplier(level){
-    let value = 1;
-    for(let i=1;i<=level;i++) value *= 1 + (i%5===0 ? .085 : .044);
+  /** 강화 단계에 따른 총 피해 배율. 등급이 높을수록 강화 효율이 커진다. */
+  function enhancementMultiplier(level,itemOrGrade){
+    const grade=typeof itemOrGrade==="string"?itemOrGrade:itemOrGrade?.grade;
+    const scale=GRADE_ENHANCE_SCALE[grade]||1;
+    let value=1;
+    const max=Math.max(0,Math.min(MAX_ENHANCE,Number(level)||0));
+    for(let i=1;i<=max;i++){
+      // 5단위 돌파는 크게, +16 이후는 초고강화 구간으로 추가 성장.
+      const base=i%5===0 ? .072 : .036;
+      const high=i>=16 ? (i>=21?1.22:1.10) : 1;
+      value*=1+base*scale*high;
+    }
     return value;
   }
 
@@ -39,15 +51,15 @@
   }
 
   function normalizeWeapon(item){
-    item.level = Math.max(0, Math.min(15, Number(item.level)||0));
+    item.level = Math.max(0, Math.min(MAX_ENHANCE, Number(item.level)||0));
     item.failStack = Math.max(0, Math.min(5, Number(item.failStack)||0));
     item.rerolls = Number(item.rerolls)||0;
     item.potentialPity = Math.max(0, Math.min(.05, Number(item.potentialPity)||0));
     if(!item.baseDamageMul){
       // 구버전 강화로 증가한 피해량을 보존하면서 새 계산식으로 전환한다.
-      item.baseDamageMul = (Number(item.damageMul)||1) / enhancementMultiplier(item.level);
+      item.baseDamageMul = (Number(item.damageMul)||1) / enhancementMultiplier(item.level,item);
     }
-    item.damageMul = item.baseDamageMul * enhancementMultiplier(item.level);
+    item.damageMul = item.baseDamageMul * enhancementMultiplier(item.level,item);
     item.visualId = (window.WeaponVisuals?.families?.[item.visualId] ? item.visualId : item.weapon);
     item.element = (window.WeaponVisuals?.elements?.[item.element] ? item.element : item.ability);
     item.potentialGrade = POTENTIAL_ORDER.includes(item.potentialGrade) ? item.potentialGrade : "rare";
@@ -138,9 +150,16 @@
     return `${line.name} ${value}`;
   }
 
-  function enhanceCost(item){return Math.floor(80 + item.level*55 + gradeIndex(item.grade)*32)}
+  function enhanceCost(item){
+    const lv=Math.max(0,Number(item.level)||0),gi=gradeIndex(item.grade);
+    return Math.floor(80 + lv*55 + Math.max(0,lv-15)**2*10 + gi*32 + (lv>=20?gi*18:0));
+  }
   function refineCost(item,black){return Math.floor((black?360:150) + item.rerolls*(black?35:22) + gradeIndex(item.grade)*28)}
-  function finalEnhanceChance(item){return Math.min(1,(ENHANCE_CHANCE[item.level]||0) + item.failStack*.05)}
+  function finalEnhanceChance(item){
+    const lv=Math.max(0,Number(item.level)||0),base=ENHANCE_CHANCE[lv]||0;
+    const pityStep=lv>=20?.012:lv>=15?.02:.05;
+    return Math.min(1,base + item.failStack*pityStep);
+  }
 
   let selectedItemId=null;
   let pendingPotential=null;
@@ -205,33 +224,34 @@
     root.querySelector("#forgeDetailPower").textContent=`${item.damageMul.toFixed(2)}x · +${item.level}`;
     if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
     else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
-    root.querySelector("#enhanceLevel").textContent=item.level>=15?"최대 강화":`+${item.level} → +${item.level+1}`;
-    root.querySelector("#enhanceRate").textContent=item.level>=15?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
-    root.querySelector("#enhanceCost").textContent=item.level>=15?"-":enhanceCost(item);
-    root.querySelector("#enhanceExecute").disabled=item.level>=15;
+    root.querySelector("#enhanceLevel").textContent=item.level>=MAX_ENHANCE?"최대 강화":`+${item.level} → +${item.level+1}`;
+    root.querySelector("#enhanceRate").textContent=item.level>=MAX_ENHANCE?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
+    root.querySelector("#enhanceCost").textContent=item.level>=MAX_ENHANCE?"-":enhanceCost(item);
+    root.querySelector("#enhanceExecute").disabled=item.level>=MAX_ENHANCE;
     const equipBtn=root.querySelector("#forgeDetailEquip"),isEq=account.equipped[item.weapon]===item.id;equipBtn.textContent=isEq?"장착 해제":"이 무기 장착";equipBtn.classList.toggle("is-equipped",isEq);
     root.querySelector("#potentialGrade").textContent=`${POTENTIAL_NAMES[item.potentialGrade]} 잠재 · 최대 ${POTENTIAL_NAMES[maxPotentialGrade(item)]}`;
     root.querySelector("#potentialGrade").style.color=POTENTIAL_COLORS[item.potentialGrade];
-    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 능력치 보너스 발동</p>`;
+    root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15 / +20 / +25에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 능력치 보너스 발동</p>`;
     root.querySelector("#normalRefine").textContent=`일반 정련 · ${refineCost(item,false)}금자`;
     root.querySelector("#blackRefine").textContent=`흑옥 정련 · ${refineCost(item,true)}금자`;
     root.querySelector("#potentialCompare").innerHTML="";
   }
 
   function executeEnhance(){
-    const item=selectedItem(); if(!item||item.level>=15)return;
+    const item=selectedItem(); if(!item||item.level>=MAX_ENHANCE)return;
     const cost=enhanceCost(item), scene=detailOverlay().querySelector("#anvilScene"), message=detailOverlay().querySelector("#enhanceMessage");
     if(account.gold<cost){message.className="forge-result-message bad";message.textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;GameAudio.playUI("error");return}
     account.gold-=cost; scene.className="anvil-scene striking"; message.className="forge-result-message"; message.textContent="장인이 호흡을 가다듬고 망치를 내리친다…"; GameAudio.playUI("forge-strike");
     setTimeout(()=>{
       const success=Math.random()<finalEnhanceChance(item);
       if(success){
-        item.level++; item.failStack=0; item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level);
+        item.level++; item.failStack=0; item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level,item);
         scene.className="anvil-scene success"; message.className="forge-result-message good";message.textContent=`강화 성공! ${item.name}이 +${item.level}에 도달했다.`;
         GameAudio.playUI("forge-success");setTimeout(()=>GameAudio.playUI("forge-success-tail"),75);
       }else{
         item.failStack=Math.min(5,item.failStack+1);
-        scene.className="anvil-scene failure"; message.className="forge-result-message bad";message.textContent=`강화 실패. 장인의 숨결이 ${item.failStack*5}%p 누적됐다. 단계 하락이나 파괴는 없다.`;
+        scene.className="anvil-scene failure"; message.className="forge-result-message bad";const pityStep=item.level>=20?1.2:item.level>=15?2:5;
+        message.textContent=`강화 실패. 장인의 숨결이 ${(item.failStack*pityStep).toFixed(item.level>=15?1:0)}%p 누적됐다. 단계 하락이나 파괴는 없다.`;
         GameAudio.playUI("forge-failure");
       }
       saveAccountData();renderDetail();setTimeout(()=>scene.className="anvil-scene",650);
@@ -329,13 +349,15 @@
     if(typeof checkAchievements==="function")checkAchievements();
   };
 
-  /** 강화 단계가 단순 피해 배율에 그치지 않도록 +5/+10/+15에서 전투 체감 보너스를 준다. */
+  /** 강화 단계가 단순 피해 배율에 그치지 않도록 +5/+10/+15/+20/+25에서 전투 체감 보너스를 준다. */
   function applyEnhanceMilestones(item){
     const lv=Math.max(0,Number(item.level)||0);
     player.forgeMilestones=[];
     if(lv>=5){player.damageMul*=1.05;player.ultimateGain*=1.08;player.speed*=1.03;player.forgeMilestones.push("+5 개봉 · 피해 +5% / 절기 충전 +8% / 이동 +3%")}
     if(lv>=10){player.critChance+=.05;player.cooldownRate*=1.08;player.forgeMilestones.push("+10 진명 · 치명 +5% / 부가 무공 재사용 +8%")}
     if(lv>=15){player.eliteDamageMul*=1.15;player.ultimateGain*=1.12;player.areaMul*=1.08;player.forgeMilestones.push("+15 신병 · 정예·보스 피해 +15% / 절기 충전 +12% / 범위 +8%")}
+    if(lv>=20){player.damageMul*=1.08;player.cooldownRate*=1.08;player.damageReduction=Math.min(.65,player.damageReduction+.025);player.forgeMilestones.push("+20 현경 · 피해 +8% / 부가 무공 재사용 +8% / 피해 감소 +2.5%")}
+    if(lv>=25){player.eliteDamageMul*=1.18;player.critChance+=.06;player.areaMul*=1.10;player.ultimateGain*=1.10;player.forgeMilestones.push("+25 극성 · 정예·보스 피해 +18% / 치명 +6% / 범위 +10% / 절기 충전 +10%")}
   }
 
   /** 3줄 잠재의 조합 자체에도 보상을 주어 좋은 잠재를 맞춘 체감이 전투에서 드러나게 한다. */
@@ -380,5 +402,5 @@
   // 저장 데이터를 불러오기 전 기본 계정을 덮어쓰지 않는다.
   detailOverlay();
   GameEvents.on("save:loaded",()=>{if(migrateForgeData())saveAccountData()});
-  window.CheonHaForgeV13={openDetail,normalizeWeapon,enhancementMultiplier,potentialText};
+  window.CheonHaForgeV13={openDetail,normalizeWeapon,enhancementMultiplier,potentialText,MAX_ENHANCE,GRADE_ENHANCE_SCALE};
 })();

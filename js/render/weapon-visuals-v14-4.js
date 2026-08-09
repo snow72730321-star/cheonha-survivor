@@ -32,7 +32,7 @@ const WeaponVisuals=(()=>{
   }
   function family(wid){return families[wid]||families.sword}
   function element(item){return elements[normalize(item)?.element||"han"]||elements.han}
-  function tier(item){const lv=Number(item?.level)||0;return lv>=15?3:lv>=10?2:lv>=5?1:0}
+  function tier(item){const lv=Number(item?.level)||0;return lv>=25?5:lv>=20?4:lv>=15?3:lv>=10?2:lv>=5?1:0}
   function asset(itemOrFamily){
     const id=typeof itemOrFamily==="string"?itemOrFamily:normalize(itemOrFamily)?.visualId;
     return family(id||selectedWeapon||"sword").asset;
@@ -74,7 +74,7 @@ const WeaponVisuals=(()=>{
       ctx.beginPath();ctx.ellipse(cx,cy,(24+lv*5)*z*pulse,(8+lv*1.5)*z*pulse,0,0,Math.PI*2);ctx.stroke();
       if(lv>=2){ctx.globalAlpha=.09+lv*.035;ctx.beginPath();ctx.arc(cx,cy-13*z,(28+lv*4)*z*(1+Math.sin(t*1.7)*.03),0,Math.PI*2);ctx.stroke();}
     }else{
-      const count=lv===3?7:lv===2?5:lv===1?3:1;ctx.shadowColor=el.color;ctx.shadowBlur=(5+lv*4)*z;
+      const count=lv>=5?12:lv===4?9:lv===3?7:lv===2?5:lv===1?3:1;ctx.shadowColor=el.color;ctx.shadowBlur=(5+lv*4)*z;
       for(let i=0;i<count;i++){const phase=t*(.62+lv*.11)+i*6.283185307/count;const r=(22+lv*6+(i%2)*5)*z;const yoff=Math.sin(t*1.35+i*1.7)*9*z;ctx.globalAlpha=.24+lv*.07;ctx.beginPath();ctx.arc(cx+Math.cos(phase)*r,cy-13*z+yoff+Math.sin(phase)*8*z,(1.1+lv*.35)*z,0,Math.PI*2);ctx.fill();}
     }
     ctx.restore();

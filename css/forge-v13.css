@@ -95,6 +95,8 @@
 .weapon-tier-1 .anvil-weapon-img{filter:drop-shadow(0 7px 5px rgba(0,0,0,.76)) drop-shadow(0 0 10px var(--weapon-aura))}
 .weapon-tier-2 .anvil-weapon-img{filter:brightness(1.06) contrast(1.04) drop-shadow(0 7px 5px rgba(0,0,0,.78)) drop-shadow(0 0 15px var(--weapon-aura))}
 .weapon-tier-3 .anvil-weapon-img{filter:brightness(1.13) contrast(1.07) saturate(1.1) drop-shadow(0 7px 5px rgba(0,0,0,.8)) drop-shadow(0 0 22px var(--weapon-aura));animation:masterWeaponPulse 1.25s ease-in-out infinite alternate}
+.weapon-tier-4 .anvil-weapon-img{filter:brightness(1.20) contrast(1.09) saturate(1.16) drop-shadow(0 7px 5px rgba(0,0,0,.82)) drop-shadow(0 0 30px var(--weapon-aura));animation:masterWeaponPulse .95s ease-in-out infinite alternate}
+.weapon-tier-5 .anvil-weapon-img{filter:brightness(1.30) contrast(1.11) saturate(1.22) drop-shadow(0 7px 5px rgba(0,0,0,.84)) drop-shadow(0 0 40px var(--weapon-aura));animation:masterWeaponPulse .72s ease-in-out infinite alternate}
 .art-anvil-scene .forge-fire{filter:blur(1px) saturate(1.18);box-shadow:0 0 36px rgba(255,126,34,.32)}
 .art-anvil-scene .forge-scene-glow{background:radial-gradient(ellipse,rgba(255,184,72,.28),rgba(214,74,23,.10) 42%,transparent 72%);filter:blur(15px)}
 .art-anvil-scene .forge-sparks{mix-blend-mode:screen}
