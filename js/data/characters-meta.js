@@ -207,10 +207,11 @@ function ultimateAttack(){
    // golden_dragon_charge source art faces left. Renderer rotates it by PI so its mouth faces castA.
    // Local source anchor=(562,340), mouth/energy convergence anchor≈(360,382), scale=.62.
    // Transform that local mouth offset with the same render angle so the beam is born at the dragon mouth.
-   const chargeScale=.62,chargeRenderA=castA+Math.PI;
-   const mouthLocalX=(360-562)*chargeScale,mouthLocalY=(382-340)*chargeScale;
-   const x0=castX+Math.cos(chargeRenderA)*mouthLocalX-Math.sin(chargeRenderA)*mouthLocalY;
-   const y0=castY+Math.sin(chargeRenderA)*mouthLocalX+Math.cos(chargeRenderA)*mouthLocalY;
+   const chargeScale=.62,chargeRenderA=castA+Math.PI,chargeBack=92;
+   const chargeBaseX=castX-Math.cos(castA)*chargeBack,chargeBaseY=castY-Math.sin(castA)*chargeBack;
+   const mouthLocalX=(360-562)*chargeScale,mouthLocalY=-(382-340)*chargeScale;
+   const x0=chargeBaseX+Math.cos(chargeRenderA)*mouthLocalX-Math.sin(chargeRenderA)*mouthLocalY;
+   const y0=chargeBaseY+Math.sin(chargeRenderA)*mouthLocalX+Math.cos(chargeRenderA)*mouthLocalY;
    delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a:castA,len:beamLen,width:beamWidth,damage:24*scale,stacks,castX,castY});
    addVisual({type:"text",x:castX,y:castY-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
  }

@@ -346,14 +346,15 @@ drawVisuals=function(){
         skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304)},
         skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
-        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.62,angleOffset:Math.PI}
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.62,angleOffset:Math.PI,flipY:true,backwardOffset:92}
       }[v.type];
       const renderA=a+(cfg.angleOffset||0);
-      const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale;
-      const x=v.x+Math.cos(renderA)*localX-Math.sin(renderA)*localY;
-      const y=v.y+Math.sin(renderA)*localX+Math.cos(renderA)*localY;
+      const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale*(cfg.flipY?-1:1);
+      const back=cfg.backwardOffset||0,baseX=v.x-Math.cos(a)*back,baseY=v.y-Math.sin(a)*back;
+      const x=baseX+Math.cos(renderA)*localX-Math.sin(renderA)*localY;
+      const y=baseY+Math.sin(renderA)*localX+Math.cos(renderA)*localY;
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
-      VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scale:cfg.scale,alpha:vis});
+      VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scaleX:cfg.scale,scaleY:cfg.flipY?-cfg.scale:cfg.scale,alpha:vis});
     }else if(v.type==="skillFistGoldenBeam"){
       const a=v.a||0,len=v.r||700,width=v.width||90;
       // Beam local source is the left edge; its center is therefore half a beam length forward.

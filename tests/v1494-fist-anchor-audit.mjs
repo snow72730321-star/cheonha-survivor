@@ -10,8 +10,8 @@ for(const sig of [
   'skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340'
 ])ok(sprite.includes(sig),`missing explicit source anchor: ${sig}`);
 ok(sprite.includes('localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale'),"source-anchor transform missing");
-ok(sprite.includes('x=v.x+Math.cos(renderA)*localX-Math.sin(renderA)*localY'),"rotated X anchor transform missing");
-ok(sprite.includes('y=v.y+Math.sin(renderA)*localX+Math.cos(renderA)*localY'),"rotated Y anchor transform missing");
-ok(meta.includes('mouthLocalX=(360-562)*chargeScale')&&meta.includes('mouthLocalY=(382-340)*chargeScale'),"charge mouth-anchor missing");
+ok(sprite.includes('x=baseX+Math.cos(renderA)*localX-Math.sin(renderA)*localY'),"rotated X anchor transform missing");
+ok(sprite.includes('y=baseY+Math.sin(renderA)*localX+Math.cos(renderA)*localY'),"rotated Y anchor transform missing");
+ok(meta.includes('mouthLocalX=(360-562)*chargeScale')&&meta.includes('mouthLocalY=-(382-340)*chargeScale'),"charge mouth-anchor missing");
 ok(sprite.includes('Beam local source is the left edge'),"beam source-edge policy missing");
 console.log("v14.9.4 fist anchor audit: OK");
