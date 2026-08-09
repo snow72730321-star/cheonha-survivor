@@ -201,11 +201,12 @@ function ultimateAttack(){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
    const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(82+stacks*2.2)*player.areaMul;
+   const castX=player.x,castY=player.y,castA=a;
    setHuanglongStacks(0);
-   addVisual({type:"skillFistGoldenCharge",x:player.x,y:player.y,a,r:205,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
-   const chargeScale=.55,muzzle=(650-260)*chargeScale,x0=player.x+Math.cos(a)*muzzle,y0=player.y+Math.sin(a)*muzzle;
-   delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a,len:beamLen,width:beamWidth,damage:24*scale,stacks});
-   addVisual({type:"text",x:player.x,y:player.y-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
+   addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
+   const muzzle=58,x0=castX+Math.cos(castA)*muzzle,y0=castY+Math.sin(castA)*muzzle;
+   delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a:castA,len:beamLen,width:beamWidth,damage:24*scale,stacks,castX,castY});
+   addVisual({type:"text",x:castX,y:castY-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
  }
  showMessage(currentUltimateName(selectedWeapon),1.5);
 }

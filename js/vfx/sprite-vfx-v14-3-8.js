@@ -338,15 +338,15 @@ drawVisuals=function(){
       // All directional fist sprites are normalized so +X is forward.
       // sourceX/sourceY are the local pixel coordinates that must sit on the caster/impact point.
       const cfg={
-        skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:46,sourceY:103,scale:Math.max(.34,r/512)},
+        skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:466,sourceY:103,scale:Math.max(.72,r/250)},
         skillFistHundredShoot:{id:"skillFistHundredShoot",fw:466,fh:275,sourceX:233,sourceY:138,scale:.56},
         skillFistHundredCombo:{id:"skillFistHundredCombo",fw:640,fh:483,sourceX:320,sourceY:242,scale:.38},
-        skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.38,r/382)},
-        skillFistDragonKickCombo:{id:"skillFistDragonKickCombo",fw:460,fh:540,sourceX:230,sourceY:300,scale:.42},
+        skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.78,r/250)},
+        skillFistDragonKickCombo:{id:"skillFistDragonKickCombo",fw:460,fh:540,sourceX:230,sourceY:300,scale:.56},
         skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304)},
         skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
-        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:260,sourceY:340,scale:.55}
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.62}
       }[v.type];
       const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale;
       const x=v.x+Math.cos(a)*localX-Math.sin(a)*localY;
