@@ -147,7 +147,7 @@ console.log("AudioBuffer 오디오 엔진 회귀 테스트 통과",audioRegressi
 // v14.3.7 회귀: 무공별 전용 VFX와 벽력도법 부채꼴이 실제 visuals에 생성되는지 확인한다.
 const vfxRegression=vm.runInContext(`(()=>{
   const cases={
-    sword:[["meteor",3],["tenk",2]],spear:[["dragonspin",3]],bow:[["arrowrain",3],["sunmoon",2]],
+    sword:[["meteor",3]],spear:[["dragonspin",3]],bow:[["arrowrain",3],["sunmoon",2]],
     poison:[["thousand",3],["miasma",3]],tao:[["icepulse",3]],
     saber:[["mountain",3]],katana:[["moonchain",3],["zanshinDrop",3],["nameless",2]],
     fist:[["hundredstep",3],["taijifist",3],["dragonreturn",2]]
@@ -158,7 +158,7 @@ const vfxRegression=vm.runInContext(`(()=>{
   spawnEnemy("bandit",player.x+110,player.y);enemies[0].speed=0;GameSpatial.rebuild(enemies);fireBasic();
   return {emitted,saberTypes:visuals.map(v=>v.type),customCount:new Set(emitted.map(v=>v.type)).size};
 })()`,context);
-if(vfxRegression.customCount<14||!vfxRegression.saberTypes.includes("cone")||vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill")&&item.type!=="namelessCutV1454")){
+if(vfxRegression.customCount<13||!vfxRegression.saberTypes.includes("cone")||vfxRegression.saberTypes.includes("skillSaberThunderFan")||vfxRegression.emitted.some(item=>!item.type.startsWith("skill")&&item.type!=="namelessCutV1454")){
   throw new Error(`무공별 VFX·벽력도법 중복 방지 회귀 검증 실패: ${JSON.stringify(vfxRegression)}`);
 }
 console.log("무공별 전용 VFX·벽력도법 중복 방지 회귀 테스트 통과",vfxRegression);

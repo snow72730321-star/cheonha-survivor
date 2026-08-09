@@ -48,7 +48,7 @@ globalThis.VFXSprites=(()=>{
     skillSaberUnityMountain:{src:"assets/vfx/user_batch02/vfx_04.png",frameW:741,frameH:200,frames:6,cols:6,fps:11.11,blend:"lighter"},
     skillSwordMeteor:{src:"assets/vfx/user/meteor_sword_rain_user.png",frameW:183,frameH:284,frames:10,cols:5,fps:11.11,blend:"lighter"},
     skillSwordTaiji:{src:"assets/vfx/skills/sword_taiji_array.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
-    skillSwordTenk:{src:"assets/vfx/skills/sword_ten_thousand.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
+    skillSwordTenk:{src:"assets/vfx/skills/sword_ten_thousand.png",frameW:192,frameH:192,frames:8,fps:12,blend:"lighter"},
     skillSpearSpin:{src:"assets/vfx/skills/spear_dragon_spin.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSpearStarfall:{src:"assets/vfx/skills/spear_starfall.png",frameW:160,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSpearOverlord:{src:"assets/vfx/user/user_vfx_02.png",frameW:386,frameH:277,frames:16,fps:16.67,blend:"lighter"},
@@ -212,7 +212,7 @@ drawProjectiles=function(){
       const tx=p.x-Math.cos(angle)*48,ty=p.y-Math.sin(angle)*48;VFXSprites.draw("trailGold",tx,ty,{angle,scaleX:1.05,scaleY:.72,alpha:.72});
       continue;
     }
-    if(p.trail||["crescent","spear","arrow","sword","fire","sun","moon","fist"].includes(p.shape)){
+    if(p.source!=="tenk"&&(p.trail||["crescent","spear","arrow","sword","fire","sun","moon","fist"].includes(p.shape))){
       const tx=p.x-Math.cos(angle)*trailLength*.45,ty=p.y-Math.sin(angle)*trailLength*.45;
       VFXSprites.draw(gold?"trailGold":"trailBlue",tx,ty,{angle,scaleX:Math.max(.32,trailLength/128),scaleY:.48,alpha:.5});
     }
