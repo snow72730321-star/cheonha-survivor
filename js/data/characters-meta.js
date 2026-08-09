@@ -203,7 +203,7 @@ function ultimateAttack(){
    const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(82+stacks*2.2)*player.areaMul;
    setHuanglongStacks(0);
    addVisual({type:"skillFistGoldenCharge",x:player.x,y:player.y,a,r:205,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
-   const muzzle=118,x0=player.x+Math.cos(a)*muzzle,y0=player.y+Math.sin(a)*muzzle;
+   const chargeScale=.55,muzzle=(650-260)*chargeScale,x0=player.x+Math.cos(a)*muzzle,y0=player.y+Math.sin(a)*muzzle;
    delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a,len:beamLen,width:beamWidth,damage:24*scale,stacks});
    addVisual({type:"text",x:player.x,y:player.y-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
  }

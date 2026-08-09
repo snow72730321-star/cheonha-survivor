@@ -335,21 +335,28 @@ drawVisuals=function(){
       VFXSprites.drawOneShot("skillSaberDemonDescent",x,y,{age:progress,angle:a,scaleX:len/632,scaleY:h/340,alpha:vis,flipX:true});
     }else if(["skillFistTiger","skillFistHundredShoot","skillFistHundredCombo","skillFistDragonKick","skillFistDragonKickCombo","skillFistGoldenDragon","skillFistToOneDefense","skillFistToOne","skillFistGoldenCharge"].includes(v.type)){
       const a=v.a||0,r=v.r||120;
+      // All directional fist sprites are normalized so +X is forward.
+      // sourceX/sourceY are the local pixel coordinates that must sit on the caster/impact point.
       const cfg={
-        skillFistTiger:["skillFistTiger",.48,180],
-        skillFistHundredShoot:["skillFistHundredShoot",.42,190],
-        skillFistHundredCombo:["skillFistHundredCombo",0,150],
-        skillFistDragonKick:["skillFistDragonKick",.48,170],
-        skillFistDragonKickCombo:["skillFistDragonKickCombo",0,155],
-        skillFistGoldenDragon:["skillFistGoldenDragon",.46,520],
-        skillFistToOneDefense:["skillFistToOneDefense",.12,145],
-        skillFistToOne:["skillFistToOne",.25,340],
-        skillFistGoldenCharge:["skillFistGoldenCharge",.08,240]
-      }[v.type],id=cfg[0],off=cfg[1],div=cfg[2],x=v.x+Math.cos(a)*r*off,y=v.y+Math.sin(a)*r*off;
+        skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:46,sourceY:103,scale:Math.max(.34,r/512)},
+        skillFistHundredShoot:{id:"skillFistHundredShoot",fw:466,fh:275,sourceX:233,sourceY:138,scale:.56},
+        skillFistHundredCombo:{id:"skillFistHundredCombo",fw:640,fh:483,sourceX:320,sourceY:242,scale:.38},
+        skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.38,r/382)},
+        skillFistDragonKickCombo:{id:"skillFistDragonKickCombo",fw:460,fh:540,sourceX:230,sourceY:300,scale:.42},
+        skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304)},
+        skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
+        skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:260,sourceY:340,scale:.55}
+      }[v.type];
+      const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale;
+      const x=v.x+Math.cos(a)*localX-Math.sin(a)*localY;
+      const y=v.y+Math.sin(a)*localX+Math.cos(a)*localY;
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
-      VFXSprites.drawOneShot(id,x,y,{age:progress,angle:a,scale:Math.max(.32,r/div),alpha:vis});
+      VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:a,scale:cfg.scale,alpha:vis});
     }else if(v.type==="skillFistGoldenBeam"){
-      const a=v.a||0,len=v.r||700,width=v.width||90,x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
+      const a=v.a||0,len=v.r||700,width=v.width||90;
+      // Beam local source is the left edge; its center is therefore half a beam length forward.
+      const x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
       const vis=Math.min(1,Math.pow(alpha,.18));
       VFXSprites.draw("skillFistGoldenBeam",x,y,{age:v.age||0,loop:true,angle:a,scaleX:len/900,scaleY:width/308,alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
