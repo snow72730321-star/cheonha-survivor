@@ -10,7 +10,7 @@ assert.match(chars,/unityGain=\(\(player\.saberUnityTimer\|\|0\)>0&&selectedWeap
 assert.match(chars,/Math\.min\(4,dealt\*\.08\)/);
 assert.match(chars,/player\.saberUnityTimer=15/);
 assert.match(combat,/source:"?demon"?|"demon"/);
-assert.match(combat,/"demon",\{knock:300,shake:14,color:"#a82e35",width:9,skipVisual:true\}/);
+assert.match(combat,/lineHit\(player\.x,player\.y,x2,y2,baseWidth,43\+a\.demon\*18,"demon",\{knock:300,shake:14,color:"#a82e35",skipVisual:true,skipImpactVfx:true\}\)/);
 for(const [name,text] of [["loader",loader],["sprite",sprite],["v10",v10],["sw",sw]]){
   assert.doesNotMatch(text,/saber_demon_wheel/,`${name}: demon wheel legacy ref remains`);
 }

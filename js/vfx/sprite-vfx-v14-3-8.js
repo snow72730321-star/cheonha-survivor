@@ -321,8 +321,8 @@ drawVisuals=function(){
       const vis=Math.min(1,alpha*(v.visibilityBoost||1));
       VFXSprites.drawOneShot("skillSaberUnityMountain",x,y,{age:progress,angle:a,scaleX,scaleY:Math.max(.68,(v.width||36)/46),alpha:vis,flipX:true});
     }else if(v.type==="skillSaberDemonDescent"){
-      const vis=Math.min(1,Math.pow(alpha,.28)*(v.visibilityBoost||1));
-      VFXSprites.drawOneShot("skillSaberDemonDescent",v.x,v.y,{age:progress,scale:Math.max(.55,(v.r||220)/245),alpha:vis});
+      const vis=Math.min(1,Math.pow(alpha,.28)*(v.visibilityBoost||1)),a=v.a||0,len=Math.max(220,v.r||620),h=Math.max(140,v.width||300),x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
+      VFXSprites.drawOneShot("skillSaberDemonDescent",x,y,{age:progress,angle:a,scaleX:len/632,scaleY:h/340,alpha:vis,flipX:true});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});
