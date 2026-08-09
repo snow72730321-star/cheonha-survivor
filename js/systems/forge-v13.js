@@ -157,7 +157,7 @@
   function refineCost(item,black){return Math.floor((black?360:150) + item.rerolls*(black?35:22) + gradeIndex(item.grade)*28)}
   function finalEnhanceChance(item){
     const lv=Math.max(0,Number(item.level)||0),base=ENHANCE_CHANCE[lv]||0;
-    const pityStep=lv>=20?.012:lv>=15?.02:.05;
+    const pityStep=lv>=20?.006:lv>=15?.012:.05;
     return Math.min(1,base + item.failStack*pityStep);
   }
 
@@ -258,7 +258,7 @@
       }else{
         item.failStack=Math.min(5,item.failStack+1);
         scene.className="anvil-scene failure"; message.className="forge-result-message bad";const pityStep=item.level>=20?1.2:item.level>=15?2:5;
-        message.textContent=`강화 실패. 장인의 숨결이 ${(item.failStack*pityStep).toFixed(item.level>=15?1:0)}%p 누적됐다. 단계 하락이나 파괴는 없다.`;
+        message.textContent=`강화 실패. 장인의 숨결이 ${(item.failStack*pityStep*100).toFixed(item.level>=15?1:0)}%p 누적됐다. 단계 하락이나 파괴는 없다.`;
         GameAudio.playUI("forge-failure");
       }
       saveAccountData();renderDetail();setTimeout(()=>scene.className="anvil-scene",650);
