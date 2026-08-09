@@ -124,10 +124,23 @@ const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){
  // 피해 기반 충전은 보조 수단만 남긴다. 절기 타격으로 절기를 다시 채우는 순환은 금지.
  if(!isUltimateSource(source)&&dealt>0)gainUltimate(Math.min(.12,dealt*.0012));
 };
+function setHuanglongStacks(n){
+ const old=player.huanglongStacks||0,next=Math.max(0,Math.min(20,n|0)),delta=next-old;
+ player.huanglongStacks=next;
+ player.damageReduction=Math.max(0,Math.min(.72,(player.damageReduction||0)+delta*.012));
+}
+function triggerTenThousandFists(){
+ player.tenThousandStacks=0;
+ const base=facingAngle();
+ addVisual({type:"skillFistToOne",x:player.x,y:player.y,a:base,r:310,life:1.85,max:1.85,color:"#ffd86a",holdAlpha:true});
+ for(let i=0;i<7;i++){const aa=base+(i-3)*.16;delayed.push({time:.16+i*.10,type:"aoe",x:player.x+Math.cos(aa)*(95+i*17),y:player.y+Math.sin(aa)*(95+i*17),r:72+i*3,damage:30+(player.arts.diamondbody||1)*12,color:"#ffe07a",source:"tenThousand",knock:150})}
+ showMessage("만권일극 · 일극개방",1.1);
+}
 const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
  const wasDead=e.dead;
  baseKillEnemy(e,source,opt);
  if(!wasDead&&e.dead){
+   if(selectedWeapon==="fist"&&source==="dragonreturn")setHuanglongStacks((player.huanglongStacks||0)+1);
    if(!isUltimateSource(source)){
      if(e.type==="boss")gainUltimate(18,{ignoreScaling:true});
      else if(e.type==="midboss")gainUltimate(9,{ignoreScaling:true});
@@ -142,7 +155,13 @@ const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
 
 function threatNear(){for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y),closing=e.speed*(e.chargeTime>0?2.5:1);if(d<player.r+e.r+36+closing*.12)return true}for(const h of hazards){if(h.dead)continue;if(h.type==="blast"&&h.time<.42&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+35)return true;if(h.type==="orb"&&Math.hypot(h.x-player.x,h.y-player.y)<65)return true;if(h.type==="puddle"&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+18)return true;if(h.type==="cross"&&h.time<.38&&(Math.abs(player.x-h.x)<(h.w||38)+player.r||Math.abs(player.y-h.y)<(h.w||38)+player.r))return true}return false}
 const basePerformDodge=performDodge;performDodge=function(){const can=state==="playing"&&player.dodgeCooldown<=0&&player.dodgeTimer<=0,perfect=can&&threatNear();basePerformDodge();if(perfect){player.metrics.perfectDodges++;player.perfectWindow=1.2;slowTimer=.42;slowScale=.33;gainUltimate(10,{ignoreScaling:true});showMessage("정밀 회피 · 찰나의 경지",1.1);addVisual({type:"text",x:player.x,y:player.y-30,text:"PERFECT",life:.55,max:.55,color:"#bdeeff"});GameAudio.playSFX("perfect-dodge")}};
-const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}const heavenDR=saberHeavenDefenseBonus();baseHurtPlayer(amount*(1-heavenDR))};
+const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}
+ if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0&&player.invuln<=0&&state==="playing"){
+   let close=null,best=115;
+   for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;close=e}}
+   if(close){const ang=Math.atan2(close.y-player.y,close.x-player.x);player.tenThousandStacks=Math.min(10,(player.tenThousandStacks||0)+1);addVisual({type:"skillFistToOneDefense",x:player.x,y:player.y,a:ang,r:92,life:.56,max:.56,color:"#ffd96a",holdAlpha:true});if(player.tenThousandStacks>=10)triggerTenThousandFists()}
+ }
+ const heavenDR=saberHeavenDefenseBonus();baseHurtPlayer(amount*(1-heavenDR))};
 
 function checkEvolution(){const evo=evolutionDefs[selectedWeapon];if(!evo||player.evolutions[selectedWeapon]||!evo.check(player))return;player.evolutions[selectedWeapon]=evo.name;evo.apply(player);showMessage(`무공 진화 · ${evo.name}`,3);screenShake=Math.max(screenShake,shakeValue(14));addVisual({type:"ring",x:player.x,y:player.y,r:180,life:.8,max:.8,color:"#fff0a0",width:10});GameAudio.playUI("evolution")}
 const baseCheckHidden=checkHidden;checkHidden=function(){baseCheckHidden();checkEvolution()};
@@ -181,11 +200,12 @@ function ultimateAttack(){
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
-   addVisual({type:"dragon",x:player.x,y:player.y,a,r:len,life:1,max:1,color:"#ffd86f"});
-   lineHit(player.x,player.y,player.x+Math.cos(a)*len,player.y+Math.sin(a)*len,78,300,"ultimate",{color:"#ffd86f",knock:620,shake:20,life:.85});
-   coneHit(a,Math.min(len*.72,720),.36,150,"ultimate",{color:"#ffeaa8",knock:340,shake:10});
-   aoe(player.x,player.y,150,88,"ultimate",{color:"#ffd86f",knock:220});
-   addVisual({type:"text",x:player.x+Math.cos(a)*95,y:player.y+Math.sin(a)*95-24,text:"항룡 · 정면 붕괴",life:.75,max:.75,color:"#ffe9a0"});
+   const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(82+stacks*2.2)*player.areaMul;
+   setHuanglongStacks(0);
+   addVisual({type:"skillFistGoldenCharge",x:player.x,y:player.y,a,r:205,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
+   const muzzle=118,x0=player.x+Math.cos(a)*muzzle,y0=player.y+Math.sin(a)*muzzle;
+   delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a,len:beamLen,width:beamWidth,damage:24*scale,stacks});
+   addVisual({type:"text",x:player.x,y:player.y-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
  }
  showMessage(currentUltimateName(selectedWeapon),1.5);
 }

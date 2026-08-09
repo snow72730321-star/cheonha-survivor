@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.9.1-demon-descent-vfx";
+  const BUILD="v14.9.3-fist-rework";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -72,6 +72,16 @@ const GameAssets=(()=>{
     "assets/vfx/skills/fist/hundred_step.png",
     "assets/vfx/skills/fist/iron_mountain.png",
     "assets/vfx/skills/fist/taiji_vortex.png",
+    "assets/vfx/skills/fist/tiger_fist.png",
+    "assets/vfx/skills/fist/hundred_fist_shoot.png",
+    "assets/vfx/skills/fist/hundred_fist_combo.png",
+    "assets/vfx/skills/fist/dragon_kick.png",
+    "assets/vfx/skills/fist/dragon_kick_combo.png",
+    "assets/vfx/skills/fist/golden_dragon_fist.png",
+    "assets/vfx/skills/fist/fist_to_one_defense.png",
+    "assets/vfx/skills/fist/fist_to_one.png",
+    "assets/vfx/skills/fist/golden_dragon_charge.png",
+    "assets/vfx/skills/fist/golden_dragon_beam.png",
     "assets/vfx/crests/bow_crest.png",
     "assets/vfx/crests/fist_crest.png",
     "assets/vfx/crests/katana_crest.png",

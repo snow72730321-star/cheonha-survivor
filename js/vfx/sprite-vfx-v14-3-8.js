@@ -68,6 +68,16 @@ globalThis.VFXSprites=(()=>{
     skillFistHundredStep:{src:"assets/vfx/skills/fist/hundred_step.png",frameW:256,frameH:128,frames:8,fps:25,blend:"lighter"},
     skillFistTaiji:{src:"assets/vfx/skills/fist/taiji_vortex.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
     skillFistDragonReturn:{src:"assets/vfx/skills/fist/dragon_return.png",frameW:256,frameH:128,frames:8,fps:24,blend:"lighter"},
+    skillFistTiger:{src:"assets/vfx/skills/fist/tiger_fist.png",frameW:512,frameH:206,frames:6,cols:6,fps:11.11,blend:"source-over"},
+    skillFistHundredShoot:{src:"assets/vfx/skills/fist/hundred_fist_shoot.png",frameW:466,frameH:275,frames:6,cols:6,fps:11.11,blend:"source-over"},
+    skillFistHundredCombo:{src:"assets/vfx/skills/fist/hundred_fist_combo.png",frameW:640,frameH:483,frames:38,cols:6,fps:7.6,blend:"source-over"},
+    skillFistDragonKick:{src:"assets/vfx/skills/fist/dragon_kick.png",frameW:382,frameH:200,frames:4,cols:4,fps:11.11,blend:"source-over"},
+    skillFistDragonKickCombo:{src:"assets/vfx/skills/fist/dragon_kick_combo.png",frameW:460,frameH:540,frames:15,cols:6,fps:20,blend:"source-over"},
+    skillFistGoldenDragon:{src:"assets/vfx/skills/fist/golden_dragon_fist.png",frameW:1304,frameH:516,frames:17,cols:6,fps:15.74,blend:"source-over"},
+    skillFistToOneDefense:{src:"assets/vfx/skills/fist/fist_to_one_defense.png",frameW:667,frameH:601,frames:28,cols:6,fps:50,blend:"source-over"},
+    skillFistToOne:{src:"assets/vfx/skills/fist/fist_to_one.png",frameW:1614,frameH:1040,frames:21,cols:6,fps:11.11,blend:"source-over"},
+    skillFistGoldenCharge:{src:"assets/vfx/skills/fist/golden_dragon_charge.png",frameW:822,frameH:663,frames:26,cols:6,fps:16.67,blend:"source-over"},
+    skillFistGoldenBeam:{src:"assets/vfx/skills/fist/golden_dragon_beam.png",frameW:900,frameH:308,frames:16,cols:6,fps:18.18,blend:"source-over"},
   });
 
   const effects=[];
@@ -323,6 +333,25 @@ drawVisuals=function(){
     }else if(v.type==="skillSaberDemonDescent"){
       const vis=Math.min(1,Math.pow(alpha,.28)*(v.visibilityBoost||1)),a=v.a||0,len=Math.max(220,v.r||620),h=Math.max(140,v.width||300),x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
       VFXSprites.drawOneShot("skillSaberDemonDescent",x,y,{age:progress,angle:a,scaleX:len/632,scaleY:h/340,alpha:vis,flipX:true});
+    }else if(["skillFistTiger","skillFistHundredShoot","skillFistHundredCombo","skillFistDragonKick","skillFistDragonKickCombo","skillFistGoldenDragon","skillFistToOneDefense","skillFistToOne","skillFistGoldenCharge"].includes(v.type)){
+      const a=v.a||0,r=v.r||120;
+      const cfg={
+        skillFistTiger:["skillFistTiger",.48,180],
+        skillFistHundredShoot:["skillFistHundredShoot",.42,190],
+        skillFistHundredCombo:["skillFistHundredCombo",0,150],
+        skillFistDragonKick:["skillFistDragonKick",.48,170],
+        skillFistDragonKickCombo:["skillFistDragonKickCombo",0,155],
+        skillFistGoldenDragon:["skillFistGoldenDragon",.46,520],
+        skillFistToOneDefense:["skillFistToOneDefense",.12,145],
+        skillFistToOne:["skillFistToOne",.25,340],
+        skillFistGoldenCharge:["skillFistGoldenCharge",.08,240]
+      }[v.type],id=cfg[0],off=cfg[1],div=cfg[2],x=v.x+Math.cos(a)*r*off,y=v.y+Math.sin(a)*r*off;
+      const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
+      VFXSprites.drawOneShot(id,x,y,{age:progress,angle:a,scale:Math.max(.32,r/div),alpha:vis});
+    }else if(v.type==="skillFistGoldenBeam"){
+      const a=v.a||0,len=v.r||700,width=v.width||90,x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
+      const vis=Math.min(1,Math.pow(alpha,.18));
+      VFXSprites.draw("skillFistGoldenBeam",x,y,{age:v.age||0,loop:true,angle:a,scaleX:len/900,scaleY:width/308,alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});

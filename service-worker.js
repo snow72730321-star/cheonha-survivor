@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-9-2-demon-direction";
+const CACHE="cheonha-v14-9-3-fist-rework";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -66,6 +66,16 @@ const APP_SHELL=[
   "assets/vfx/skills/fist/hundred_step.png",
   "assets/vfx/skills/fist/iron_mountain.png",
   "assets/vfx/skills/fist/taiji_vortex.png",
+  "assets/vfx/skills/fist/dragon_kick.png",
+  "assets/vfx/skills/fist/dragon_kick_combo.png",
+  "assets/vfx/skills/fist/fist_to_one.png",
+  "assets/vfx/skills/fist/fist_to_one_defense.png",
+  "assets/vfx/skills/fist/golden_dragon_beam.png",
+  "assets/vfx/skills/fist/golden_dragon_charge.png",
+  "assets/vfx/skills/fist/golden_dragon_fist.png",
+  "assets/vfx/skills/fist/hundred_fist_combo.png",
+  "assets/vfx/skills/fist/hundred_fist_shoot.png",
+  "assets/vfx/skills/fist/tiger_fist.png",
   "assets/vfx/skills/katana/moon_chain.png",
   "assets/vfx/skills/katana/nameless_cuts.png",
   "assets/vfx/skills/katana/zanshin.png",
