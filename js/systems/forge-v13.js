@@ -170,7 +170,7 @@
     root=document.createElement("section");
     root.className="overlay"; root.id="forgeDetail";
     root.innerHTML=`<div class="panel">
-      <div class="forge-detail-title"><strong id="forgeDetailName">무기</strong><span id="forgeDetailPower">1.00x</span></div>
+      <div class="forge-detail-title"><strong id="forgeDetailName">무기</strong><span id="forgeDetailPower">전투력 0</span></div>
       <div class="forge-tabs">
         <button class="forge-tab active" data-forge-tab="enhance">모루 강화</button>
         <button class="forge-tab" data-forge-tab="potential">내공 잠재</button>
@@ -178,7 +178,7 @@
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
         <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="forge-fire"></div><div class="anvil-weapon" id="anvilWeapon"><img class="anvil-weapon-img" alt="무기"></div><div class="anvil-hammer asset-hammer"></div><div class="forge-sparks"></div><div class="forge-impact-flash"></div></div>
-        <div class="forge-rate-card"><div><b id="enhanceLevel">+0 → +1</b><small>강화 단계</small></div><div><b id="enhanceRate">100%</b><small>최종 성공률</small></div><div><b id="enhanceCost">80</b><small>필요 금자</small></div></div>
+        <div class="forge-rate-card"><div><b id="enhanceLevel">+0 → +1</b><small>강화 단계</small></div><div><b id="enhanceRate">100%</b><small>최종 성공률</small></div><div><b id="enhanceCost">80</b><small>필요 금자</small></div></div><div class="combat-power-breakdown" id="forgeCombatPowerBreakdown"></div>
         <div class="forge-result-message" id="enhanceMessage">무기를 모루 위에 올렸다.</div>
         <button class="primary" id="enhanceExecute" type="button">망치를 내리친다</button>
         <button class="secondary forge-detail-equip" id="forgeDetailEquip" type="button">이 무기 장착</button>
@@ -197,7 +197,7 @@
     root.querySelectorAll("[data-forge-tab]").forEach(btn=>btn.addEventListener("click",()=>switchTab(btn.dataset.forgeTab)));
     root.querySelector("#forgeDetailClose").addEventListener("click",()=>{root.classList.remove("show");pendingPotential=null;refreshForge()});
     root.querySelector("#enhanceExecute").addEventListener("click",executeEnhance);
-    root.querySelector("#forgeDetailEquip").addEventListener("click",()=>{const item=selectedItem();if(!item)return;const wasEquipped=account.equipped[item.weapon]===item.id;if(wasEquipped)delete account.equipped[item.weapon];else account.equipped[item.weapon]=item.id;saveAccountData();renderDetail();renderWeaponInventory();showMessage(wasEquipped?`${item.name} 장착을 해제했다.`:`${item.name}을 장착했다.`,1.1);GameAudio.playUI(wasEquipped?"cancel":"equip")});
+    root.querySelector("#forgeDetailEquip").addEventListener("click",()=>{const item=selectedItem();if(!item)return;const wasEquipped=account.equipped[item.weapon]===item.id;if(wasEquipped)delete account.equipped[item.weapon];else account.equipped[item.weapon]=item.id;saveAccountData();renderDetail();renderWeaponInventory();if(typeof buildWeaponMenu==="function")buildWeaponMenu();if(typeof buildDifficultyMenu==="function")buildDifficultyMenu();if(typeof updateStartButton==="function")updateStartButton();showMessage(wasEquipped?`${item.name} 장착을 해제했다.`:`${item.name}을 장착했다.`,1.1);GameAudio.playUI(wasEquipped?"cancel":"equip")});
     root.querySelector("#normalRefine").addEventListener("click",()=>executeRefine(false));
     root.querySelector("#blackRefine").addEventListener("click",()=>executeRefine(true));
     return root;
@@ -221,7 +221,14 @@
     const item=selectedItem(); if(!item)return;
     const root=detailOverlay(), gd=gradeDefs.find(g=>g.id===item.grade);
     root.querySelector("#forgeDetailName").innerHTML=`<span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span>`;
-    root.querySelector("#forgeDetailPower").textContent=`${item.damageMul.toFixed(2)}x · +${item.level}`;
+    const cp=window.CombatPowerSystem?CombatPowerSystem.calculate(item):null;
+    root.querySelector("#forgeDetailPower").textContent=cp?`전투력 ${CombatPowerSystem.format(cp.total)}`:`${item.damageMul.toFixed(2)}x · +${item.level}`;
+    const cpBox=root.querySelector("#forgeCombatPowerBreakdown");
+    if(cpBox&&cp){
+      const nextItem=item.level<MAX_ENHANCE?{...item,level:item.level+1}:null;
+      const next=nextItem?CombatPowerSystem.calculate(nextItem):null;
+      cpBox.innerHTML=`<div class="cp-main"><b>${CombatPowerSystem.format(cp.total)}</b><span>무기 전투력</span></div><div class="cp-components"><span>기초·강화 <b>${CombatPowerSystem.format(cp.core)}</b></span><span>제작 품질 <b>+${CombatPowerSystem.format(cp.quality)}</b></span><span>속성 <b>+${CombatPowerSystem.format(cp.ability)}</b></span><span>잠재 <b>+${CombatPowerSystem.format(cp.potential)}</b></span><span>공명 능력치 <b>+${CombatPowerSystem.format(cp.resonance)}</b></span></div>${next?`<div class="cp-next">강화 성공 시 <b>${CombatPowerSystem.format(next.total)}</b> <em>+${CombatPowerSystem.format(next.total-cp.total)}</em></div>`:`<div class="cp-next max">최대 강화 전투력</div>`}`;
+    }
     if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
     else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
     root.querySelector("#enhanceLevel").textContent=item.level>=MAX_ENHANCE?"최대 강화":`+${item.level} → +${item.level+1}`;
@@ -310,7 +317,7 @@
     reveal.querySelector(".forge-reveal-rarity").textContent=gd?.name||item.grade;
     reveal.querySelector(".forge-reveal-rarity").className=`forge-reveal-rarity rarity-${item.grade}`;
     reveal.querySelector(".forge-reveal-name").textContent=item.name;
-    reveal.querySelector(".forge-reveal-sub").textContent=`${el.name} · 기본 피해 ${item.damageMul.toFixed(2)}배 · ${item.abilityName}`;
+    reveal.querySelector(".forge-reveal-sub").textContent=`${el.name} · ${window.CombatPowerSystem?"전투력 "+CombatPowerSystem.format(CombatPowerSystem.value(item))+" · ":""}기본 피해 ${item.damageMul.toFixed(2)}배 · ${item.abilityName}`;
     reveal.dataset.rarity=item.grade;reveal.style.setProperty("--weapon-aura",el.color);reveal.classList.add("show");
   }
 
@@ -334,17 +341,18 @@
     ui.weaponInventory.innerHTML=account.weapons.length?account.weapons.slice().reverse().map(item=>{
       normalizeWeapon(item);const gd=gradeDefs.find(g=>g.id===item.grade),eq=account.equipped[item.weapon]===item.id;
       const art=window.WeaponVisuals?WeaponVisuals.asset(item):"";const color=window.WeaponVisuals?WeaponVisuals.element(item).color:"#d6bc72";
-      return `<div class="weapon-item v13-item art-weapon-card ${eq?"equipped":""}" style="--weapon-aura:${color}"><div class="weapon-card-art" data-art-id="${item.id}"><img src="${art}" alt="${item.name}"></div><div class="weapon-card-copy"><strong><span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span><span>${item.damageMul.toFixed(2)}x</span></strong><p>${weaponDefs[item.weapon].name} · ${item.abilityName}: ${item.abilityDesc}</p><div class="potential-mini">${item.potentials.map(x=>`<span>• ${potentialText(x)}</span>`).join("")}</div><div class="weapon-actions"><button class="equip-toggle ${eq?"is-equipped":""}" data-equip="${item.id}">${eq?"장착 해제":"장착"}</button><button data-detail="${item.id}">모루·잠재</button><button data-break="${item.id}">분해</button></div></div></div>`;
+      const cp=window.CombatPowerSystem?CombatPowerSystem.value(item):0;
+      return `<div class="weapon-item v13-item art-weapon-card ${eq?"equipped":""}" style="--weapon-aura:${color}"><div class="weapon-card-art" data-art-id="${item.id}"><img src="${art}" alt="${item.name}"></div><div class="weapon-card-copy"><strong><span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span><span>${cp?"전투력 "+CombatPowerSystem.format(cp):item.damageMul.toFixed(2)+"x"}</span></strong><p>${weaponDefs[item.weapon].name} · ${item.abilityName}: ${item.abilityDesc}</p><div class="potential-mini">${item.potentials.map(x=>`<span>• ${potentialText(x)}</span>`).join("")}</div><div class="weapon-actions"><button class="equip-toggle ${eq?"is-equipped":""}" data-equip="${item.id}">${eq?"장착 해제":"장착"}</button><button data-detail="${item.id}">모루·잠재</button><button data-break="${item.id}">분해</button></div></div></div>`;
     }).join(""):'<p class="desc">아직 제작한 무기가 없다.</p>';
     if(window.WeaponVisuals)ui.weaponInventory.querySelectorAll("[data-art-id]").forEach(box=>{const item=account.weapons.find(x=>x.id===box.dataset.artId);if(item)WeaponVisuals.decorate(box,item,item.weapon)});
-    ui.weaponInventory.querySelectorAll("[data-equip]").forEach(b=>b.addEventListener("click",()=>{const item=account.weapons.find(x=>x.id===b.dataset.equip);if(!item)return;const wasEquipped=account.equipped[item.weapon]===item.id;if(wasEquipped)delete account.equipped[item.weapon];else account.equipped[item.weapon]=item.id;saveAccountData();renderWeaponInventory();if(selectedItemId===item.id)renderDetail();showMessage(wasEquipped?`${item.name} 장착을 해제했다.`:`${item.name}을 장착했다.`,1.1);GameAudio.playUI(wasEquipped?"cancel":"equip")}));
+    ui.weaponInventory.querySelectorAll("[data-equip]").forEach(b=>b.addEventListener("click",()=>{const item=account.weapons.find(x=>x.id===b.dataset.equip);if(!item)return;const wasEquipped=account.equipped[item.weapon]===item.id;if(wasEquipped)delete account.equipped[item.weapon];else account.equipped[item.weapon]=item.id;saveAccountData();renderWeaponInventory();if(selectedItemId===item.id)renderDetail();if(typeof buildWeaponMenu==="function")buildWeaponMenu();if(typeof buildDifficultyMenu==="function")buildDifficultyMenu();if(typeof updateStartButton==="function")updateStartButton();showMessage(wasEquipped?`${item.name} 장착을 해제했다.`:`${item.name}을 장착했다.`,1.1);GameAudio.playUI(wasEquipped?"cancel":"equip")}));
     ui.weaponInventory.querySelectorAll("[data-detail]").forEach(b=>b.addEventListener("click",()=>openDetail(b.dataset.detail)));
     ui.weaponInventory.querySelectorAll("[data-break]").forEach(b=>b.addEventListener("click",()=>{
       const i=account.weapons.findIndex(x=>x.id===b.dataset.break),item=account.weapons[i];if(i<0)return;
       const refund=45+gradeIndex(item.grade)*58+item.level*28;
       account.gold+=refund;
       const oreChance=Math.min(.75,.18+gradeIndex(item.grade)*.09);if(Math.random()<oreChance){const key=oreKey(item.ability,item.grade);account.ores[key]=(account.ores[key]||0)+1}
-      if(account.equipped[item.weapon]===item.id)delete account.equipped[item.weapon];account.weapons.splice(i,1);saveAccountData();refreshForge();showMessage(`무기를 분해해 ${refund} 금자를 회수했다.`,1.4);GameAudio.playUI("dismantle")
+      if(account.equipped[item.weapon]===item.id)delete account.equipped[item.weapon];account.weapons.splice(i,1);saveAccountData();refreshForge();if(typeof buildWeaponMenu==="function")buildWeaponMenu();if(typeof buildDifficultyMenu==="function")buildDifficultyMenu();if(typeof updateStartButton==="function")updateStartButton();showMessage(`무기를 분해해 ${refund} 금자를 회수했다.`,1.4);GameAudio.playUI("dismantle")
     }));
     if(typeof checkAchievements==="function")checkAchievements();
   };

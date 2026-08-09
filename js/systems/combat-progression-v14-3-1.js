@@ -17,42 +17,39 @@ const CombatProgressionV1431=(()=>{
   ]);
 
   function forgedPower(item){
+    if(window.CombatPowerSystem&&item?.grade)return CombatPowerSystem.threatIndex(item);
     if(!item)return 1;
     let score=Math.max(1,Number(item.damageMul)||1);
-    const ability={han:.08,moon:.06,black:.05,poison:.08,fire:.08,ice:.07,thunder:.07}[item.ability]||0;
-    score*=1+ability;
-    for(const line of item.potentials||[]){
-      const value=Math.max(0,Number(line.value)||0);
-      const weight={damage:1,attackSpeed:.85,cooldown:.75,crit:.55,critDamage:.28,boss:.3,area:.3,reduction:.42,speed:.3,hp:.0025,projectile:.045,pierce:.03}[line.key]||.18;
-      score*=1+value*weight;
-    }
-    return clamp(score,1,3.2);
+    if(item.ability==="han")score*=1.08;
+    for(const line of item.potentials||[])if(line.key==="damage")score*=1+Math.max(0,Number(line.value)||0);
+    return Math.max(1,score);
   }
 
+  function combatPower(item){return window.CombatPowerSystem?CombatPowerSystem.value(item):0}
+
+
   function threatFactor(){return player.dynamicThreat||1}
-  // 수라 적정 장비선: 신화 이상은 무강도 인정, 전설은 +15에서 인정한다.
-  // 입장 자체를 막지는 않고 미달 시 최종 보스에 '수라 위압'을 적용하는 소프트 게이트다.
-  function suraGearReady(item){
-    if(!item)return false;
-    const gi=gradeIndex(item.grade),lv=Math.max(0,Number(item.level)||0);
-    return gi>=5||(gi===4&&lv>=15);
-  }
+  // 수라 적정 장비선은 정식 전투력으로 판정한다. 기준점은 20,000이며
+  // 무옵션 전설 +15와 신화 +0이 이 선에 맞도록 CombatPowerSystem에서 캘리브레이션한다.
+  function suraGearReady(item){return combatPower(item)>=(window.CombatPowerSystem?CombatPowerSystem.recommended("sura"):20000)}
   function progress(){return runDuration>0?clamp(elapsed/runDuration,0,1):0}
   function latePhase(){return clamp((progress()-.52)/.48,0,1)}
 
   const baseResetGame=resetGame;
   resetGame=function(){
     baseResetGame.apply(this,arguments);
+    player.combatPower=combatPower(player.forgedWeapon);
     player.forgedCombatPower=forgedPower(player.forgedWeapon);
     player.dynamicThreat=1+Math.min(.06,Math.max(0,player.forgedCombatPower-1)*.04);
     player.suraGearReady=selectedDifficulty!=="sura"||suraGearReady(player.forgedWeapon);
+    player.suraPressure=window.CombatPowerSystem?CombatPowerSystem.pressure(player.combatPower):{tier:player.suraGearReady?0:3,hp:1.18,resist:.72,damage:1.22,label:"수라 위압"};
     player.skillWarmup=0;
     player.metrics.eliteTraitKills=0;
     const extra=Math.round((player.dynamicThreat-1)*100);
     if(extra>=2)ui.weaponHud.textContent+=` · 적응 +${extra}%`;
     if(selectedDifficulty==="sura"&&!player.suraGearReady){
       ui.weaponHud.textContent+=" · 수라 위압";
-      showMessage("수라 위압 · 권장 장비 미달 (신화 이상 / 전설 +15)",2.6);
+      showMessage(`수라 위압 · 현재 전투력 ${window.CombatPowerSystem?CombatPowerSystem.format(player.combatPower):player.combatPower} / 권장 20,000`,2.6);
     }
   };
 
@@ -126,16 +123,17 @@ const CombatProgressionV1431=(()=>{
       if(rank===4){
         boss.hp*=1.12;
         if(!player.suraGearReady){
-          boss.hp*=1.18;boss.damageTakenMul=(boss.damageTakenMul||1)*.72;boss.suraPressure=true;
+          const pressure=player.suraPressure||{tier:3,hp:1.18,resist:.72,damage:1.22,label:"강한 위압"};
+          boss.hp*=pressure.hp;boss.damageTakenMul=(boss.damageTakenMul||1)*pressure.resist;boss.suraPressure=pressure.tier;boss.suraPressureLabel=pressure.label;
         }
       }
       boss.maxHp=boss.hp;
       boss.damage*=1.14+rank*.025;boss.damage*=1+(dynamic-1)*.4;
-      if(rank===4)boss.damage*=player.suraGearReady?1.08:1.22;
+      if(rank===4)boss.damage*=player.suraGearReady?1.08:1.08*(player.suraPressure?.damage||1.22);
       boss.speed*=rank===4?1.10:1.07;
       boss.summon*=.88;boss.blast*=.88;if(boss.dash)boss.dash*=.88;if(boss.orbs)boss.orbs*=.88;
       boss.finalRage=false;
-      if(rank===4&&boss.suraPressure)showMessage("수라 위압 · 장비 격차로 혈마의 마기가 압도한다",2.4);
+      if(rank===4&&boss.suraPressure)showMessage(`${boss.suraPressureLabel||"수라 위압"} · 전투력 격차로 혈마의 마기가 강해진다`,2.4);
     }
     return result;
   };
@@ -187,5 +185,5 @@ const CombatProgressionV1431=(()=>{
 
   GameEvents.on("skill:learned",showLearnEffect);
 
-  return Object.freeze({forgedPower,threatFactor,latePhase,primeNewArt});
+  return Object.freeze({forgedPower,combatPower,suraGearReady,threatFactor,latePhase,primeNewArt});
 })();

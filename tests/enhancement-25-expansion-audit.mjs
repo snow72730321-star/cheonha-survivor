@@ -11,5 +11,5 @@ assert.match(f,/if\(lv>=25\).*\+25 극성/);
 assert.match(v,/lv>=25\?5:lv>=20\?4:lv>=15\?3/);
 assert.match(c,/data-weapon-tier="4"/);
 assert.match(c,/data-weapon-tier="5"/);
-assert.match(p,/return gi>=5\|\|\(gi===4&&lv>=15\)/);
+assert.match(p,/CombatPowerSystem\.recommended\("sura"\)/);
 console.log("enhancement-25-expansion-audit: OK");
