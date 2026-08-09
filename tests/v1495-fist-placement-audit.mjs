@@ -11,6 +11,6 @@ ok(vfx.includes('skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:466')
 ok(vfx.includes('skillFistDragonKick:{id:"skillFistDragonKick"')&&vfx.includes('scale:Math.max(.78,r/250)'),"황룡각 scale missing");
 ok(vfx.includes('skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562')&&vfx.includes('scale:.62'),"황룡진천 charge orientation missing");
 ok(meta.includes('const castX=player.x,castY=player.y,castA=a'),"ultimate cast snapshot missing");
-ok(meta.includes('const muzzle=58,x0=castX+Math.cos(castA)*muzzle'),"beam start is not close to fixed cast origin");
+ok(meta.includes('chargeRenderA=castA+Math.PI')&&meta.includes('type:"goldenDragonBeamStart",x:x0,y:y0,a:castA'),"beam start is not bound to charge mouth anchor");
 ok(meta.includes('x:castX,y:castY,a:castA')&&meta.includes('a:castA,len:beamLen'),"charge/beam are not tied to fixed cast transform");
 console.log("v14.9.5 fist placement hotfix audit: OK");

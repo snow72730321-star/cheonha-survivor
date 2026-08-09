@@ -12,6 +12,6 @@ for(const sig of [
 ok(sprite.includes('localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale'),"source-anchor transform missing");
 ok(sprite.includes('x=v.x+Math.cos(renderA)*localX-Math.sin(renderA)*localY'),"rotated X anchor transform missing");
 ok(sprite.includes('y=v.y+Math.sin(renderA)*localX+Math.cos(renderA)*localY'),"rotated Y anchor transform missing");
-ok(meta.includes('const muzzle=58'),"charge muzzle close-offset missing");
+ok(meta.includes('mouthLocalX=(360-562)*chargeScale')&&meta.includes('mouthLocalY=(382-340)*chargeScale'),"charge mouth-anchor missing");
 ok(sprite.includes('Beam local source is the left edge'),"beam source-edge policy missing");
 console.log("v14.9.4 fist anchor audit: OK");
