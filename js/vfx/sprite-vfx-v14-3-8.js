@@ -43,6 +43,7 @@ globalThis.VFXSprites=(()=>{
     skillSaberUnityThunder:{src:"assets/vfx/skills/saber/unity_thunder.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
     skillSaberWhirlwindUser:{src:"assets/vfx/skills/saber/whirlwind.png",frameW:500,frameH:500,frames:32,cols:8,fps:20,blend:"lighter"},
     skillSaberUnityMountain:{src:"assets/vfx/skills/saber/unity_mountain.png",frameW:741,frameH:200,frames:6,cols:6,fps:11.11,blend:"lighter"},
+    skillSaberDemonDescent:{src:"assets/vfx/skills/saber/heavenly_demon_descent.png",frameW:632,frameH:340,frames:10,cols:5,fps:11.11,blend:"lighter"},
     skillSwordMeteor:{src:"assets/vfx/skills/sword/meteor_rain.png",frameW:183,frameH:284,frames:10,cols:5,fps:11.11,blend:"lighter"},
     skillSwordTaiji:{src:"assets/vfx/skills/sword/taiji_array.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
     skillSwordTenk:{src:"assets/vfx/skills/sword/ten_thousand.png",frameW:192,frameH:192,frames:8,fps:12,blend:"lighter"},
@@ -319,6 +320,9 @@ drawVisuals=function(){
       const x=v.x+Math.cos(a)*originOffset,y=v.y+Math.sin(a)*originOffset;
       const vis=Math.min(1,alpha*(v.visibilityBoost||1));
       VFXSprites.drawOneShot("skillSaberUnityMountain",x,y,{age:progress,angle:a,scaleX,scaleY:Math.max(.68,(v.width||36)/46),alpha:vis,flipX:true});
+    }else if(v.type==="skillSaberDemonDescent"){
+      const vis=Math.min(1,Math.pow(alpha,.28)*(v.visibilityBoost||1));
+      VFXSprites.drawOneShot("skillSaberDemonDescent",v.x,v.y,{age:progress,scale:Math.max(.55,(v.r||220)/245),alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});

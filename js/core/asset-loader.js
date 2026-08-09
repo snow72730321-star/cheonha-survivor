@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.9.0-vfx-layout";
+  const BUILD="v14.9.1-demon-descent-vfx";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -59,6 +59,7 @@ const GameAssets=(()=>{
     "assets/vfx/skills/tao/fire_dragon.png",
     "assets/vfx/skills/tao/five_thunder.png",
     "assets/vfx/skills/tao/ice_array.png",
+    "assets/vfx/skills/saber/heavenly_demon_descent.png",
     "assets/vfx/skills/saber/mountain_split.png",
     "assets/vfx/skills/saber/thunder_fan.png",
     "assets/vfx/skills/saber/unity_mountain.png",
