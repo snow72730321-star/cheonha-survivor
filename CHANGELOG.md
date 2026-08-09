@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v14.9.0 VFX 리소스 구조 정리
+
+- `assets/vfx/skills/`를 검/창/활/암기·독/도술/박도/왜도/권 무기군별 하위 폴더로 정리.
+- `user/`, `user_batch02/`, `user_poison/` 임시 폴더 제거 및 실제 스킬명 기반 파일명으로 변경.
+- 미사용 `saber_heavy_arc`, 리워크 전 `poison_thousand_fan`, `poison_miasma_bloom`, `user_vfx_05` 제거.
+- 미사용 VFX registry alias (`saberHeavy`, `skillSaberSocheon`, 구형 암기·독 3종) 제거.
+- 절기 컷신의 구형/테스트 파일명 일부를 현재 스킬명 기준으로 정리.
+- `assets/vfx/README.md`와 VFX 폴더 구조 회귀 감사를 추가해 임시 폴더·고아 에셋 재유입을 방지.
+
+---
+
 ## v14.8.9 진천마합일 단악참 VFX 방향 수정
 
 - 진천마합일 중 단악참 VFX 4의 원본 진행방향(오른쪽→왼쪽)을 좌우 반전해 플레이어→적 방향으로 수정.

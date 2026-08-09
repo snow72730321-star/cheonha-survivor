@@ -1,0 +1,61 @@
+/* v12.1 Awakening Cut-in Pass
+ * 특정 게임의 컷신을 복제하지 않고, 사선 구도·대형 초상화·기술명 충격 등장이라는
+ * 각성기 연출의 원리를 천하생존록 고유 디자인으로 재구성한다.
+ */
+#cutscene.awakening{background:#050608;overflow:hidden;isolation:isolate}
+#cutscene.awakening::before{content:"";position:absolute;inset:-25%;background:
+ radial-gradient(circle at 20% 42%,color-mix(in srgb,var(--ult) 28%,transparent),transparent 28%),
+ repeating-linear-gradient(112deg,transparent 0 32px,color-mix(in srgb,var(--ult2) 7%,transparent) 34px 36px,transparent 38px 70px);
+ transform:scale(1.25);opacity:0}.awakening.show::before{animation:awakenBg 2.05s ease-out both}
+#cutscene .awakening-ink{position:absolute;inset:-12%;background:
+ radial-gradient(ellipse at 28% 54%,rgba(0,0,0,.95) 0 17%,transparent 46%),
+ conic-gradient(from 210deg at 28% 54%,transparent,var(--ult),transparent 18%,var(--ult2),transparent 38%);
+ mix-blend-mode:screen;filter:blur(3px);opacity:0;transform:scale(.35) rotate(-14deg)}
+#cutscene.show .awakening-ink{animation:awakenInk 2.05s cubic-bezier(.18,.8,.22,1) both}
+#cutscene .awakening-band{position:absolute;left:-20%;top:18%;width:140%;height:58%;background:linear-gradient(100deg,rgba(0,0,0,.98),rgba(12,13,18,.92) 45%,color-mix(in srgb,var(--ult2) 22%,#050608));transform:skewY(-7deg) translateX(-115%);border-top:2px solid var(--ult);border-bottom:1px solid color-mix(in srgb,var(--ult2) 65%,transparent);box-shadow:0 0 28px color-mix(in srgb,var(--ult) 25%,transparent)}
+#cutscene.show .awakening-band{animation:awakenBand 2.05s cubic-bezier(.12,.78,.18,1) both}
+#cutscene .awakening-symbol{position:absolute;right:-4vw;top:8%;font-family:Georgia,"Noto Serif KR",serif;font-size:min(44vw,420px);font-weight:900;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--ult) 34%,transparent);opacity:0;transform:rotate(-8deg) scale(1.4);line-height:1}
+#cutscene.show .awakening-symbol{animation:awakenSymbol 2.05s ease-out both}
+#cutscene .awakening-speed{position:absolute;inset:0;opacity:0;background:repeating-linear-gradient(104deg,transparent 0 18px,rgba(255,255,255,.09) 19px 20px,transparent 21px 42px);transform:translateX(-30%);mix-blend-mode:screen}
+#cutscene.show .awakening-speed{animation:awakenSpeed 2.05s ease-out both}
+#cutscene.awakening .panel{width:100vw;height:100vh;max-width:none;padding:0;display:block}
+#cutscene.awakening .cutscene-frame{height:100vh;overflow:visible;display:block}
+#cutscene.awakening #cutsceneCanvas{position:absolute;width:min(80vh,88vw);height:min(80vh,88vw);left:-4vw;bottom:-7vh;max-height:none;opacity:0;transform:translateX(-22vw) scale(1.22);filter:drop-shadow(0 0 22px color-mix(in srgb,var(--ult) 50%,transparent)) drop-shadow(18px 10px 0 rgba(0,0,0,.55));z-index:4}
+#cutscene.awakening.show #cutsceneCanvas{animation:awakenPortrait 2.05s cubic-bezier(.12,.8,.2,1) both}
+#cutscene.awakening .cutscene-title-wrap{left:auto;right:5vw;bottom:16vh;width:min(64vw,560px);text-align:right;z-index:6;transform:none;opacity:0}
+#cutscene.awakening.show .cutscene-title-wrap{animation:awakenTitleWrap 2.05s cubic-bezier(.12,.8,.2,1) both}
+#cutscene.awakening .cutscene-name{font-size:clamp(38px,11vw,82px);line-height:.98;letter-spacing:.04em;text-align:right;text-shadow:0 0 5px var(--ult),5px 5px 0 #120d11,0 0 30px var(--ult2);transform:skewX(-5deg)}
+#cutscene.awakening .cutscene-line{font-size:clamp(11px,3.3vw,18px);letter-spacing:.12em;margin-top:14px;padding-top:9px;border-top:2px solid var(--ult);color:#fff}
+#cutscene .awakening-rank{display:block;color:var(--ult);font-size:clamp(10px,2.8vw,15px);font-weight:900;letter-spacing:.36em;margin-bottom:10px}
+#cutscene .awakening-whiteout{position:absolute;inset:0;background:#fff;opacity:0;z-index:20;pointer-events:none}
+#cutscene.show .awakening-whiteout{animation:awakenWhite 2.05s linear both}
+#cutscene.awakening .cutscene-seal{left:68%;top:10%;width:240px;height:240px;z-index:2}
+#cutscene.awakening.show .cutscene-seal{animation:awakenSeal 2.05s ease-out both}
+#cutscene.awakening .cutscene-slash{z-index:10;height:3px}
+#cutscene.awakening.show .cutscene-slash{animation:awakenSlash 2.05s ease-out both}
+@keyframes awakenBg{0%,8%{opacity:0;transform:scale(1.4)}18%,82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}
+@keyframes awakenInk{0%,10%{opacity:0;transform:scale(.2) rotate(-18deg)}27%,78%{opacity:.72;transform:scale(1.08) rotate(0)}100%{opacity:0;transform:scale(1.3) rotate(5deg)}}
+@keyframes awakenBand{0%,8%{transform:skewY(-7deg) translateX(-115%)}25%,82%{transform:skewY(-7deg) translateX(0)}100%{transform:skewY(-7deg) translateX(115%)}}
+@keyframes awakenSymbol{0%,25%{opacity:0;transform:rotate(-8deg) scale(1.5)}38%,82%{opacity:.45;transform:rotate(-8deg) scale(1)}100%{opacity:0;transform:rotate(-5deg) scale(1.08)}}
+@keyframes awakenSpeed{0%,58%{opacity:0;transform:translateX(-30%)}68%,82%{opacity:.55;transform:translateX(5%)}100%{opacity:0;transform:translateX(35%)}}
+@keyframes awakenPortrait{0%,12%{opacity:0;transform:translateX(-24vw) scale(1.3)}27%{opacity:1;transform:translateX(1vw) scale(1.05)}72%{opacity:1;transform:translateX(3vw) scale(1.08)}88%,100%{opacity:0;transform:translateX(14vw) scale(1.18)}}
+@keyframes awakenTitleWrap{0%,28%{opacity:0;transform:translateX(25vw) skewX(-8deg)}43%,78%{opacity:1;transform:translateX(0) skewX(0)}90%,100%{opacity:0;transform:translateX(-8vw) skewX(4deg)}}
+@keyframes awakenWhite{0%,72%{opacity:0}75%{opacity:.92}78%{opacity:0}84%{opacity:.55}87%,100%{opacity:0}}
+@keyframes awakenSeal{0%,18%{opacity:0;transform:translateX(-50%) scale(.15) rotate(-70deg)}35%,78%{opacity:.8;transform:translateX(-50%) scale(1) rotate(20deg)}100%{opacity:0;transform:translateX(-50%) scale(1.3) rotate(75deg)}}
+@keyframes awakenSlash{0%,67%{opacity:0;transform:rotate(-18deg) scaleX(.05)}72%{opacity:1;transform:rotate(-18deg) scaleX(1)}82%,100%{opacity:0;transform:rotate(-18deg) scaleX(1.15)}}
+@media(max-width:520px){#cutscene.awakening #cutsceneCanvas{width:78vh;height:78vh;left:-20vw;bottom:-4vh}.cutscene-title-wrap{right:4vw!important;bottom:18vh!important;width:68vw!important}.cutscene-name{font-size:clamp(34px,11.5vw,58px)!important}.awakening-symbol{right:-18vw!important}}
+
+
+/* v14.5.3 GIF 시험 — 왜도 무념일섬 전용 애니메이션 레이어.
+ * 원본 GIF는 26MB이므로 full 컷신에서만 요청하며 PWA 캐시에서는 제외한다. */
+#cutscene .ultimate-cutin-gif{display:none;position:absolute;z-index:3;left:50%;top:50%;width:100vw;height:64vh;max-width:none;object-fit:cover;object-position:center;transform:translate(-50%,-50%) scale(1.04);opacity:0;filter:saturate(1.12) contrast(1.06);pointer-events:none}
+#cutscene.ultimate-gif-active.show .ultimate-cutin-gif{display:block;animation:ultimateGifCutin 2.05s cubic-bezier(.16,.75,.18,1) both}
+#cutscene.ultimate-gif-active .awakening-band{opacity:.48}
+#cutscene.ultimate-gif-active #cutsceneCanvas{opacity:0!important;animation:none!important}
+#cutscene.ultimate-gif-active .awakening-ink{z-index:2;opacity:.18}
+#cutscene.ultimate-gif-active .awakening-speed{z-index:5}
+#cutscene.ultimate-gif-active .cutscene-title-wrap{z-index:8}
+#cutscene.ultimate-gif-active .awakening-symbol{z-index:7}
+#cutscene.ultimate-gif-active .awakening-whiteout,#cutscene.ultimate-gif-active .cutscene-flash,#cutscene.ultimate-gif-active .cutscene-slash{z-index:9}
+@keyframes ultimateGifCutin{0%{opacity:0;transform:translate(-50%,-50%) scale(1.12)}8%{opacity:.92}72%{opacity:.92;transform:translate(-50%,-50%) scale(1.02)}88%{opacity:.72}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:520px){#cutscene .ultimate-cutin-gif{height:58vh;width:112vw}}

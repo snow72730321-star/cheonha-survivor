@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512" role="img" aria-label="박도 마스터 무기">
+<defs>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#161d24"/><stop offset=".12" stop-color="#7c8997"/><stop offset=".29" stop-color="#f7fbff"/><stop offset=".43" stop-color="#8996a4"/><stop offset=".58" stop-color="#dce5ed"/><stop offset=".76" stop-color="#4a5663"/><stop offset="1" stop-color="#11171d"/></linearGradient>
+  <linearGradient id="steelEdge" x1="0" x2="1"><stop stop-color="#7f8d9a"/><stop offset=".18" stop-color="#fff"/><stop offset=".5" stop-color="#b9c6d0"/><stop offset=".8" stop-color="#f9fbff"/><stop offset="1" stop-color="#596574"/></linearGradient>
+  <linearGradient id="blackSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07090d"/><stop offset=".2" stop-color="#313a45"/><stop offset=".46" stop-color="#0d1218"/><stop offset=".72" stop-color="#4e5964"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c270c"/><stop offset=".17" stop-color="#9d6c25"/><stop offset=".38" stop-color="#f2cf70"/><stop offset=".55" stop-color="#fff0a8"/><stop offset=".75" stop-color="#b77a28"/><stop offset="1" stop-color="#42290c"/></linearGradient>
+  <linearGradient id="jade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123329"/><stop offset=".35" stop-color="#3e8e70"/><stop offset=".62" stop-color="#9adac0"/><stop offset="1" stop-color="#16382c"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#140b08"/><stop offset=".18" stop-color="#4f2b1d"/><stop offset=".5" stop-color="#99603a"/><stop offset=".72" stop-color="#4d2a1a"/><stop offset="1" stop-color="#130a07"/></linearGradient>
+  <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#180b08"/><stop offset=".3" stop-color="#743b28"/><stop offset=".54" stop-color="#b06a47"/><stop offset=".8" stop-color="#4c241a"/><stop offset="1" stop-color="#130908"/></linearGradient>
+  <radialGradient id="gem"><stop stop-color="#fffbe4"/><stop offset=".18" stop-color="#9ee9ff"/><stop offset=".45" stop-color="#3f8fb1"/><stop offset="1" stop-color="#163244"/></radialGradient>
+  <pattern id="damascus" width="36" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><path d="M-8 5 Q8 -2 24 5 T56 5M-8 15 Q8 8 24 15 T56 15" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2"/></pattern>
+  <pattern id="wrap" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V20" stroke="#d5a570" stroke-width="5"/><path d="M8 0V20" stroke="#5b2e21" stroke-width="5"/></pattern>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+</defs><ellipse cx="512" cy="420" rx="370" ry="38" fill="#000" opacity=".22" filter="url(#soft)"/><g filter="url(#shadow)" transform="rotate(-8 512 256)">
+<path d="M156 336 C349 300 586 217 790 111 Q849 87 887 110 C829 191 674 274 467 329 C367 355 274 370 183 381 Z" fill="url(#steel)" stroke="#eef4f8" stroke-width="6"/>
+<path d="M194 350 C399 308 612 235 810 137" fill="none" stroke="#fff" stroke-opacity=".57" stroke-width="6"/><path d="M257 332 C424 295 575 243 711 182" fill="none" stroke="url(#damascus)" stroke-width="12" opacity=".55"/>
+<path d="M148 314 L214 385" stroke="url(#gold)" stroke-width="30"/><path d="M170 328 L198 362" stroke="#fff2ad" stroke-opacity=".45" stroke-width="5"/>
+<rect x="40" y="343" width="142" height="50" rx="19" fill="url(#wood)" stroke="#25130b" stroke-width="6"/><path d="M63 352 H160M63 366H160M63 380H160" stroke="#c48e55" stroke-width="5" opacity=".55"/><circle cx="41" cy="368" r="23" fill="url(#gold)"/><circle cx="41" cy="368" r="8" fill="#311d0b"/>
+<path d="M329 313 Q467 275 584 226" fill="none" stroke="#d9b768" stroke-width="3" stroke-dasharray="20 12" opacity=".6"/>
+</g></svg>
