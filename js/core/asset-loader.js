@@ -57,7 +57,7 @@ const GameAssets=(()=>{
     "assets/vfx/skills/saber_thunder_fan.png",
     "assets/vfx/skills/spear_dragon_spin.png",
     "assets/vfx/skills/spear_starfall.png",
-    "assets/vfx/skills/sword_meteor_rain.png",
+    "assets/vfx/user/meteor_sword_rain_user.png",
     "assets/vfx/skills/sword_taiji_array.png",
     "assets/vfx/skills/sword_ten_thousand.png",
     "assets/vfx/user_batch02/vfx_01.png",

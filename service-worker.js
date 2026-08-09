@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-8-0-saber-rework";
+const CACHE="cheonha-v14-8-1-meteor-sprite";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",
@@ -72,7 +72,7 @@ const APP_SHELL=[
   "assets/vfx/skills/saber_thunder_fan.png",
   "assets/vfx/skills/spear_dragon_spin.png",
   "assets/vfx/skills/spear_starfall.png",
-  "assets/vfx/skills/sword_meteor_rain.png",
+  "assets/vfx/user/meteor_sword_rain_user.png",
   "assets/vfx/skills/sword_taiji_array.png",
   "assets/vfx/skills/sword_ten_thousand.png",
   "assets/vfx/skills/tao_ice_array.png",

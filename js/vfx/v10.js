@@ -22,7 +22,7 @@ function vfxPalette(w=selectedWeapon){return VFX10.palette[w]||VFX10.palette.swo
 // New/reworked skills should call their registered sprite VFX directly from gameplay code; this dispatcher exists only for unmigrated legacy skills.
 function emitSkillVfx(id,lv=1){const [c1,c2,c3]=vfxPalette(),x=player.x,y=player.y,a=facingAngle();
  switch(id){
-  case "meteor": addVisual({type:"skillSwordMeteor",x,y,r:82+lv*7,life:.72,max:.72,color:c1}); break;
+  case "meteor": addVisual({type:"skillSwordMeteor",x,y,r:82+lv*7,life:.9,max:.9,color:c1}); break;
   case "tenk": addVisual({type:"skillSwordTenk",x,y,r:120+lv*15,life:.85,max:.85,color:c1}); break;
   case "dragonspin": addVisual({type:"skillSpearSpin",x,y,r:112+lv*11,life:.52,max:.52,color:c1}); break;
   case "starfall": addVisual({type:"skillSpearStarfall",x,y,r:80+lv*9,life:.6,max:.6,color:c2}); break;

@@ -46,7 +46,7 @@ globalThis.VFXSprites=(()=>{
     skillSaberSocheon:{src:"assets/vfx/user_batch02/vfx_01.png",frameW:592,frameH:283,frames:7,cols:7,fps:16.67,blend:"lighter"},
     skillSaberWhirlwindUser:{src:"assets/vfx/user_batch02/vfx_03.png",frameW:500,frameH:500,frames:32,cols:8,fps:20,blend:"lighter"},
     skillSaberUnityMountain:{src:"assets/vfx/user_batch02/vfx_04.png",frameW:741,frameH:200,frames:6,cols:6,fps:11.11,blend:"lighter"},
-    skillSwordMeteor:{src:"assets/vfx/skills/sword_meteor_rain.png",frameW:160,frameH:192,frames:8,fps:24,blend:"lighter"},
+    skillSwordMeteor:{src:"assets/vfx/user/meteor_sword_rain_user.png",frameW:183,frameH:284,frames:10,cols:5,fps:11.11,blend:"lighter"},
     skillSwordTaiji:{src:"assets/vfx/skills/sword_taiji_array.png",frameW:192,frameH:192,frames:8,fps:20,blend:"lighter"},
     skillSwordTenk:{src:"assets/vfx/skills/sword_ten_thousand.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
     skillSpearSpin:{src:"assets/vfx/skills/spear_dragon_spin.png",frameW:192,frameH:192,frames:8,fps:24,blend:"lighter"},
@@ -322,7 +322,8 @@ drawVisuals=function(){
       const a=v.a||0,r=v.r||130,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillPoisonThousand",x,y,{age:progress,angle:a,scale:Math.max(.48,r/128),alpha});
     }else if(v.type==="skillSwordMeteor"){
-      VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.52,(v.r||80)/100),alpha});
+      const scale=Math.max(.58,Math.min(1.08,(v.r||80)/92));
+      VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y-284*scale*.48,{age:progress,angle:v.a||0,scale,alpha});
     }else if(v.type==="skillSpearStarfall"){
       VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.5,(v.r||75)/95),alpha});
     }else if(["skillSpearOverlord","skillTaoFireDragon","skillKatanaMoonChain","skillFistHundredStep","skillFistDragonReturn"].includes(v.type)){
@@ -394,7 +395,7 @@ drawVisuals=function(){
     }else if(v.type==="feather"){
       VFXSprites.drawOneShot("arrowGreen",v.x,v.y,{angle:v.a||0,scale:Math.max(.25,(v.r||20)/48),alpha});VFXSprites.drawOneShot("spark",v.x,v.y,{age:progress,scale:.3,alpha:alpha*.7});
     }else if(bladeTypes.has(v.type)){
-      if(v.type==="fallingSword"&&v.source==="meteor")VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||30)/44),alpha});
+      if(v.type==="fallingSword"&&v.source==="meteor"){const scale=Math.max(.66,Math.min(1.06,(v.r||30)/43));VFXSprites.drawOneShot("skillSwordMeteor",v.x,v.y-284*scale*.48,{age:progress,angle:v.a||0,scale,alpha});}
       else if(v.type==="fallingSword"&&v.source==="starfall")VFXSprites.drawOneShot("skillSpearStarfall",v.x,v.y,{age:progress,scale:Math.max(.48,(v.r||38)/48),alpha});
       else if(v.type==="fallingSword")VFXSprites.drawOneShot("blade",v.x,v.y-(alpha*80),{angle:Math.PI/2,scale:Math.max(.6,(v.width||5)/6),alpha});
       else drawBladeRing(v,alpha);

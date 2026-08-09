@@ -40,7 +40,8 @@ for(const required of ["skillSwordMeteor","skillSpearSpin","skillBowArrowRain","
 
 const skillPngs=pngs.filter(file=>file.includes(`${path.sep}skills${path.sep}`));
 const hashes=new Set(skillPngs.map(file=>fs.readFileSync(file).toString("base64")));
-if(skillPngs.length!==19||hashes.size!==19)throw new Error(`무공 전용 VFX가 누락되었거나 중복됨: ${skillPngs.length}개 / 고유 ${hashes.size}개`);
+if(skillPngs.length!==18||hashes.size!==18)throw new Error(`기본 skills 폴더 VFX가 누락되었거나 중복됨: ${skillPngs.length}개 / 고유 ${hashes.size}개`);
+if(!fs.existsSync(path.join(root,"assets/vfx/user/meteor_sword_rain_user.png")))throw new Error("유성검우 사용자 스프라이트 누락");
 
 for(const required of ["drawProjectiles=function","drawVisuals=function","drawHazards=function","drawFields=function","VFXSprites.spawn","GameAssets.load"]){
   if(!renderer.includes(required))throw new Error(`VFX 렌더러 필수 구현 누락: ${required}`);
