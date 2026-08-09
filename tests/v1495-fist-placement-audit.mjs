@@ -3,7 +3,7 @@ const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
 const meta=fs.readFileSync("js/data/characters-meta.js","utf8");
 const vfx=fs.readFileSync("js/vfx/sprite-vfx-v14-3-8.js","utf8");
 function ok(v,m){if(!v)throw new Error(m)}
-ok(combat.includes('const range=150+lv*15,half=.58+lv*.012'),"복호권 range hotfix missing");
+ok(combat.includes('range=150+lv*15,half=.58+lv*.012'),"복호권 range hotfix missing");
 ok(combat.includes('knock:210+lv*15'),"복호권 knock missing");
 ok(combat.includes('if(opt.knock){const n=d||1;e.pushX+=dx/n*opt.knock'),"coneHit knock implementation missing");
 ok(combat.includes('range=178+a.taijifist*18')&&combat.includes('r:120'),"황룡각 range/VFX size hotfix missing");

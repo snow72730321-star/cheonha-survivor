@@ -338,7 +338,7 @@ drawVisuals=function(){
       // All directional fist sprites are normalized so +X is forward.
       // sourceX/sourceY are the local pixel coordinates that must sit on the caster/impact point.
       const cfg={
-        skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:466,sourceY:103,scale:Math.max(.72,r/250)},
+        skillFistTiger:{id:"skillFistTiger",fw:512,fh:206,sourceX:466,sourceY:103,scale:Math.max(.72,r/250),angleOffset:Math.PI},
         skillFistHundredShoot:{id:"skillFistHundredShoot",fw:466,fh:275,sourceX:233,sourceY:138,scale:.56},
         skillFistHundredCombo:{id:"skillFistHundredCombo",fw:640,fh:483,sourceX:320,sourceY:242,scale:.38},
         skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.78,r/250)},
@@ -348,11 +348,12 @@ drawVisuals=function(){
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
         skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.62}
       }[v.type];
+      const renderA=a+(cfg.angleOffset||0);
       const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale;
-      const x=v.x+Math.cos(a)*localX-Math.sin(a)*localY;
-      const y=v.y+Math.sin(a)*localX+Math.cos(a)*localY;
+      const x=v.x+Math.cos(renderA)*localX-Math.sin(renderA)*localY;
+      const y=v.y+Math.sin(renderA)*localX+Math.cos(renderA)*localY;
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
-      VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:a,scale:cfg.scale,alpha:vis});
+      VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scale:cfg.scale,alpha:vis});
     }else if(v.type==="skillFistGoldenBeam"){
       const a=v.a||0,len=v.r||700,width=v.width||90;
       // Beam local source is the left edge; its center is therefore half a beam length forward.
