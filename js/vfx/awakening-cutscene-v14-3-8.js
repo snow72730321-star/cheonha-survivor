@@ -78,7 +78,7 @@
     const ch=characterDefs[selectedWeapon];
     const pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];
     cutscene.style.setProperty("--ult",pal[0]);cutscene.style.setProperty("--ult2",pal[1]);
-    ui.cutsceneName.textContent=ch.ultimate;
+    ui.cutsceneName.textContent=typeof currentUltimateName==="function"?currentUltimateName(selectedWeapon):ch.ultimate;
     ui.cutsceneLine.textContent=ch.name+" · "+ch.quote;
     const symbol=cutscene.querySelector(".awakening-symbol");if(symbol)symbol.textContent=symbolByWeapon[selectedWeapon]||"武";
     const crest=crestByWeapon[selectedWeapon]||crestByWeapon.sword;

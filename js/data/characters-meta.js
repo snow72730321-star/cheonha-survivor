@@ -52,6 +52,17 @@ function ensureV6Account(){account.skinsUnlocked=account.skinsUnlocked||{default
 const oldLoadAccountData=loadAccountData;loadAccountData=function(){oldLoadAccountData();ensureV6Account();applySettings();saveAccountData()};
 const oldSaveAccountData=saveAccountData;saveAccountData=function(){ensureV6Account();oldSaveAccountData()};
 function currentSkin(wid=selectedWeapon){return account.selectedSkins?.[wid]||"default"}
+function currentUltimateName(wid=selectedWeapon){
+  if(wid==="saber"&&(state==="playing"||state==="cutscene")&&(player.arts?.bloodsaber||0)>0)return "진천마합일";
+  return characterDefs[wid]?.ultimate||"절기";
+}
+function saberHeavenDefenseBonus(){
+  if(selectedWeapon!=="saber")return 0;
+  const lv=Math.max(0,player.arts?.bloodsaber||0);if(!lv||!player.maxHp)return 0;
+  const lost=Math.max(0,Math.min(1,1-player.hp/player.maxHp));
+  const maxBonus=.06+lv*.03; // 1/2/3성 최대 9/12/15%
+  return lost*maxBonus;
+}
 function charPalette(wid=selectedWeapon){const c=characterDefs[wid]||characterDefs.sword,skin=skinDefs[currentSkin(wid)]||skinDefs.default;return Object.assign({},c,skin.palette||{})}
 function facingDir(){const a=facingAngle(),x=Math.cos(a),y=Math.sin(a);if(Math.abs(x)>Math.abs(y))return x>0?"right":"left";return y>0?"down":"up"}
 function pixelRect(c,x,y,w,h,color,scale=3){c.fillStyle=color;c.fillRect(Math.round(x*scale),Math.round(y*scale),Math.round(w*scale),Math.round(h*scale))}
@@ -92,7 +103,7 @@ function gainUltimate(v,{ignoreScaling=false}={}){
  const scale=ignoreScaling?1:ultimateChargeScale();
  // 천마합일 지속 중에는 모든 절기 게이지 획득량을 절반으로 제한한다.
  // 보스 처치/정밀 회피처럼 ignoreScaling인 보상도 이 절기 자체 감쇠는 적용한다.
- const unityGain=((player.saberUnityTimer||0)>0&&selectedWeapon==="saber")?.5:1;
+ const unityGain=((player.saberUnityTimer||0)>0&&selectedWeapon==="saber"&&player.saberUnityTrue)?.5:1;
  player.ultimate=Math.min(player.ultimateMax,(player.ultimate||0)+v*scale*(player.ultimateGain||1)*unityGain);
  updateUltimateHud();
 }
@@ -100,13 +111,13 @@ function isUltimateSource(source){return source==="ultimate"||source==="ultimate
 const baseDamageEnemy=damageEnemy;damageEnemy=function(e,dmg,source,opt={}){
  const before=Math.max(0,e.hp),vi=visuals.length;
  // 천마합일 변신 자체의 전역 화력 상승. 기존 벽력도법/단악참 전용 강화와 곱연산된다.
- const unityDamage=(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0)?1.25:1;
+ const unityDamage=(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0)?(player.saberUnityTrue?1.25:1.18):1;
  baseDamageEnemy(e,dmg*unityDamage,source,opt);
  if(account.settings&&!account.settings.damageNumbers&&visuals.length>vi)for(let i=visuals.length-1;i>=vi;i--)if(visuals[i].type==="text"&&visuals[i].text==="치명")visuals.splice(i,1);
  const dealt=Math.max(0,before-Math.max(0,e.hp));
  // 천마합일: 15초 동안 실제 가한 피해의 8%를 흡혈한다.
  // 다수 타격 스킬의 순간 완전회복을 막기 위해 1회 타격당 최대 4 HP로 제한한다.
- if(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0&&!isUltimateSource(source)&&dealt>0){
+ if(selectedWeapon==="saber"&&(player.saberUnityTimer||0)>0&&player.saberUnityTrue&&!isUltimateSource(source)&&dealt>0){
    const heal=Math.min(4,dealt*.08);
    if(heal>0)player.hp=Math.min(player.maxHp,player.hp+heal);
  }
@@ -131,7 +142,7 @@ const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
 
 function threatNear(){for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y),closing=e.speed*(e.chargeTime>0?2.5:1);if(d<player.r+e.r+36+closing*.12)return true}for(const h of hazards){if(h.dead)continue;if(h.type==="blast"&&h.time<.42&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+35)return true;if(h.type==="orb"&&Math.hypot(h.x-player.x,h.y-player.y)<65)return true;if(h.type==="puddle"&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+18)return true;if(h.type==="cross"&&h.time<.38&&(Math.abs(player.x-h.x)<(h.w||38)+player.r||Math.abs(player.y-h.y)<(h.w||38)+player.r))return true}return false}
 const basePerformDodge=performDodge;performDodge=function(){const can=state==="playing"&&player.dodgeCooldown<=0&&player.dodgeTimer<=0,perfect=can&&threatNear();basePerformDodge();if(perfect){player.metrics.perfectDodges++;player.perfectWindow=1.2;slowTimer=.42;slowScale=.33;gainUltimate(10,{ignoreScaling:true});showMessage("정밀 회피 · 찰나의 경지",1.1);addVisual({type:"text",x:player.x,y:player.y-30,text:"PERFECT",life:.55,max:.55,color:"#bdeeff"});GameAudio.playSFX("perfect-dodge")}};
-const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}baseHurtPlayer(amount)};
+const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}const heavenDR=saberHeavenDefenseBonus();baseHurtPlayer(amount*(1-heavenDR))};
 
 function checkEvolution(){const evo=evolutionDefs[selectedWeapon];if(!evo||player.evolutions[selectedWeapon]||!evo.check(player))return;player.evolutions[selectedWeapon]=evo.name;evo.apply(player);showMessage(`무공 진화 · ${evo.name}`,3);screenShake=Math.max(screenShake,shakeValue(14));addVisual({type:"ring",x:player.x,y:player.y,r:180,life:.8,max:.8,color:"#fff0a0",width:10});GameAudio.playUI("evolution")}
 const baseCheckHidden=checkHidden;checkHidden=function(){baseCheckHidden();checkEvolution()};
@@ -159,12 +170,12 @@ function ultimateAttack(){
    const targets=visibleEnemies(0);
    for(let i=0;i<Math.min(24,targets.length);i++){const e=targets[i];delayed.push({time:i*.045,type:"strike",x:e.x,y:e.y,r:38,damage:96,source:"ultimate",color:"#9eeaff"})}
  }else if(selectedWeapon==="saber"){
-   // v14.6.6 천마합일: 절기 직후 15초간 벽력도법/단악참의 형상과 성능이 일시 강화된다.
+   const trueUnity=(player.arts?.bloodsaber||0)>0;
    player.saberUnityTimer=15;
-   // v14.6.5: 강화 직후 오래 남은 기존 쿨다운 때문에 변신이 체감되지 않는 문제를 막는다.
+   player.saberUnityTrue=trueUnity;
    player.fireTimer=Math.min(player.fireTimer||.12,.12);
-   if(player.cooldowns)player.cooldowns.mountain=Math.min(player.cooldowns.mountain||.18,.18);
-   addVisual({type:"text",x:player.x,y:player.y-48,text:"천마합일 · 피해 +25% / 흡혈 / 도법 강화 15초",life:1.1,max:1.1,color:"#ffd1cf"});
+   if(trueUnity&&player.cooldowns)player.cooldowns.mountain=Math.min(player.cooldowns.mountain||.18,.18);
+   addVisual({type:"text",x:player.x,y:player.y-48,text:trueUnity?"진천마합일 · 기존 완성형 강화 15초":"천마합일 · 피해 +18% / 공격속도 +20% · 15초",life:1.1,max:1.1,color:"#ffd1cf"});
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
@@ -174,11 +185,11 @@ function ultimateAttack(){
    aoe(player.x,player.y,150,88,"ultimate",{color:"#ffd86f",knock:220});
    addVisual({type:"text",x:player.x+Math.cos(a)*95,y:player.y+Math.sin(a)*95-24,text:"항룡 · 정면 붕괴",life:.75,max:.75,color:"#ffe9a0"});
  }
- showMessage(ch.ultimate,1.5);
+ showMessage(currentUltimateName(selectedWeapon),1.5);
 }
 
 const ultimatePalettes={sword:["#e9fbff","#78d7ff"],spear:["#ffe0a3","#c44c39"],bow:["#fff3a5","#5dbd95"],poison:["#d497ff","#69d06e"],tao:["#dff7ff","#64cfff"],saber:["#ff9b7b","#a71928"],katana:["#f6efff","#9f8dff"],fist:["#ffe69b","#d18a27"]};
-function useUltimate(){if(state!=="playing"||player.ultimate<100)return;player.ultimate=0;player.ultimateUses++;player.metrics.ultimateUses++;updateUltimateHud();state="cutscene";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";const pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];ui.cutscene.style.setProperty("--ult",pal[0]);ui.cutscene.style.setProperty("--ult2",pal[1]);ui.cutsceneName.textContent=characterDefs[selectedWeapon].ultimate;ui.cutsceneLine.textContent=characterDefs[selectedWeapon].name+" · "+characterDefs[selectedWeapon].quote;drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());ui.cutscene.classList.remove("show");void ui.cutscene.offsetWidth;ui.cutscene.classList.add("show");GameAudio.playSFX("ultimate-rise");setTimeout(()=>GameAudio.playSFX("ultimate-mid"),360);setTimeout(()=>GameAudio.playSFX("ultimate-hit"),720);setTimeout(()=>{ui.cutscene.classList.remove("show");state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ultimateAttack();last=performance.now()},1450)}
+function useUltimate(){if(state!=="playing"||player.ultimate<100)return;player.ultimate=0;player.ultimateUses++;player.metrics.ultimateUses++;updateUltimateHud();state="cutscene";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";const pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];ui.cutscene.style.setProperty("--ult",pal[0]);ui.cutscene.style.setProperty("--ult2",pal[1]);ui.cutsceneName.textContent=currentUltimateName(selectedWeapon);ui.cutsceneLine.textContent=characterDefs[selectedWeapon].name+" · "+characterDefs[selectedWeapon].quote;drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());ui.cutscene.classList.remove("show");void ui.cutscene.offsetWidth;ui.cutscene.classList.add("show");GameAudio.playSFX("ultimate-rise");setTimeout(()=>GameAudio.playSFX("ultimate-mid"),360);setTimeout(()=>GameAudio.playSFX("ultimate-hit"),720);setTimeout(()=>{ui.cutscene.classList.remove("show");state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ultimateAttack();last=performance.now()},1450)}
 
 const baseUpdate=update;update=function(dt){if(state==="playing"){if(player.shieldMax){player.shieldTimer-=dt;if(player.shieldTimer<=0){player.shieldTimer=Math.max(12,24-player.shieldMax*3);player.shield=Math.min(player.shieldMax,player.shield+1)}}player.perfectWindow=Math.max(0,(player.perfectWindow||0)-dt)}baseUpdate(dt)};
 const baseUpdateHud=updateHud;updateHud=function(){baseUpdateHud();updateUltimateHud()};

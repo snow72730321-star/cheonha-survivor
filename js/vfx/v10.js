@@ -31,7 +31,7 @@ function emitSkillVfx(id,lv=1){const [c1,c2,c3]=vfxPalette(),x=player.x,y=player
   case "thousand": addVisual({type:"skillPoisonThousand",x,y,a,r:135+lv*11,life:.5,max:.5,color:c1}); break;
   case "miasma": addVisual({type:"skillPoisonMiasma",x,y,r:88+lv*12,life:.82,max:.82,color:c2}); break;
   case "icepulse": addVisual({type:"skillTaoIceArray",x,y,r:118+lv*13,life:.48,max:.48,color:"#9eeaff"}); break;
-  case "mountain": if(!((player.saberUnityTimer||0)>0))addVisual({type:"skillSaberMountain",x,y,a,r:260+lv*20,life:.68,max:.68,color:c2,width:30+lv*3}); break;
+  case "mountain": if(!((player.saberUnityTimer||0)>0&&player.saberUnityTrue))addVisual({type:"skillSaberMountain",x,y,a,r:260+lv*20,life:.68,max:.68,color:c2,width:30+lv*3}); break;
   case "moonchain": addVisual({type:"skillKatanaMoonChain",x,y,a,r:180+lv*17,life:.56,max:.56,color:c1,width:28}); break;
   case "zanshinDrop": addVisual({type:"skillKatanaZanshin",x,y,a,r:75+lv*8,life:.58,max:.58,color:c2}); break;
   case "nameless": {const len=Math.max(W,H)*1.3;addVisual({type:"namelessCutV1454",x1:x-Math.cos(a)*len*.5,y1:y-Math.sin(a)*len*.5,x2:x+Math.cos(a)*len*.5,y2:y+Math.sin(a)*len*.5,width:7+lv*.7,life:.24,max:.24,color:c3,phase:0});break;}

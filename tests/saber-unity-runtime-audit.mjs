@@ -8,17 +8,20 @@ for(const f of ["assets/vfx/user_batch02/vfx_01.png","assets/vfx/user_batch02/vf
 assert.match(chars,/saber:\{name:"마련화",title:"소천마도",ultimate:"천마합일"/);
 assert.match(chars,/player\.saberUnityTimer=15/);
 assert.doesNotMatch(chars,/for\(let i=0;i<5;i\+\+\).*lineHit.*"ultimate"/s,"천마합일에 구형 5방향 천마참이 남아 있음");
-assert.match(combat,/range=100\+lv\*12,half=\.56\+lv\*\.035/);
+assert.match(combat,/range=\(100\+lv\*12\)\*saberHeavenRangeMul\(\)/);
 assert.match(chars,/player\.fireTimer=Math\.min/);
-assert.match(chars,/cooldowns\.mountain=Math\.min/);
-assert.match(combat,/unity=\(player\.saberUnityTimer\|\|0\)>0/);
+assert.match(chars,/trueUnity&&player\.cooldowns/);
+assert.match(combat,/trueUnity=saberTrueUnityActive\(\)/);
 assert.match(combat,/type:"skillSaberUnityThunder"/);
 assert.match(combat,/type:"skillSaberWhirlwindUser"/);
 assert.match(combat,/type:"skillSaberUnityMountain"/);
-assert.match(combat,/damage=\(20\+lv\*7\)\*\(unity\?1\.35:1\)/);
-assert.match(combat,/\*\(unity\?\.75:1\)/);
+assert.match(combat,/damage=\(20\+lv\*7\)\*\(trueUnity\?1\.35:1\)/);
+assert.match(combat,/trueUnity\?\.75:unity\?\.80:1/);
 assert.match(vfx,/skillSaberUnityThunder:\{src:"assets\/vfx\/user_batch02\/vfx_01\.png"/);
 assert.match(vfx,/skillSaberWhirlwindUser:\{src:"assets\/vfx\/user_batch02\/vfx_03\.png"/);
 assert.match(vfx,/skillSaberUnityMountain:\{src:"assets\/vfx\/user_batch02\/vfx_04\.png"/);
 assert.ok(!combat.includes('showMessage("소천마도",1)'),"title leaked into hidden skill message");
 console.log("saber unity runtime audit: ok");
+
+assert.match(chars,/return "진천마합일"/);
+assert.match(chars,/player\.saberUnityTrue=trueUnity/);

@@ -164,31 +164,35 @@ if(vfxRegression.customCount<14||!vfxRegression.saberTypes.includes("cone")||vfx
 console.log("무공별 전용 VFX·벽력도법 중복 방지 회귀 테스트 통과",vfxRegression);
 
 
-// v14.6.5 회귀: 천마합일을 실제 런타임에서 발동한 뒤 벽력도법/단악참/선풍참의 VFX와 강화 상태를 검증한다.
+// v14.8.0 회귀: 기본 천마합일과 천마신공 습득 후 진천마합일을 각각 실제 런타임 검증한다.
 const saberUnityRuntime=vm.runInContext(`(()=>{
-  selectedWeapon="saber";selectedDifficulty="chuchul";startGame();state="playing";
-  enemies=[];visuals=[];delayed=[];projectiles=[];
-  player.arts.thundersaber=8;player.arts.mountain=3;player.arts.whirlwind=3;
-  spawnEnemy("bandit",player.x+130,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
-  ultimateAttack();
-  const timerAfterUltimate=player.saberUnityTimer;
-  enemies=[];spawnEnemy("bandit",player.x+130,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
-  visuals=[];player.fireTimer=0;fireBasic();
-  const basicTypes=visuals.map(v=>v.type),basicTimer=player.fireTimer;
-  enemies=[];spawnEnemy("brute",player.x+160,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
-  visuals=[];player.cooldowns.mountain=0;player.cooldowns.whirlwind=999;tickArts(1/60);
-  const mountainTypes=visuals.map(v=>v.type),mountainCd=player.cooldowns.mountain;
-  visuals=[];player.cooldowns.whirlwind=0;player.cooldowns.mountain=999;tickArts(1/60);
-  const whirlwindTypes=visuals.map(v=>v.type);
-  return {timerAfterUltimate,basicTypes,basicTimer,mountainTypes,mountainCd,whirlwindTypes};
+  const runCase=(heavenLv)=>{
+    selectedWeapon="saber";selectedDifficulty="chuchul";startGame();state="playing";
+    enemies=[];visuals=[];delayed=[];projectiles=[];
+    player.arts.thundersaber=8;player.arts.mountain=3;player.arts.whirlwind=3;player.arts.bloodsaber=heavenLv;
+    spawnEnemy("bandit",player.x+130,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
+    ultimateAttack();
+    const timer=player.saberUnityTimer,isTrue=!!player.saberUnityTrue,name=currentUltimateName("saber");
+    enemies=[];spawnEnemy("bandit",player.x+130,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
+    visuals=[];player.fireTimer=0;fireBasic();
+    const basicTypes=visuals.map(v=>v.type),basicTimer=player.fireTimer;
+    enemies=[];spawnEnemy("brute",player.x+160,player.y);enemies[0].speed=0;enemies[0].damage=0;GameSpatial.rebuild(enemies);
+    visuals=[];player.cooldowns.mountain=0;player.cooldowns.whirlwind=999;tickArts(1/60);
+    const mountainTypes=visuals.map(v=>v.type),mountainCd=player.cooldowns.mountain;
+    return {timer,isTrue,name,basicTypes,basicTimer,mountainTypes,mountainCd};
+  };
+  return {base:runCase(0),trueUnity:runCase(1)};
 })()`,context);
-if(saberUnityRuntime.timerAfterUltimate<7.9||!saberUnityRuntime.basicTypes.includes("skillSaberUnityThunder")||saberUnityRuntime.basicTypes.includes("skillSaberThunderFan")||
-   !saberUnityRuntime.mountainTypes.includes("skillSaberUnityMountain")||saberUnityRuntime.mountainTypes.includes("skillSaberMountain")||
-   !saberUnityRuntime.whirlwindTypes.includes("skillSaberWhirlwindUser")||saberUnityRuntime.whirlwindTypes.includes("skillSaberWhirlwind")||
-   !(saberUnityRuntime.basicTimer<.7)||!(saberUnityRuntime.mountainCd<3.5)){
-  throw new Error(`천마합일 실제 런타임 검증 실패: ${JSON.stringify(saberUnityRuntime)}`);
+if(saberUnityRuntime.base.timer<14.9||saberUnityRuntime.base.isTrue||saberUnityRuntime.base.name!=="천마합일"||
+   saberUnityRuntime.base.basicTypes.includes("skillSaberUnityThunder")||saberUnityRuntime.base.mountainTypes.includes("skillSaberUnityMountain")||
+   !(saberUnityRuntime.base.basicTimer<.75)||
+   saberUnityRuntime.trueUnity.timer<14.9||!saberUnityRuntime.trueUnity.isTrue||saberUnityRuntime.trueUnity.name!=="진천마합일"||
+   !saberUnityRuntime.trueUnity.basicTypes.includes("skillSaberUnityThunder")||
+   !saberUnityRuntime.trueUnity.mountainTypes.includes("skillSaberUnityMountain")||
+   !(saberUnityRuntime.trueUnity.basicTimer<.7)||!(saberUnityRuntime.trueUnity.mountainCd<3.5)){
+  throw new Error(`마련화 절기 리워크 런타임 검증 실패: ${JSON.stringify(saberUnityRuntime)}`);
 }
-console.log("천마합일 실제 런타임 VFX/강화 검증 통과",saberUnityRuntime);
+console.log("마련화 천마합일/진천마합일 런타임 검증 통과",saberUnityRuntime);
 
 // 주 저장이 깨졌을 때 정상 백업을 복구하고 백업 자체는 보존하는지 확인한다.
 vm.runInContext("account.gold=321;SaveManager.save()",context);

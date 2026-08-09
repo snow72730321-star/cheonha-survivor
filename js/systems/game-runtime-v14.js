@@ -261,7 +261,7 @@ useUltimate=function(){
   state="cutscene";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";
   const ch=characterDefs[selectedWeapon],pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];
   ui.cutscene.style.setProperty("--ult",pal[0]);ui.cutscene.style.setProperty("--ult2",pal[1]);
-  ui.cutsceneName.textContent=ch.ultimate;ui.cutsceneLine.textContent=ch.name+" · "+ch.quote;
+  ui.cutsceneName.textContent=typeof currentUltimateName==="function"?currentUltimateName(selectedWeapon):ch.ultimate;ui.cutsceneLine.textContent=ch.name+" · "+ch.quote;
   drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());
   ui.cutscene.classList.remove("show");void ui.cutscene.offsetWidth;ui.cutscene.classList.add("show");
   setTimeout(()=>{ui.cutscene.classList.remove("show");state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ultimateAttack();last=performance.now()},520);
