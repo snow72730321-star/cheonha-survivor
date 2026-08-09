@@ -318,9 +318,13 @@ drawVisuals=function(){
     }else if(v.type==="skillSaberWhirlwindUser"){
       VFXSprites.drawOneShot("skillSaberWhirlwindUser",v.x,v.y,{age:progress,scale:Math.max(.5,(v.r||110)/170),alpha});
     }else if(v.type==="skillSaberUnityMountain"){
-      const a=v.a||0,r=v.r||270,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
+      // vfx_04 원본은 프레임 진행이 오른쪽→왼쪽이다.
+      // 좌우 반전해 플레이어→공격방향으로 진행시키고, 첫 사출 시작점이 플레이어에 닿도록
+      // 원본 프레임의 실사용 폭(약 739px)을 기준으로 중심을 판정 길이의 절반 앞에 둔다.
+      const a=v.a||0,r=v.r||270,scaleX=Math.max(.32,r/741),originOffset=368.5*scaleX;
+      const x=v.x+Math.cos(a)*originOffset,y=v.y+Math.sin(a)*originOffset;
       const vis=Math.min(1,alpha*(v.visibilityBoost||1));
-      VFXSprites.drawOneShot("skillSaberUnityMountain",x,y,{age:progress,angle:a,scaleX:Math.max(.58,r/300),scaleY:Math.max(.68,(v.width||36)/46),alpha:vis});
+      VFXSprites.drawOneShot("skillSaberUnityMountain",x,y,{age:progress,angle:a,scaleX,scaleY:Math.max(.68,(v.width||36)/46),alpha:vis,flipX:true});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});
