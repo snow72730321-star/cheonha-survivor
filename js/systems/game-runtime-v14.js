@@ -91,31 +91,64 @@ gainXp=function gainXpQueued(amount){
   }
 };
 
+/** 무한나락 유한 성장 완료 후 사용하는 초월 성장. 각 능력은 정확한 누적 상한을 가진다. */
+function abyssFiniteGrowthComplete(){
+  if(selectedDifficulty!=="abyss"||!player||!selectedWeapon)return false;
+  const w=weaponDefs[selectedWeapon],arts=[w.basic,...w.arts];
+  return arts.every(a=>(player.arts[a.id]||0)>=a.max)&&universal.every(u=>(player.universal[u.id]||0)>=u.max);
+}
+function ensureAbyssTranscend(){
+  if(!player.abyssTranscend)player.abyssTranscend={damage:0,haste:0,speed:0,area:0,vitality:0,ultimate:0};
+  return player.abyssTranscend;
+}
+function exactStepRatio(level,step,sign=1){
+  const before=1+sign*step*Math.max(0,level-1),after=1+sign*step*level;
+  return after/before;
+}
+function abyssTranscendChoices(){
+  if(!abyssFiniteGrowthComplete())return [];
+  const t=ensureAbyssTranscend(),out=[];
+  if(t.damage<10)out.push({kind:"transcend",id:"abyss_damage",name:"공력 증진",tag:`초월 ${t.damage}/10`,desc:`전체 피해 +3% · 누적 최대 +30%`,apply:()=>{const n=++t.damage;player.damageMul*=exactStepRatio(n,.03,1)}});
+  if(t.haste<10)out.push({kind:"transcend",id:"abyss_haste",name:"신속",tag:`초월 ${t.haste}/10`,desc:`기본 공격 간격 2% 단축 · 누적 최대 20%`,apply:()=>{const n=++t.haste;player.attackSpeedMul*=exactStepRatio(n,.02,-1)}});
+  if(t.speed<10)out.push({kind:"transcend",id:"abyss_speed",name:"축지",tag:`초월 ${t.speed}/10`,desc:`이동속도 +2% · 누적 최대 +20%`,apply:()=>{const n=++t.speed;player.speed*=exactStepRatio(n,.02,1)}});
+  if(t.area<10)out.push({kind:"transcend",id:"abyss_area",name:"광역화",tag:`초월 ${t.area}/10`,desc:`공격 범위 +2% · 누적 최대 +20%`,apply:()=>{const n=++t.area;player.areaMul*=exactStepRatio(n,.02,1)}});
+  if(t.vitality<10)out.push({kind:"transcend",id:"abyss_vitality",name:"금강불괴",tag:`초월 ${t.vitality}/10`,desc:`최대 체력 +3% · 누적 최대 +30%, 증가분만큼 체력 회복`,apply:()=>{const old=player.maxHp,n=++t.vitality;player.maxHp*=exactStepRatio(n,.03,1);player.hp=Math.min(player.maxHp,player.hp+(player.maxHp-old))}});
+  if(t.ultimate<10)out.push({kind:"transcend",id:"abyss_ultimate",name:"절기순환",tag:`초월 ${t.ultimate}/10`,desc:`절기 게이지 획득량 +3% · 누적 최대 +30%`,apply:()=>{const n=++t.ultimate;player.ultimateGain*=exactStepRatio(n,.03,1)}});
+  // 모든 초월 상한을 찍은 뒤에도 레벨업이 막히지 않도록 회복 선택은 계속 남긴다.
+  out.push({kind:"transcend",id:"abyss_recover",name:"회광반조",tag:"초월 회복",desc:"즉시 최대 체력의 20%를 회복한다.",apply:()=>{player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.2)}});
+  return out;
+}
+
 levelChoice=function levelChoiceQueued(){
   if(pendingLevelUps<=0)return;
   state="levelup";ui.dodgeBtn.style.display="none";
   const pool=choicePool();
-  const artPool=pool.filter(choice=>choice.kind==="art");
   const picks=[];
+  const transcend=abyssTranscendChoices();
 
-  function take(source){
+  function take(source,removeFromPool=true){
     if(!source.length)return;
     const index=Math.floor(Math.random()*source.length);
     const choice=source.splice(index,1)[0];
-    const poolIndex=pool.indexOf(choice);
-    if(poolIndex>=0)pool.splice(poolIndex,1);
+    if(removeFromPool){const poolIndex=pool.indexOf(choice);if(poolIndex>=0)pool.splice(poolIndex,1)}
     picks.push(choice);
   }
 
-  take(artPool);take(artPool);
-  while(picks.length<3&&pool.length)take(pool);
+  if(transcend.length){
+    while(picks.length<3&&transcend.length)take(transcend,false);
+  }else{
+    const artPool=pool.filter(choice=>choice.kind==="art");
+    take(artPool);take(artPool);
+    while(picks.length<3&&pool.length)take(pool);
 
-  const repeats=[
-    {kind:"repeat",name:"내공 정련",tag:"반복 성장",desc:"모든 피해가 영구적으로 2% 증가한다.",apply:()=>player.damageMul*=1.02},
-    {kind:"repeat",name:"기혈 순환",tag:"반복 성장",desc:"최대 체력이 5 증가하고 최대 체력의 20%를 회복한다.",apply:()=>{player.maxHp+=5;player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.2)}},
-    {kind:"repeat",name:"신법 연마",tag:"반복 성장",desc:"이동속도가 1.5% 증가하고 보법 재사용 대기시간이 1% 감소한다.",apply:()=>{player.speed*=1.015;player.dodgeCooldownMul=Math.max(.55,player.dodgeCooldownMul*.99)}}
-  ];
-  for(const reward of repeats){if(picks.length<3)picks.push(reward)}
+    // 일반 원정 및 아직 히든 무공이 완성되지 않은 나락에서는 기존 반복 성장으로 레벨 흐름을 유지한다.
+    const repeats=[
+      {kind:"repeat",name:"내공 정련",tag:"반복 성장",desc:"모든 피해가 영구적으로 2% 증가한다.",apply:()=>player.damageMul*=1.02},
+      {kind:"repeat",name:"기혈 순환",tag:"반복 성장",desc:"최대 체력이 5 증가하고 최대 체력의 20%를 회복한다.",apply:()=>{player.maxHp+=5;player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.2)}},
+      {kind:"repeat",name:"신법 연마",tag:"반복 성장",desc:"이동속도가 1.5% 증가하고 보법 재사용 대기시간이 1% 감소한다.",apply:()=>{player.speed*=1.015;player.dodgeCooldownMul=Math.max(.55,player.dodgeCooldownMul*.99)}}
+    ];
+    for(const reward of repeats){if(picks.length<3)picks.push(reward)}
+  }
 
   const ready=weaponDefs[selectedWeapon].arts.filter(art=>art.hidden&&player.hiddenReady[art.id]&&!player.arts[art.id]);
   ui.hiddenBanner.innerHTML=ready.length?`<div class="unlock-banner">히든 단서 완성: ${ready.map(art=>art.name).join(" · ")}</div><div style="height:9px"></div>`:"";
@@ -140,6 +173,22 @@ levelChoice=function levelChoiceQueued(){
     ui.choices.appendChild(button);
   }
   ui.levelUp.classList.add("show");
+};
+
+const runtimeRenderPauseForTranscend=renderPause;
+renderPause=function(){
+  runtimeRenderPauseForTranscend.apply(this,arguments);
+  if(selectedDifficulty!=="abyss"||!player?.abyssTranscend||!ui.pauseContent)return;
+  const t=player.abyssTranscend;
+  const rows=[
+    ["공력",`${t.damage||0}/10 · +${(t.damage||0)*3}%`],
+    ["공속",`${t.haste||0}/10 · +${(t.haste||0)*2}%`],
+    ["이속",`${t.speed||0}/10 · +${(t.speed||0)*2}%`],
+    ["범위",`${t.area||0}/10 · +${(t.area||0)*2}%`],
+    ["기혈",`${t.vitality||0}/10 · +${(t.vitality||0)*3}%`],
+    ["절기",`${t.ultimate||0}/10 · +${(t.ultimate||0)*3}%`]
+  ];
+  ui.pauseContent.insertAdjacentHTML("beforeend",`<h3>나락 초월</h3><div class="stat-grid">${rows.map(r=>`<div class="stat"><b>${r[1]}</b><span>${r[0]}</span></div>`).join("")}</div>`);
 };
 
 /** 전투 밖으로 나갈 때 히든 무공 진행 HUD/레벨업 단서를 반드시 정리한다. */

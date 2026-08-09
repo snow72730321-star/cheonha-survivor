@@ -30,7 +30,7 @@ const AbyssModeV1487=(()=>{
     baseReset.apply(this,arguments);
     if(!active())return;
     nextBossAt=360;nextAbyssMiniAt=180;lastStage=0;
-    player.abyssMode=true;player.abyssTarget=TARGET;
+    player.abyssMode=true;player.abyssTarget=TARGET;player.abyssTranscend={damage:0,haste:0,speed:0,area:0,vitality:0,ultimate:0};
     // 수라 위압과 별개. 나락은 장비가 강해도 적이 따라 강해지는 스케일링을 사용하지 않는다.
     player.dynamicThreat=1;
     ui.weaponHud.textContent=`${weaponDefs[selectedWeapon].name} · 무한나락 · 15분 생존 목표${player.forgedWeapon?" · "+player.forgedWeapon.name:""}`;
