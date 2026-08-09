@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.9.8-golden-dragon-charge-orientation";
+  const BUILD="v14.9.10-fist-stacks-player-envelope";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];

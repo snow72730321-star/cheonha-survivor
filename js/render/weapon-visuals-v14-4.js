@@ -66,16 +66,18 @@ const WeaponVisuals=(()=>{
     if(typeof ctx==="undefined"||typeof player==="undefined")return;
     const item=normalize(player.forgedWeapon||equipped(selectedWeapon));if(!item)return;
     const lv=tier(item);if(lv<=0&&!item.element)return;
-    const el=element(item),z=typeof mobileCameraScale==="function"?mobileCameraScale():1,t=typeof elapsed==="number"?elapsed:0,cx=W/2,cy=H/2+12*z;
+    const el=element(item),z=typeof mobileCameraScale==="function"?mobileCameraScale():1,t=typeof elapsed==="number"?elapsed:0,cx=W/2,cy=H/2;
+    const env=(typeof playerVisualEnvelope==="function")?playerVisualEnvelope(z):{rx:61*z,ry:79*z,cyOffset:-10*z};
+    const ey=cy+env.cyOffset;
     ctx.save();ctx.globalCompositeOperation="lighter";ctx.strokeStyle=el.color;ctx.fillStyle=el.color;
     if(!front){
-      const pulse=1+Math.sin(t*(2.1+lv*.2))*.045;
-      ctx.globalAlpha=.16+lv*.045;ctx.lineWidth=(1.4+lv*.55)*z;ctx.shadowColor=el.color;ctx.shadowBlur=(7+lv*6)*z;
-      ctx.beginPath();ctx.ellipse(cx,cy,(24+lv*5)*z*pulse,(8+lv*1.5)*z*pulse,0,0,Math.PI*2);ctx.stroke();
-      if(lv>=2){ctx.globalAlpha=.09+lv*.035;ctx.beginPath();ctx.arc(cx,cy-13*z,(28+lv*4)*z*(1+Math.sin(t*1.7)*.03),0,Math.PI*2);ctx.stroke();}
+      const pulse=1+Math.sin(t*(2.1+lv*.2))*.035;
+      ctx.globalAlpha=.12+lv*.04;ctx.lineWidth=(1.4+lv*.5)*z;ctx.shadowColor=el.color;ctx.shadowBlur=(7+lv*6)*z;
+      ctx.beginPath();ctx.ellipse(cx,ey,env.rx*(1+lv*.035)*pulse,env.ry*(1+lv*.02)*pulse,0,0,Math.PI*2);ctx.stroke();
+      if(lv>=2){ctx.globalAlpha=.075+lv*.028;ctx.beginPath();ctx.ellipse(cx,ey,(env.rx+8*z+lv*2*z)*pulse,(env.ry+8*z+lv*2*z)*pulse,0,0,Math.PI*2);ctx.stroke();}
     }else{
       const count=lv>=5?12:lv===4?9:lv===3?7:lv===2?5:lv===1?3:1;ctx.shadowColor=el.color;ctx.shadowBlur=(5+lv*4)*z;
-      for(let i=0;i<count;i++){const phase=t*(.62+lv*.11)+i*6.283185307/count;const r=(22+lv*6+(i%2)*5)*z;const yoff=Math.sin(t*1.35+i*1.7)*9*z;ctx.globalAlpha=.24+lv*.07;ctx.beginPath();ctx.arc(cx+Math.cos(phase)*r,cy-13*z+yoff+Math.sin(phase)*8*z,(1.1+lv*.35)*z,0,Math.PI*2);ctx.fill();}
+      for(let i=0;i<count;i++){const phase=t*(.62+lv*.11)+i*6.283185307/count;const px=cx+Math.cos(phase)*(env.rx+6*z+lv*2*z),py=ey+Math.sin(phase)*(env.ry+6*z+lv*2*z);ctx.globalAlpha=.22+lv*.065;ctx.beginPath();ctx.arc(px,py,(1.1+lv*.35)*z,0,Math.PI*2);ctx.fill();}
     }
     ctx.restore();
   }

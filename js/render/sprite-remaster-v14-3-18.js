@@ -197,6 +197,13 @@ function drawMissingAsset(cx,cy,label){
  * 플레이어 렌더링.
  * 무적 상태에서 draw 호출 자체를 건너뛰지 않으므로 이동 중 깜빡임이 발생하지 않는다.
  */
+function playerVisualEnvelope(z=1){
+  // Current combat character art is 48×64 rendered at roughly 2.55x.
+  // Use the visible sprite envelope rather than player.r/hitbox for protective visuals.
+  return {rx:61*z,ry:79*z,cyOffset:-10*z};
+}
+window.playerVisualEnvelope=playerVisualEnvelope;
+
 drawPlayer=function(){
   const pose=playerMotionPose(),img=spriteImages.characters[selectedWeapon];
   const cx=W/2,cy=H/2,z=mobileCameraScale(),a=facingAngle();
@@ -230,14 +237,30 @@ drawPlayer=function(){
   ctx.restore();
 
   if(player.shield>0){
-    // v14.5.4: 호신강기를 한눈에 읽을 수 있는 다층 보호막 + 남은 충전 구슬로 표시한다.
     const charges=Math.max(1,Math.floor(player.shield)),maxCharges=Math.max(charges,Math.floor(player.shieldMax||charges));
-    const pulse=.5+.5*Math.sin(elapsed*4.5),radius=(34+pulse*2)*z;
+    const pulse=.5+.5*Math.sin(elapsed*4.5),env=playerVisualEnvelope(z),rx=env.rx*(1+pulse*.025),ry=env.ry*(1+pulse*.025),sy=cy+env.cyOffset;
     ctx.save();ctx.globalCompositeOperation="lighter";
-    ctx.fillStyle=`rgba(116,214,255,${.07+pulse*.035})`;ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=`rgba(198,244,255,${.78+pulse*.18})`;ctx.lineWidth=3*z;ctx.shadowColor="#8ee8ff";ctx.shadowBlur=12*z;ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.stroke();
-    ctx.strokeStyle="rgba(105,192,255,.6)";ctx.lineWidth=1.4*z;ctx.beginPath();ctx.arc(cx,cy,radius-5*z,0,Math.PI*2);ctx.stroke();
-    for(let i=0;i<maxCharges;i++){const ang=-Math.PI/2+(i-(maxCharges-1)/2)*.34,rr=radius+8*z,x=cx+Math.cos(ang)*rr,y=cy+Math.sin(ang)*rr;ctx.fillStyle=i<charges?"#e9fbff":"rgba(130,170,185,.28)";ctx.shadowBlur=i<charges?8*z:0;ctx.beginPath();ctx.arc(x,y,3.2*z,0,Math.PI*2);ctx.fill()}
+    ctx.fillStyle=`rgba(116,214,255,${.055+pulse*.03})`;ctx.beginPath();ctx.ellipse(cx,sy,rx,ry,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle=`rgba(198,244,255,${.78+pulse*.18})`;ctx.lineWidth=3*z;ctx.shadowColor="#8ee8ff";ctx.shadowBlur=12*z;ctx.beginPath();ctx.ellipse(cx,sy,rx,ry,0,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle="rgba(105,192,255,.6)";ctx.lineWidth=1.4*z;ctx.beginPath();ctx.ellipse(cx,sy,rx-6*z,ry-8*z,0,0,Math.PI*2);ctx.stroke();
+    for(let i=0;i<maxCharges;i++){const ang=-Math.PI/2+(i-(maxCharges-1)/2)*.28,px=cx+Math.cos(ang)*(rx+8*z),py=sy+Math.sin(ang)*(ry+8*z);ctx.fillStyle=i<charges?"#e9fbff":"rgba(130,170,185,.28)";ctx.shadowBlur=i<charges?8*z:0;ctx.beginPath();ctx.arc(px,py,3.2*z,0,Math.PI*2);ctx.fill()}
+    ctx.restore();
+  }
+
+  if(selectedWeapon==="fist"&&((player.arts?.dragonreturn||0)>0||(player.arts?.diamondbody||0)>0)){
+    const env=playerVisualEnvelope(z),hy=cy+env.cyOffset-env.ry-13*z;
+    ctx.save();ctx.font=`bold ${10*z}px system-ui`;ctx.textAlign="center";ctx.textBaseline="middle";
+    const h=player.huanglongStacks||0,m=player.tenThousandStacks||0;
+    if((player.arts?.dragonreturn||0)>0){
+      const text=`황룡 ${h}/20`,w=Math.max(62*z,ctx.measureText(text).width+14*z);
+      ctx.fillStyle="rgba(22,18,10,.72)";ctx.strokeStyle="rgba(255,215,92,.72)";ctx.lineWidth=1.2*z;ctx.beginPath();ctx.roundRect(cx-w/2,hy-10*z,w,18*z,7*z);ctx.fill();ctx.stroke();
+      ctx.fillStyle="#ffe06b";ctx.fillText(text,cx,hy-1*z);
+    }
+    if((player.arts?.diamondbody||0)>0){
+      const text=`만권 ${m}/10`,w=Math.max(62*z,ctx.measureText(text).width+14*z),yy=hy+21*z;
+      ctx.fillStyle="rgba(18,18,18,.72)";ctx.strokeStyle="rgba(238,238,238,.62)";ctx.lineWidth=1.2*z;ctx.beginPath();ctx.roundRect(cx-w/2,yy-10*z,w,18*z,7*z);ctx.fill();ctx.stroke();
+      ctx.fillStyle="#f4f4f4";ctx.fillText(text,cx,yy-1*z);
+    }
     ctx.restore();
   }
 };

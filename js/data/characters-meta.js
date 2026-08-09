@@ -131,10 +131,13 @@ function setHuanglongStacks(n){
 }
 function triggerTenThousandFists(){
  player.tenThousandStacks=0;
- const base=facingAngle();
+ const base=facingAngle(),beforeHp=player.hp,heal=player.maxHp*.15;
+ player.hp=Math.min(player.maxHp,player.hp+heal);
+ const healed=Math.max(0,player.hp-beforeHp);
  addVisual({type:"skillFistToOne",x:player.x,y:player.y,a:base,r:310,life:1.85,max:1.85,color:"#ffd86a",holdAlpha:true});
+ if(healed>0){addVisual({type:"text",x:player.x,y:player.y-58,text:`+${Math.ceil(healed)} HP`,life:.85,max:.85,color:"#9dffb0"});particle(player.x,player.y,"#9dffb0",55,10)}
  for(let i=0;i<7;i++){const aa=base+(i-3)*.16;delayed.push({time:.16+i*.10,type:"aoe",x:player.x+Math.cos(aa)*(95+i*17),y:player.y+Math.sin(aa)*(95+i*17),r:72+i*3,damage:30+(player.arts.diamondbody||1)*12,color:"#ffe07a",source:"tenThousand",knock:150})}
- showMessage("만권일극 · 일극개방",1.1);
+ showMessage(`만권일극 · 일극개방${healed>0?` · 체력 ${Math.ceil(healed)} 회복`:""}`,1.1);
 }
 const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
  const wasDead=e.dead;
@@ -200,16 +203,17 @@ function ultimateAttack(){
  }else if(selectedWeapon==="katana"){
    for(let i=0;i<12;i++){const ang=(i%6)*Math.PI/3+.14*Math.floor(i/6),off=(i-5.5)*24,x1=player.x+Math.cos(ang+Math.PI/2)*off-Math.cos(ang)*650,y1=player.y+Math.sin(ang+Math.PI/2)*off-Math.sin(ang)*650;delayed.push({time:i*.045,type:"aoe",x:player.x+Math.cos(ang+Math.PI/2)*off,y:player.y+Math.sin(ang+Math.PI/2)*off,r:78,damage:62,color:"#f2efff",source:"ultimate",knock:0});addVisual({type:"line",x1,y1,x2:x1+Math.cos(ang)*1300,y2:y1+Math.sin(ang)*1300,width:8,life:.62,max:.62,color:"#f2efff"})}
  }else{
-   const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(82+stacks*2.2)*player.areaMul;
+   const stacks=player.huanglongStacks||0,scale=1+stacks*.035,beamLen=Math.max(W,H)*1.32,beamWidth=(112+stacks*2.8)*player.areaMul;
    const castX=player.x,castY=player.y,castA=a;
    setHuanglongStacks(0);
    addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:1.56,max:1.56,color:"#ffd85a",holdAlpha:true});
    // golden_dragon_charge source art faces left. Renderer rotates it by PI so its mouth faces castA.
    // Local source anchor=(562,340), mouth/energy convergence anchor≈(360,382), scale=.62.
    // Transform that local mouth offset with the same render angle so the beam is born at the dragon mouth.
-   const chargeScale=.62,chargeRenderA=castA+Math.PI,chargeBack=92;
+   const chargeScale=.56,chargeRenderA=castA+Math.PI,chargeBack=124;
    const chargeBaseX=castX-Math.cos(castA)*chargeBack,chargeBaseY=castY-Math.sin(castA)*chargeBack;
-   const mouthLocalX=(360-562)*chargeScale,mouthLocalY=-(382-340)*chargeScale;
+   // Energy orb / open-mouth convergence point measured from the charge sprite.
+   const mouthLocalX=(358-562)*chargeScale,mouthLocalY=-(381-340)*chargeScale;
    const x0=chargeBaseX+Math.cos(chargeRenderA)*mouthLocalX-Math.sin(chargeRenderA)*mouthLocalY;
    const y0=chargeBaseY+Math.sin(chargeRenderA)*mouthLocalX+Math.cos(chargeRenderA)*mouthLocalY;
    delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a:castA,len:beamLen,width:beamWidth,damage:24*scale,stacks,castX,castY});

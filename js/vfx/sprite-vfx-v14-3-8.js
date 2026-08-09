@@ -343,10 +343,10 @@ drawVisuals=function(){
         skillFistHundredCombo:{id:"skillFistHundredCombo",fw:640,fh:483,sourceX:320,sourceY:242,scale:.38},
         skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.78,r/250)},
         skillFistDragonKickCombo:{id:"skillFistDragonKickCombo",fw:460,fh:540,sourceX:230,sourceY:300,scale:.56},
-        skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304)},
+        skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304),angleOffset:Math.PI},
         skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
-        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.62,angleOffset:Math.PI,flipY:true,backwardOffset:92}
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.56,angleOffset:Math.PI,flipY:true,backwardOffset:124}
       }[v.type];
       const renderA=a+(cfg.angleOffset||0);
       const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale*(cfg.flipY?-1:1);
