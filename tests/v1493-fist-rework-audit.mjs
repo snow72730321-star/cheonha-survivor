@@ -8,7 +8,7 @@ for(const n of ["복호권","백보신권","황룡각","황룡십팔장","만권
 for(const id of ["skillFistTiger","skillFistHundredShoot","skillFistHundredCombo","skillFistDragonKick","skillFistDragonKickCombo","skillFistGoldenDragon","skillFistToOneDefense","skillFistToOne","skillFistGoldenCharge","skillFistGoldenBeam"])ok(vfx.includes(id),`missing VFX ${id}`);
 ok(combat.includes('source==="hundredstep"')&&combat.includes('"hundredstepCombo"'),"hundred fist splash missing");
 ok(meta.includes('Math.min(20,n|0)')&&meta.includes('delta*.012'),"황룡 20-stack defense missing");
-ok(meta.includes('player.tenThousandStacks>=10'),"만권 trigger threshold missing");
+ok(meta.includes('TEN_THOUSAND_TRIGGER=3')&&meta.includes('player.tenThousandStacks>=TEN_THOUSAND_TRIGGER'),"만권 3-stack trigger threshold missing");
 ok(meta.includes('setHuanglongStacks(0)'),"ultimate does not consume all 황룡");
 ok(combat.includes('life:3,max:3')&&combat.includes('i<15')&&combat.includes('i*.2'),"3-second beam/ticks missing");
 ok(vfx.includes('VFXSprites.draw("skillFistGoldenBeam"')&&vfx.includes('loop:true'),"beam loop exception missing");

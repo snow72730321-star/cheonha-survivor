@@ -40,7 +40,7 @@ for(const [wid,[name,condition]] of Object.entries(extraHidden))weaponDefs[wid].
 universal.push(
  {id:"swiftcycle",name:"진기순환",max:5,tag:"재사용",desc:"부가 무공 재사용 속도 +9%",apply:p=>p.cooldownRate*=1.09},
  {id:"windedge",name:"장풍연성",max:4,tag:"투사체",desc:"투사체 속도 +12%",apply:p=>p.projectileSpeedMul*=1.12},
- {id:"guardian",name:"불괴호신",max:3,tag:"호신",desc:"일정 시간마다 피해를 1회 막는다. 캐릭터 주위 보호막과 구슬로 남은 횟수를 표시한다.",apply:p=>{p.shieldMax++;p.shield=p.shieldMax}},
+ {id:"guardian",name:"불괴호신",max:3,tag:"호신",desc:"일정 시간마다 피해를 1회 완전히 막는다. 만권일극을 익힌 상태에서 방어에 성공하면 만권 스택 판정을 함께 얻는다. 캐릭터 주위 보호막과 구슬로 남은 횟수를 표시한다.",apply:p=>{p.shieldMax++;p.shield=p.shieldMax}},
  {id:"fortune",name:"천운심결",max:5,tag:"행운",desc:"금자와 광석 획득 확률 증가",apply:p=>p.luck+=.12},
  {id:"bossbane",name:"파군심법",max:4,tag:"파진",desc:"정예·보스 피해 +14%",apply:p=>p.eliteDamageMul*=1.14},
  {id:"lifeline",name:"연명공",max:4,tag:"회복",desc:"격파 시 체력 회복 +0.25",apply:p=>p.killHeal+=.25}
@@ -85,7 +85,7 @@ const baseResize=resize;resize=function(){baseResize();applySettings();canvas.wi
 const baseParticle=particle;particle=function(x,y,color=C[selectedWeapon],speed=80,n=1){const q=account.settings?.quality||"normal",mul=q==="low"?.35:q==="high"?1.35:1;baseParticle(x,y,color,speed,Math.max(1,Math.floor(n*mul)))};
 function shakeValue(v){return v*(account.settings?.shake??1)}
 
-const baseResetGame=resetGame;resetGame=function(){baseResetGame();Object.assign(player,{dir:"up",walkFrame:0,ultimate:0,ultimateMax:100,ultimateGain:1,shield:0,shieldMax:0,shieldTimer:18,luck:0,perfectWindow:0,evolutions:{},ultimateUses:0,precisionBuff:0});player.metrics.perfectDodges=0;player.metrics.ultimateUses=0;slowTimer=0;cutsceneTimer=0;account.stats.paths[selectedWeapon]=true;saveAccountData();ui.ultimateBtn.style.display="flex";updateUltimateHud()};
+const baseResetGame=resetGame;resetGame=function(){baseResetGame();Object.assign(player,{dir:"up",walkFrame:0,ultimate:0,ultimateMax:100,ultimateGain:1,shield:0,shieldMax:0,shieldTimer:18,luck:0,perfectWindow:0,evolutions:{},ultimateUses:0,precisionBuff:0,diamondGuardReady:false,diamondGuardTimer:0});player.metrics.perfectDodges=0;player.metrics.ultimateUses=0;slowTimer=0;cutsceneTimer=0;account.stats.paths[selectedWeapon]=true;saveAccountData();ui.ultimateBtn.style.display="flex";updateUltimateHud()};
 const baseStartGame=startGame;startGame=function(){baseStartGame();ui.ultimateBtn.style.display="flex"};
 // 런 통계는 game-runtime-v14.js의 finalizeRunStats()가 정확히 한 번만 집계한다.
 const baseEndGame=endGame;endGame=function(win,reason=""){return baseEndGame(win,reason)};
@@ -139,6 +139,16 @@ function setOneStrikeStacks(n){
  player.damageMul*=Math.pow(1.003,delta);
  addVisual({type:"text",x:player.x,y:player.y-44,text:`일극 ${next}/100 · 체력/피해 상승`,life:.9,max:.9,color:"#fff0a8"});
 }
+const TEN_THOUSAND_TRIGGER=3;
+function diamondGuardInterval(){const lv=Math.max(1,Math.min(3,player.arts?.diamondbody||1));return Math.max(8,11-lv)}
+function gainTenThousandStack(reason="impact",angle=facingAngle()){
+ if(selectedWeapon!=="fist"||(player.arts?.diamondbody||0)<=0)return false;
+ const before=player.tenThousandStacks||0;
+ player.tenThousandStacks=Math.min(TEN_THOUSAND_TRIGGER,before+1);
+ addVisual({type:"skillFistToOneDefense",x:player.x,y:player.y,a:angle,r:92,life:.56,max:.56,color:reason==="guardian"?"#d9f5ff":"#ffd96a",holdAlpha:true});
+ if(player.tenThousandStacks>=TEN_THOUSAND_TRIGGER)triggerTenThousandFists();
+ return true;
+}
 function triggerTenThousandFists(){
  player.tenThousandStacks=0;
  const base=facingAngle(),beforeHp=player.hp,heal=player.maxHp*.15;
@@ -169,11 +179,25 @@ const baseKillEnemy=killEnemy;killEnemy=function(e,source="basic",opt={}){
 
 function threatNear(){for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y),closing=e.speed*(e.chargeTime>0?2.5:1);if(d<player.r+e.r+36+closing*.12)return true}for(const h of hazards){if(h.dead)continue;if(h.type==="blast"&&h.time<.42&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+35)return true;if(h.type==="orb"&&Math.hypot(h.x-player.x,h.y-player.y)<65)return true;if(h.type==="puddle"&&Math.hypot(h.x-player.x,h.y-player.y)<h.r+18)return true;if(h.type==="cross"&&h.time<.38&&(Math.abs(player.x-h.x)<(h.w||38)+player.r||Math.abs(player.y-h.y)<(h.w||38)+player.r))return true}return false}
 const basePerformDodge=performDodge;performDodge=function(){const can=state==="playing"&&player.dodgeCooldown<=0&&player.dodgeTimer<=0,perfect=can&&threatNear();basePerformDodge();if(perfect){player.metrics.perfectDodges++;player.perfectWindow=1.2;slowTimer=.42;slowScale=.33;gainUltimate(10,{ignoreScaling:true});showMessage("정밀 회피 · 찰나의 경지",1.1);addVisual({type:"text",x:player.x,y:player.y-30,text:"PERFECT",life:.55,max:.55,color:"#bdeeff"});GameAudio.playSFX("perfect-dodge")}};
-const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){if(player.shield>0&&player.invuln<=0&&state==="playing"){player.shield--;player.invuln=.45;showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return}
- if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0&&player.invuln<=0&&state==="playing"){
-   let close=null,best=115;
-   for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;close=e}}
-   if(close){const ang=Math.atan2(close.y-player.y,close.x-player.x);player.tenThousandStacks=Math.min(10,(player.tenThousandStacks||0)+1);addVisual({type:"skillFistToOneDefense",x:player.x,y:player.y,a:ang,r:92,life:.56,max:.56,color:"#ffd96a",holdAlpha:true});if(player.tenThousandStacks>=10)triggerTenThousandFists()}
+const baseHurtPlayer=hurtPlayer;hurtPlayer=function(amount){
+ if(player.invuln>0||state!=="playing")return;
+ if(player.shield>0){
+   player.shield--;player.invuln=.45;
+   if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0)gainTenThousandStack("guardian");
+   showMessage("호신강기가 피해를 막았다",.8);addVisual({type:"ring",x:player.x,y:player.y,r:32,life:.3,max:.3,color:"#bdeeff",width:5});return;
+ }
+ let defended=false;
+ if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0){
+   if(player.diamondGuardReady){
+     player.diamondGuardReady=false;player.diamondGuardTimer=diamondGuardInterval();amount*=.2;defended=true;
+     gainTenThousandStack("diamond");
+     showMessage("만권일극 · 금강호체 80% 경감",.85);addVisual({type:"ring",x:player.x,y:player.y,r:46,life:.42,max:.42,color:"#ffe39a",width:6});
+   }
+   if(!defended){
+     let close=null,best=115;
+     for(const e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-player.x,e.y-player.y);if(d<best){best=d;close=e}}
+     if(close)gainTenThousandStack("impact",Math.atan2(close.y-player.y,close.x-player.x));
+   }
  }
  const heavenDR=saberHeavenDefenseBonus();baseHurtPlayer(amount*(1-heavenDR))};
 
@@ -233,6 +257,10 @@ function ultimateAttack(){
 const ultimatePalettes={sword:["#e9fbff","#78d7ff"],spear:["#ffe0a3","#c44c39"],bow:["#fff3a5","#5dbd95"],poison:["#d497ff","#69d06e"],tao:["#dff7ff","#64cfff"],saber:["#ff9b7b","#a71928"],katana:["#f6efff","#9f8dff"],fist:["#ffe69b","#d18a27"]};
 function useUltimate(){if(state!=="playing"||player.ultimate<100)return;player.ultimate=0;player.ultimateUses++;player.metrics.ultimateUses++;updateUltimateHud();state="cutscene";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";const pal=ultimatePalettes[selectedWeapon]||["#fff0a0","#d9b95f"];ui.cutscene.style.setProperty("--ult",pal[0]);ui.cutscene.style.setProperty("--ult2",pal[1]);ui.cutsceneName.textContent=currentUltimateName(selectedWeapon);ui.cutsceneLine.textContent=characterDefs[selectedWeapon].name+" · "+characterDefs[selectedWeapon].quote;drawPortrait(ui.cutsceneCanvas,selectedWeapon,currentSkin());ui.cutscene.classList.remove("show");void ui.cutscene.offsetWidth;ui.cutscene.classList.add("show");GameAudio.playSFX("ultimate-rise");setTimeout(()=>GameAudio.playSFX("ultimate-mid"),360);setTimeout(()=>GameAudio.playSFX("ultimate-hit"),720);setTimeout(()=>{ui.cutscene.classList.remove("show");state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ultimateAttack();last=performance.now()},1450)}
 
-const baseUpdate=update;update=function(dt){if(state==="playing"){if(player.shieldMax){player.shieldTimer-=dt;if(player.shieldTimer<=0){player.shieldTimer=Math.max(12,24-player.shieldMax*3);player.shield=Math.min(player.shieldMax,player.shield+1)}}player.perfectWindow=Math.max(0,(player.perfectWindow||0)-dt)}baseUpdate(dt)};
+const baseUpdate=update;update=function(dt){if(state==="playing"){
+ if(player.shieldMax){player.shieldTimer-=dt;if(player.shieldTimer<=0){player.shieldTimer=Math.max(12,24-player.shieldMax*3);player.shield=Math.min(player.shieldMax,player.shield+1)}}
+ if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0&&!player.diamondGuardReady){player.diamondGuardTimer=Math.max(0,(player.diamondGuardTimer||diamondGuardInterval())-dt);if(player.diamondGuardTimer<=0){player.diamondGuardReady=true;player.diamondGuardTimer=0;showMessage("만권일극 · 금강호체 준비",.75);addVisual({type:"ring",x:player.x,y:player.y,r:42,life:.38,max:.38,color:"#ffe7a6",width:4})}}
+ player.perfectWindow=Math.max(0,(player.perfectWindow||0)-dt)
+ }baseUpdate(dt)};
 const baseUpdateHud=updateHud;updateHud=function(){baseUpdateHud();updateUltimateHud()};
 const baseLoop=loop;loop=function(now){const fps=Number(account.settings?.fps||60),min=1000/fps;if(now-lastFrameDraw<min){requestAnimationFrame(loop);return}lastFrameDraw=now;let raw=Math.min(.033,Math.max(0,(now-last)/1000));last=now;if(slowTimer>0){slowTimer-=raw;raw*=slowScale}else slowScale=1;update(raw);draw();requestAnimationFrame(loop)};

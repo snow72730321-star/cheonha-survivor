@@ -247,6 +247,11 @@ drawPlayer=function(){
     ctx.restore();
   }
 
+  if(selectedWeapon==="fist"&&(player.arts?.diamondbody||0)>0&&player.diamondGuardReady){
+    const pulse=.5+.5*Math.sin(elapsed*5.2),env=playerVisualEnvelope(z),sy=cy+env.cyOffset;
+    ctx.save();ctx.globalCompositeOperation="lighter";ctx.strokeStyle=`rgba(255,226,132,${.46+pulse*.26})`;ctx.lineWidth=2.2*z;ctx.shadowColor="#ffd96a";ctx.shadowBlur=(8+pulse*7)*z;ctx.beginPath();ctx.ellipse(cx,sy,env.rx+5*z,env.ry+6*z,0,0,Math.PI*2);ctx.stroke();ctx.restore();
+  }
+
   if(selectedWeapon==="fist"&&((player.arts?.dragonreturn||0)>0||(player.arts?.diamondbody||0)>0)){
     const env=playerVisualEnvelope(z),sideGap=12*z,leftX=cx-env.rx-sideGap,rightX=cx+env.rx+sideGap,baseY=cy+env.cyOffset;
     ctx.save();ctx.font=`bold ${10*z}px system-ui`;ctx.textAlign="center";ctx.textBaseline="middle";
@@ -254,8 +259,9 @@ drawPlayer=function(){
     const badge=(text,x,y,fill,stroke,color)=>{const w=Math.max(66*z,ctx.measureText(text).width+14*z);ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=1.2*z;ctx.beginPath();ctx.roundRect(x-w/2,y-10*z,w,18*z,7*z);ctx.fill();ctx.stroke();ctx.fillStyle=color;ctx.fillText(text,x,y-1*z)};
     if((player.arts?.dragonreturn||0)>0)badge(`황룡 ${h}/20`,leftX,baseY,"rgba(22,18,10,.72)","rgba(255,215,92,.72)","#ffe06b");
     if((player.arts?.diamondbody||0)>0){
-      badge(`만권 ${m}/10`,rightX,baseY,"rgba(18,18,18,.72)","rgba(238,238,238,.62)","#f4f4f4");
+      badge(`만권 ${m}/3`,rightX,baseY,"rgba(18,18,18,.72)","rgba(238,238,238,.62)","#f4f4f4");
       badge(`일극 ${o}/100`,rightX,baseY+22*z,"rgba(28,20,8,.76)","rgba(255,226,132,.72)","#fff0a8");
+      badge(player.diamondGuardReady?"호체 준비":`호체 ${(player.diamondGuardTimer||0).toFixed(1)}s`,rightX,baseY+44*z,"rgba(31,24,8,.72)","rgba(255,219,120,.58)",player.diamondGuardReady?"#ffe38c":"#d7c99d");
     }
     ctx.restore();
   }
