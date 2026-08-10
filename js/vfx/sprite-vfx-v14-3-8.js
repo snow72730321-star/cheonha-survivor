@@ -343,23 +343,30 @@ drawVisuals=function(){
         skillFistHundredCombo:{id:"skillFistHundredCombo",fw:640,fh:483,sourceX:320,sourceY:242,scale:.38},
         skillFistDragonKick:{id:"skillFistDragonKick",fw:382,fh:200,sourceX:42,sourceY:102,scale:Math.max(.78,r/250)},
         skillFistDragonKickCombo:{id:"skillFistDragonKickCombo",fw:460,fh:540,sourceX:230,sourceY:300,scale:.56},
-        skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:115,sourceY:278,scale:Math.max(.46,r/1304)},
+        // 원본 황룡십팔장 시트는 첫 프레임이 먼 쪽에서 생긴 뒤 시전자 쪽으로 퍼진다.
+        // 우측 끝을 원점으로 잡고 X축 반전해 "시전자 → 공격방향"으로 용이 튀어나가게 만든다.
+        skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:1189,sourceY:278,scale:Math.max(.46,r/1304),flipX:true},
         skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
-        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:562,sourceY:340,scale:.56,angleOffset:Math.PI,flipY:true,backwardOffset:124}
+        // 황룡진천은 에너지 구체 중심(174,340)을 실제 발사 원점으로 사용한다.
+        // cast 방향을 좌/우 반평면으로 나눠 flipY를 선택해 용의 등/머리가 항상 화면 위쪽을 향하게 한다.
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:174,sourceY:340,scale:.56,angleOffset:Math.PI,forwardOffset:96,upright:true}
       }[v.type];
       const renderA=a+(cfg.angleOffset||0);
-      const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale,localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale*(cfg.flipY?-1:1);
-      const back=cfg.backwardOffset||0,baseX=v.x-Math.cos(a)*back,baseY=v.y-Math.sin(a)*back;
+      const flipX=!!cfg.flipX;
+      const flipY=cfg.upright?Math.cos(a)>=0:!!cfg.flipY;
+      const localX=(cfg.fw*.5-cfg.sourceX)*cfg.scale*(flipX?-1:1);
+      const localY=(cfg.fh*.5-cfg.sourceY)*cfg.scale*(flipY?-1:1);
+      const forward=cfg.forwardOffset||0,back=cfg.backwardOffset||0;
+      const baseX=v.x+Math.cos(a)*(forward-back),baseY=v.y+Math.sin(a)*(forward-back);
       const x=baseX+Math.cos(renderA)*localX-Math.sin(renderA)*localY;
       const y=baseY+Math.sin(renderA)*localX+Math.cos(renderA)*localY;
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
       if(v.type==="skillFistGoldenCharge"){
-        const chargeCycle=26/16.67,age=v.age||0;
-        if(age<chargeCycle)VFXSprites.drawOneShot(cfg.id,x,y,{age,angle:renderA,scaleX:cfg.scale,scaleY:cfg.flipY?-cfg.scale:cfg.scale,alpha:vis});
-        else VFXSprites.drawOneShot(cfg.id,x,y,{frame:25,angle:renderA,scaleX:cfg.scale,scaleY:cfg.flipY?-cfg.scale:cfg.scale,alpha:vis});
+        // 차징 종료 후 프레임 고정 금지. 빔이 끝날 때까지 26프레임 차징 시트를 계속 루프 재생한다.
+        VFXSprites.draw(cfg.id,x,y,{age:v.age||0,loop:true,angle:renderA,scaleX:cfg.scale,scaleY:cfg.scale,alpha:vis,flipX,flipY});
       }else{
-        VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scaleX:cfg.scale,scaleY:cfg.flipY?-cfg.scale:cfg.scale,alpha:vis});
+        VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scaleX:cfg.scale,scaleY:cfg.scale,alpha:vis,flipX,flipY});
       }
     }else if(v.type==="skillFistGoldenBeam"){
       const a=v.a||0,len=v.r||700,width=v.width||90;

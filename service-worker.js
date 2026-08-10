@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-9-12-one-strike-growth";
+const CACHE="cheonha-v14-9-13-golden-dragon-vfx-align";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css",

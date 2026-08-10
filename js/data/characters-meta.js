@@ -218,16 +218,12 @@ function ultimateAttack(){
    const castX=player.x,castY=player.y,castA=a;
    setHuanglongStacks(0);
    addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:4.45,max:4.45,color:"#ffd85a",holdAlpha:true});
-   // golden_dragon_charge source art faces left. Renderer rotates it by PI so its mouth faces castA.
-   // Local source anchor=(562,340), mouth/energy convergence anchor≈(360,382), scale=.62.
-   // Transform that local mouth offset with the same render angle so the beam is born at the dragon mouth.
-   const chargeScale=.56,chargeRenderA=castA+Math.PI,chargeBack=124;
-   const chargeBaseX=castX-Math.cos(castA)*chargeBack,chargeBaseY=castY-Math.sin(castA)*chargeBack;
-   // User-marked energy sphere center on the 822×663 source frame: approximately (174,381).
-   // Beam muzzle follows the exact same scale/flip/rotation/back-shift as the charge sprite.
-   const mouthLocalX=(174-562)*chargeScale,mouthLocalY=-(381-340)*chargeScale;
-   const x0=chargeBaseX+Math.cos(chargeRenderA)*mouthLocalX-Math.sin(chargeRenderA)*mouthLocalY;
-   const y0=chargeBaseY+Math.sin(chargeRenderA)*mouthLocalX+Math.cos(chargeRenderA)*mouthLocalY;
+   // 차징 용의 에너지 구체 중심을 실제 포구로 고정한다.
+   // 렌더러도 동일한 96px 전방 포구에 source frame (174,340)을 맞춰 배치하므로
+   // 빔 위치를 따로 보정하는 것이 아니라 용 자체가 빔 축에 정확히 맞춰진다.
+   const chargeMuzzleOffset=96;
+   const x0=castX+Math.cos(castA)*chargeMuzzleOffset;
+   const y0=castY+Math.sin(castA)*chargeMuzzleOffset;
    delayed.push({time:1.42,type:"goldenDragonBeamStart",x:x0,y:y0,a:castA,len:beamLen,width:beamWidth,damage:24*scale,stacks,castX,castY});
    addVisual({type:"text",x:castX,y:castY-52,text:`황룡 ${stacks} · 전량 방출`,life:1.0,max:1.0,color:"#ffe99a"});
  }
