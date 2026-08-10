@@ -1,0 +1,163 @@
+/* v14 안정화·접근성·설정 UI */
+#assetLoader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#0b100d;color:#eee8d7;transition:opacity .25s ease}
+#assetLoader.done{opacity:0;pointer-events:none}
+.asset-loader-card{width:min(420px,84vw);padding:22px;border:1px solid #6f765f;background:#111812;box-shadow:0 18px 60px #0008;text-align:center}
+.asset-loader-bar{height:8px;margin-top:12px;background:#283127;overflow:hidden}.asset-loader-bar span{display:block;height:100%;width:0;background:#d9b95f;transition:width .12s linear}
+#systemToast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));z-index:10000;max-width:min(520px,88vw);padding:11px 15px;border:1px solid #78694b;background:#161d17;color:#f2ead8;transform:translate(-50%,30px);opacity:0;pointer-events:none;transition:.2s}
+#systemToast.show{transform:translate(-50%,0);opacity:1}#systemToast.error{border-color:#a84d49;color:#ffd7d2}
+#hiddenProgressHud{position:fixed;left:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:22;display:none;max-width:min(420px,62vw);padding:8px 10px;border:1px solid #535c4c;background:#0e1510dd;color:#ddd5c2;font-size:12px;line-height:1.35;pointer-events:none}
+#hiddenProgressHud.show{display:block}.hidden-progress-row{display:flex;gap:8px;justify-content:space-between}.hidden-progress-row b{color:#e3c56c}.hidden-progress-track{height:3px;margin-top:3px;background:#293128}.hidden-progress-track span{display:block;height:100%;background:#8fb5a0}
+.settings-section{margin:16px 0 8px;padding-top:12px;border-top:1px solid #384136}.settings-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.settings-actions button{margin:0}.settings-note{font-size:12px;color:#aaa48e;line-height:1.45}
+.keybind-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.keybind-grid label{display:flex;align-items:center;justify-content:space-between;gap:8px}.keybind-grid select{max-width:120px}
+body.left-handed #dodgeBtn{right:auto;left:18px}body.left-handed #ultimateBtn{right:auto;left:104px}body.left-handed #hiddenProgressHud{left:auto;right:14px}
+body.high-contrast{filter:contrast(1.12)}body.large-ui #dodgeBtn,body.large-ui #ultimateBtn{transform:scale(1.15);transform-origin:bottom right}body.left-handed.large-ui #dodgeBtn,body.left-handed.large-ui #ultimateBtn{transform-origin:bottom left}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+body.reduce-motion .cutscene-slash,body.reduce-motion .cutscene-flash,body.reduce-motion .cutscene-seal{display:none!important}
+body.reduce-motion #cutscene{transition:none!important}
+.dev-metrics{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;white-space:pre-wrap;color:#b8c7ba;background:#0a0f0b;padding:8px;border:1px solid #354136}
+:root{--joystick-scale:1;--button-scale:1;--damage-number-scale:1;--boss-arrow-scale:1}
+#joystick{width:calc(118px * var(--joystick-scale));height:calc(118px * var(--joystick-scale))}
+#stick{width:calc(48px * var(--joystick-scale));height:calc(48px * var(--joystick-scale))}
+#dodgeBtn,#ultimateBtn{scale:var(--button-scale)}
+body.left-handed #dodgeBtn,body.left-handed #ultimateBtn{transform-origin:bottom left}
+
+
+/* v14.3.1 신규 무공 습득 및 오디오 설정 */
+#skillLearnToast{position:fixed;left:50%;top:23%;z-index:30;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:220px;padding:13px 22px;border:1px solid rgba(255,229,154,.72);border-radius:16px;background:linear-gradient(135deg,rgba(20,24,19,.96),rgba(55,43,20,.93));box-shadow:0 12px 42px rgba(0,0,0,.48),0 0 28px rgba(255,220,120,.14);opacity:0;pointer-events:none;transform:translate(-50%,-18px) scale(.92)}
+#skillLearnToast.show{animation:skill-learn-toast 1.25s ease both}
+#skillLearnToast span{font-size:10px;letter-spacing:.18em;color:#d9b95f}
+#skillLearnToast b{font-size:20px;color:#fff1bd;text-shadow:0 0 16px rgba(255,224,135,.38)}
+@keyframes skill-learn-toast{0%{opacity:0;transform:translate(-50%,12px) scale(.86)}18%,72%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-16px) scale(.96)}}
+.volume-row{display:grid;grid-template-columns:minmax(120px,.75fr) minmax(140px,1.25fr);gap:12px;align-items:center}
+.volume-row label{display:flex;justify-content:space-between;gap:10px}
+.volume-row output{color:var(--gold);font-variant-numeric:tabular-nums}
+.volume-row input[type="range"]{width:100%;accent-color:var(--gold)}
+@media(max-width:520px){.volume-row{grid-template-columns:1fr}.volume-row label{margin-bottom:-4px}}
+
+/* v14.3.21 game speed control */
+.speed-btn{min-width:42px;padding:0 7px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.speed-btn:active{transform:scale(.94)}
+/* v14.3.25 combat portrait HUD */
+.status-with-portrait{display:flex;align-items:stretch;gap:9px;min-width:0}
+.status-data{flex:1;min-width:0}
+.combat-portrait{position:relative;flex:0 0 68px;width:68px;min-height:78px;border:1px solid rgba(232,201,112,.55);border-radius:12px;overflow:hidden;background:radial-gradient(circle at 50% 35%,rgba(212,177,83,.16),rgba(9,13,10,.96) 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.035),0 4px 14px rgba(0,0,0,.35)}
+.combat-portrait::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.78));}
+.combat-portrait img{display:block;width:100%;height:100%;min-height:78px;object-fit:cover;object-position:50% 23%;image-rendering:pixelated;transform:scale(1.05)}
+.combat-portrait span{position:absolute;left:3px;right:3px;bottom:3px;z-index:1;font-size:9px;line-height:1.1;text-align:center;color:#fff0bd;font-weight:800;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:520px){.combat-portrait{flex-basis:58px;width:58px;min-height:68px}.combat-portrait img{min-height:68px}.combat-portrait span{font-size:8px}.status-with-portrait{gap:6px}}
+
+/* v14.3.25 main forge image scene */
+.forge-main-panel{position:relative;overflow:hidden;padding-top:188px!important;background:linear-gradient(180deg,rgba(8,10,8,.93),rgba(11,15,12,.99))!important}
+.forge-panel-content{position:relative;z-index:3}
+.forge-hero-scene{position:absolute;inset:0 0 auto;height:210px;overflow:hidden;border-bottom:1px solid rgba(232,194,87,.25);pointer-events:none;background:#090b09}
+.forge-workshop-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 62%;filter:saturate(.94) contrast(1.06) brightness(.85);transform:scale(1.035);animation:forgeArtBreathe 5.5s ease-in-out infinite alternate}
+.forge-hero-vignette{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.04) 45%,rgba(7,10,8,.94) 100%),radial-gradient(circle at 48% 68%,transparent 0 28%,rgba(0,0,0,.42) 95%)}
+.forge-heat-haze{position:absolute;left:29%;bottom:4%;width:37%;height:62%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,178,67,.15),rgba(228,75,23,.04) 48%,transparent 72%);filter:blur(12px);mix-blend-mode:screen;animation:forgeHeat 1.55s ease-in-out infinite alternate}
+.forge-ember-layer{position:absolute;inset:0;background-image:radial-gradient(circle,#ffd96d 0 1.2px,transparent 1.8px),radial-gradient(circle,#ff9138 0 1px,transparent 1.6px),radial-gradient(circle,#fff0a1 0 .8px,transparent 1.4px);background-size:67px 83px,91px 71px,113px 97px;background-position:20px 176px,10px 202px,45px 188px;opacity:.44;animation:forgeEmbers 3.6s linear infinite;mask-image:linear-gradient(to top,#000 0 58%,transparent 96%)}
+@keyframes forgeArtBreathe{from{transform:scale(1.025) translateY(0)}to{transform:scale(1.055) translateY(-3px)}}
+@keyframes forgeHeat{from{transform:translateY(3px) scale(.94);opacity:.58}to{transform:translateY(-4px) scale(1.08);opacity:.92}}
+@keyframes forgeEmbers{from{background-position:20px 205px,10px 220px,45px 204px}to{background-position:35px 52px,-5px 72px,64px 42px}}
+@media(max-width:520px){.forge-main-panel{padding-top:154px!important}.forge-hero-scene{height:176px}}
+
+/* v14.4 Weapon Identity: 절기 버튼을 장착 무기 아이콘으로 사용 */
+#ultimateBtn{--weapon-aura:#dce8f4;isolation:isolate;width:88px;height:122px;right:calc(env(safe-area-inset-right) + 14px);bottom:calc(env(safe-area-inset-bottom) + 104px);border-radius:26px;background:radial-gradient(circle at 50% 42%,rgba(29,42,52,.96),rgba(8,14,18,.96) 72%);border-color:color-mix(in srgb,var(--weapon-aura) 70%,#fff 12%);box-shadow:0 0 0 5px color-mix(in srgb,var(--weapon-aura) 9%,transparent),0 0 14px color-mix(in srgb,var(--weapon-aura) 20%,transparent)}
+#ultimateBtn .ultimate-weapon-img{position:absolute;z-index:2;width:96px;height:58px;object-fit:contain;left:50%;top:47%;transform:translate(-50%,-50%) rotate(-90deg);pointer-events:none;transition:filter .2s ease,transform .2s ease}
+#ultimateBtn .ultimate-weapon-tag{position:absolute;z-index:3;left:8px;top:7px;min-width:23px;padding:1px 4px;border-radius:999px;background:rgba(5,8,7,.76);border:1px solid color-mix(in srgb,var(--weapon-aura) 45%,transparent);font-size:8px;color:#fff4d3;line-height:1.3}
+#ultimateBtn #ultimateCd{position:absolute;z-index:3;left:0;right:0;bottom:8px;margin:0;text-align:center;text-shadow:0 1px 3px #000;font-size:9px}
+#ultimateBtn #ultimateFill{z-index:0;background:linear-gradient(0deg,color-mix(in srgb,var(--weapon-aura) 38%,transparent),color-mix(in srgb,var(--weapon-aura) 8%,transparent))}
+#ultimateBtn[data-weapon-tier="1"]{box-shadow:0 0 0 6px color-mix(in srgb,var(--weapon-aura) 11%,transparent),0 0 18px color-mix(in srgb,var(--weapon-aura) 32%,transparent)}
+#ultimateBtn[data-weapon-tier="2"]{box-shadow:0 0 0 6px color-mix(in srgb,var(--weapon-aura) 15%,transparent),0 0 24px color-mix(in srgb,var(--weapon-aura) 44%,transparent)}
+#ultimateBtn[data-weapon-tier="3"]{animation:weaponButtonAura 1.45s ease-in-out infinite alternate;box-shadow:0 0 0 7px color-mix(in srgb,var(--weapon-aura) 18%,transparent),0 0 30px color-mix(in srgb,var(--weapon-aura) 58%,transparent)}
+#ultimateBtn[data-weapon-tier="4"]{animation:weaponButtonAura 1.05s ease-in-out infinite alternate;box-shadow:0 0 0 8px color-mix(in srgb,var(--weapon-aura) 22%,transparent),0 0 38px color-mix(in srgb,var(--weapon-aura) 72%,transparent)}
+#ultimateBtn[data-weapon-tier="5"]{animation:weaponButtonAura .78s ease-in-out infinite alternate;box-shadow:0 0 0 9px color-mix(in srgb,var(--weapon-aura) 26%,transparent),0 0 48px color-mix(in srgb,var(--weapon-aura) 88%,transparent)}
+#ultimateBtn.ready .ultimate-weapon-img{transform:translate(-50%,-50%) rotate(-90deg) scale(1.08);animation:weaponReadyPulse .75s ease-in-out infinite alternate}
+@keyframes weaponButtonAura{to{filter:brightness(1.12);box-shadow:0 0 0 8px color-mix(in srgb,var(--weapon-aura) 22%,transparent),0 0 38px color-mix(in srgb,var(--weapon-aura) 68%,transparent)}}
+@keyframes weaponReadyPulse{to{transform:translate(-50%,-50%) rotate(-90deg) scale(1.16)}}
+
+/* v14.4 실제 선택 무기를 모루 위에 렌더링 */
+.art-anvil-scene .anvil-weapon{position:absolute;z-index:5;left:50%;bottom:53px;width:min(74%,430px);height:112px;transform:translateX(-50%);display:block!important;color:inherit;text-shadow:none!important;pointer-events:none}
+.anvil-weapon-img{position:absolute;width:100%;height:100%;object-fit:contain;inset:0;transform-origin:50% 64%;animation:anvilWeaponBreathe 2.4s ease-in-out infinite alternate}
+.anvil-weapon-aura{position:absolute;left:12%;right:12%;top:22%;bottom:9%;border-radius:50%;background:radial-gradient(ellipse,color-mix(in srgb,var(--weapon-aura) 32%,transparent),transparent 68%);filter:blur(14px);opacity:.25}
+.anvil-weapon-meta{position:absolute;right:5%;bottom:2px;display:flex;gap:6px;align-items:center;padding:3px 7px;border-radius:999px;background:rgba(4,6,5,.72);border:1px solid color-mix(in srgb,var(--weapon-aura) 38%,transparent);backdrop-filter:blur(3px)}
+.anvil-weapon-meta b{color:#fff0b0;font-size:12px}.anvil-weapon-meta span{color:#d6d1c3;font-size:9px}
+.anvil-weapon[data-weapon-tier="1"] .anvil-weapon-aura{opacity:.42}.anvil-weapon[data-weapon-tier="2"] .anvil-weapon-aura{opacity:.62;animation:anvilAura 1.45s ease-in-out infinite alternate}.anvil-weapon[data-weapon-tier="3"] .anvil-weapon-aura{opacity:.86;animation:anvilAura .85s ease-in-out infinite alternate}.anvil-weapon[data-weapon-tier="4"] .anvil-weapon-aura{opacity:.96;animation:anvilAura .62s ease-in-out infinite alternate;filter:blur(17px)}.anvil-weapon[data-weapon-tier="5"] .anvil-weapon-aura{opacity:1;animation:anvilAura .46s ease-in-out infinite alternate;filter:blur(20px)}
+.anvil-scene.striking .anvil-weapon-img{animation:anvilWeaponStrike .52s ease-out}.anvil-scene.success .anvil-weapon-img{animation:anvilWeaponSuccess .75s ease-out}.anvil-scene.failure .anvil-weapon-img{animation:anvilWeaponFail .48s ease-out}
+@keyframes anvilWeaponBreathe{to{transform:translateY(-2px) scale(1.012)}}
+@keyframes anvilAura{to{transform:scale(1.08);filter:blur(17px);opacity:1}}
+@keyframes anvilWeaponStrike{45%{transform:translateY(4px) scale(.985);filter:brightness(1.6)}100%{transform:none}}
+@keyframes anvilWeaponSuccess{35%{transform:scale(1.05);filter:brightness(2.1)}100%{transform:none}}
+@keyframes anvilWeaponFail{20%{transform:translateX(-5px) rotate(-1deg)}45%{transform:translateX(6px) rotate(1deg)}70%{transform:translateX(-3px)}100%{transform:none;filter:brightness(.7) saturate(.65)}}
+@media(max-width:520px){#ultimateBtn .ultimate-weapon-img{width:59px;height:41px}.art-anvil-scene .anvil-weapon{bottom:48px;width:82%;height:92px}.anvil-weapon-meta{right:1%;bottom:-1px}}
+
+
+/* v14.4.1 HUD portrait reliability + mobile forge scrolling + floating weapon ultimate */
+#combatPortraitWrap{display:block!important;height:82px;min-height:82px;align-self:stretch;visibility:visible!important;opacity:1!important}
+#combatPortrait{display:block!important;width:100%;height:82px!important;min-height:82px!important;object-fit:cover;object-position:50% 20%;visibility:visible!important;opacity:1!important}
+#combatPortrait.portrait-error{object-fit:contain;background:radial-gradient(circle at 50% 45%,rgba(217,185,95,.17),rgba(8,12,9,.95));}
+
+/* forge-main-panel의 overflow:hidden이 iOS의 내부 스크롤을 막던 문제를 해제한다. */
+#forge.forge-overlay{align-items:flex-start;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y!important}
+#forge .forge-main-panel{overflow-x:hidden!important;overflow-y:auto!important;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 22px)!important;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y!important}
+#forge .forge-panel-content{touch-action:pan-y!important;padding-bottom:calc(env(safe-area-inset-bottom) + 8px)}
+#forge .forge-panel-content select,#forge .forge-panel-content button,#forge .forge-panel-content input{touch-action:manipulation}
+
+/* 절기 트리거: 원형 버튼 UI를 제거하고 떠 있는 무기 자체만 보인다. */
+#ultimateBtn{
+  --weapon-aura:#dce8f4;--ult-progress:0;
+  width:118px!important;height:92px!important;
+  right:calc(env(safe-area-inset-right) + 10px)!important;
+  bottom:calc(env(safe-area-inset-bottom) + 103px)!important;
+  padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;overflow:visible!important;
+  color:transparent!important;font-size:0!important;
+  filter:none!important;isolation:isolate;touch-action:manipulation;
+}
+#ultimateBtn::before{content:"";position:absolute;inset:13% 7% 12%;z-index:0;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at center,color-mix(in srgb,var(--weapon-aura) 28%,transparent),transparent 70%);filter:blur(11px);opacity:var(--ult-halo-opacity,.28);transition:opacity .12s linear}
+#ultimateBtn::after{content:"";position:absolute;left:15%;right:15%;bottom:11px;height:2px;z-index:4;border-radius:99px;pointer-events:none;background:linear-gradient(90deg,var(--weapon-aura) var(--ult-pct,0%),rgba(255,255,255,.1) var(--ult-pct,0%));box-shadow:0 0 7px color-mix(in srgb,var(--weapon-aura) 55%,transparent);opacity:.75}
+#ultimateBtn .ultimate-weapon-img{position:absolute!important;z-index:3!important;left:50%!important;top:45%!important;width:112px!important;height:76px!important;object-fit:contain!important;transform:translate(-50%,-50%) scale(var(--ult-scale,.94))!important;pointer-events:none!important;filter:brightness(var(--ult-brightness,.7)) saturate(var(--ult-saturation,.72)) drop-shadow(0 4px 4px rgba(0,0,0,.72)) drop-shadow(0 0 var(--ult-glow-size,4px) var(--weapon-aura))!important;transition:filter .12s linear,transform .12s linear}
+#ultimateBtn .ultimate-weapon-tag{z-index:5!important;left:auto!important;right:7px!important;top:2px!important;min-width:0!important;padding:2px 5px!important;background:rgba(4,7,6,.72)!important;border:1px solid color-mix(in srgb,var(--weapon-aura) 55%,transparent)!important;color:#fff3c3!important;font-size:9px!important}
+#ultimateBtn #ultimateFill{display:none!important}
+#ultimateBtn #ultimateCd{position:absolute!important;z-index:5!important;left:auto!important;right:9px!important;bottom:5px!important;margin:0!important;width:auto!important;color:rgba(255,255,255,.86)!important;font-size:9px!important;font-weight:700!important;text-shadow:0 1px 4px #000!important}
+#ultimateBtn.ready{animation:floatingWeaponReady .72s ease-in-out infinite alternate!important;background:transparent!important;border:0!important;box-shadow:none!important}
+#ultimateBtn.ready .ultimate-weapon-img{animation:none!important;transform:translate(-50%,-50%) scale(1.06)!important;filter:brightness(1.28) saturate(1.12) drop-shadow(0 4px 4px rgba(0,0,0,.72)) drop-shadow(0 0 17px var(--weapon-aura))!important}
+#ultimateBtn:active .ultimate-weapon-img{transform:translate(-50%,-50%) scale(.92)!important;filter:brightness(1.5) drop-shadow(0 0 18px var(--weapon-aura))!important}
+#ultimateBtn[data-weapon-tier="1"],#ultimateBtn[data-weapon-tier="2"],#ultimateBtn[data-weapon-tier="3"],#ultimateBtn[data-weapon-tier="4"],#ultimateBtn[data-weapon-tier="5"]{box-shadow:none!important}
+@keyframes floatingWeaponReady{to{transform:translateY(-3px)}}
+body.left-handed #ultimateBtn{right:auto!important;left:calc(env(safe-area-inset-left) + 91px)!important}
+body.large-ui #ultimateBtn{scale:var(--button-scale);transform-origin:bottom right}
+body.left-handed.large-ui #ultimateBtn{transform-origin:bottom left}
+@media(max-width:520px){
+  #combatPortraitWrap{width:62px!important;flex-basis:62px!important;height:72px;min-height:72px}
+  #combatPortrait{height:72px!important;min-height:72px!important}
+  #ultimateBtn{width:102px!important;height:82px!important;right:calc(env(safe-area-inset-right) + 7px)!important;bottom:calc(env(safe-area-inset-bottom) + 96px)!important}
+  #ultimateBtn .ultimate-weapon-img{width:98px!important;height:66px!important}
+  body.left-handed #ultimateBtn{right:auto!important;left:calc(env(safe-area-inset-left) + 78px)!important}
+}
+
+/* v14.4.2: restored combat speed control */
+#speedBtn.speed-btn{display:inline-flex;align-items:center;justify-content:center;min-width:42px;padding:0 8px;font-size:12px;font-weight:900;letter-spacing:-.02em;white-space:nowrap;touch-action:manipulation}
+@media(max-width:390px){#speedBtn.speed-btn{min-width:38px;padding:0 6px;font-size:11px}}
+
+/* v14.4.3 forge workshop ambience */
+.forge-hero-scene::before{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(112deg,transparent 0 33%,rgba(255,231,175,.055) 47%,transparent 58%);mix-blend-mode:screen;animation:forgeHeroSweep 7s ease-in-out infinite}
+.forge-hero-scene::after{content:"";position:absolute;left:9%;bottom:5%;width:38%;height:44%;z-index:3;pointer-events:none;background:radial-gradient(ellipse,rgba(255,127,31,.24),transparent 68%);filter:blur(13px);animation:forgeHeroFire 1.2s ease-in-out infinite alternate}
+.forge-workshop-art{filter:brightness(.78) saturate(1.05) contrast(1.11)!important}
+.forge-ember-layer{z-index:5!important;opacity:.82!important}
+.forge-heat-haze{z-index:5!important;opacity:.5!important}
+.forge-panel-content{position:relative;z-index:7}
+@keyframes forgeHeroSweep{0%,100%{transform:translateX(-6%);opacity:.25}50%{transform:translateX(7%);opacity:.75}}
+@keyframes forgeHeroFire{from{transform:scale(.92);opacity:.42}to{transform:scale(1.08);opacity:.85}}
+
+/* v14.5.0 forge master-art atmosphere */
+.forge-hero-scene{height:230px!important;border-bottom:1px solid rgba(224,178,79,.2);box-shadow:inset 0 -34px 45px rgba(0,0,0,.63)}
+.forge-main-panel{padding-top:236px!important;background:linear-gradient(180deg,rgba(7,9,7,.95),rgba(10,13,10,.995))!important}
+.forge-hero-scene .forge-workshop-art{object-position:center 68%!important;filter:brightness(.7) saturate(1.1) contrast(1.16)!important;transform:scale(1.025)!important}
+.forge-hero-vignette{background:linear-gradient(180deg,rgba(0,0,0,.1),transparent 30%,rgba(0,0,0,.72)),radial-gradient(ellipse at 50% 60%,transparent 18%,rgba(0,0,0,.58) 82%)!important}
+.forge-ember-layer{background-image:radial-gradient(circle,#ffd36b 0 1.2px,transparent 1.7px),radial-gradient(circle,#ff7a2d 0 1px,transparent 1.5px)!important;background-size:71px 93px,113px 137px!important;animation:forgeEmbers 6s linear infinite!important}
+.forge-heat-haze{background:radial-gradient(ellipse at 29% 78%,rgba(255,151,44,.14),transparent 36%),radial-gradient(ellipse at 56% 73%,rgba(255,105,31,.08),transparent 30%)!important;filter:blur(12px)!important;animation:forgeHeatHaze 2.4s ease-in-out infinite alternate!important}
+@keyframes forgeEmbers{from{background-position:0 100px,30px 160px}to{background-position:35px -80px,0 -130px}}
+@keyframes forgeHeatHaze{from{transform:scale(1) translateY(2px);opacity:.45}to{transform:scale(1.04) translateY(-4px);opacity:.8}}
+@media(max-width:520px){.forge-hero-scene{height:192px!important}.forge-main-panel{padding-top:198px!important}}
+
+@media(max-width:520px){#ultimateBtn{width:82px;height:114px;right:calc(env(safe-area-inset-right) + 12px);bottom:calc(env(safe-area-inset-bottom) + 98px);border-radius:24px}#ultimateBtn .ultimate-weapon-img{width:90px;height:54px}body.left-handed #ultimateBtn{right:auto;left:96px}}
+@media(max-width:390px){#ultimateBtn{width:78px;height:108px;bottom:calc(env(safe-area-inset-bottom) + 94px)}#ultimateBtn .ultimate-weapon-img{width:86px;height:52px}}
