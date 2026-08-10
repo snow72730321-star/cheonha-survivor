@@ -218,9 +218,9 @@ function ultimateAttack(){
    const castX=player.x,castY=player.y,castA=a;
    setHuanglongStacks(0);
    addVisual({type:"skillFistGoldenCharge",x:castX,y:castY,a:castA,r:240,life:4.45,max:4.45,color:"#ffd85a",holdAlpha:true});
-   // 차징 용의 에너지 구체 중심을 실제 포구로 고정한다.
-   // 렌더러도 동일한 96px 전방 포구에 source frame (174,340)을 맞춰 배치하므로
-   // 빔 위치를 따로 보정하는 것이 아니라 용 자체가 빔 축에 정확히 맞춰진다.
+   // v14.9.14: 차징 용의 실제 흰색 에너지 구체 중심을 포구로 고정한다.
+   // 렌더러가 동일한 96px 전방 포구에 source frame (180,384)를 맞춰 용 자체를 재배치하고,
+   // beam 내부 발사부 (96,160)도 같은 월드 좌표에 겹치도록 한다.
    const chargeMuzzleOffset=96;
    const x0=castX+Math.cos(castA)*chargeMuzzleOffset;
    const y0=castY+Math.sin(castA)*chargeMuzzleOffset;

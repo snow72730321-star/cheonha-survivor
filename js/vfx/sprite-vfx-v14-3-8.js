@@ -348,9 +348,10 @@ drawVisuals=function(){
         skillFistGoldenDragon:{id:"skillFistGoldenDragon",fw:1304,fh:516,sourceX:1189,sourceY:278,scale:Math.max(.46,r/1304),flipX:true},
         skillFistToOneDefense:{id:"skillFistToOneDefense",fw:667,fh:601,sourceX:334,sourceY:301,scale:.42},
         skillFistToOne:{id:"skillFistToOne",fw:1614,fh:1040,sourceX:270,sourceY:520,scale:.42},
-        // 황룡진천은 에너지 구체 중심(174,340)을 실제 발사 원점으로 사용한다.
+        // v14.9.14: 사용자가 표시한 golden_dragon_charge의 흰색 에너지 구체 중심을
+        // 원본 822x663 프레임 좌표로 역산한 (180,384)를 실제 발사 원점으로 사용한다.
         // cast 방향을 좌/우 반평면으로 나눠 flipY를 선택해 용의 등/머리가 항상 화면 위쪽을 향하게 한다.
-        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:174,sourceY:340,scale:.56,angleOffset:Math.PI,forwardOffset:96,upright:true}
+        skillFistGoldenCharge:{id:"skillFistGoldenCharge",fw:822,fh:663,sourceX:180,sourceY:384,scale:.56,angleOffset:Math.PI,forwardOffset:96,upright:true}
       }[v.type];
       const renderA=a+(cfg.angleOffset||0);
       const flipX=!!cfg.flipX;
@@ -363,17 +364,27 @@ drawVisuals=function(){
       const y=baseY+Math.sin(renderA)*localX+Math.cos(renderA)*localY;
       const vis=v.holdAlpha?Math.min(1,Math.pow(alpha,.25)):alpha;
       if(v.type==="skillFistGoldenCharge"){
-        // 차징 종료 후 프레임 고정 금지. 빔이 끝날 때까지 26프레임 차징 시트를 계속 루프 재생한다.
-        VFXSprites.draw(cfg.id,x,y,{age:v.age||0,loop:true,angle:renderA,scaleX:cfg.scale,scaleY:cfg.scale,alpha:vis,flipX,flipY});
+        // v14.9.14: visuals.age에 의존하지 않고 life 감소량으로 애니메이션 시계를 직접 만든다.
+        // 빔 발사 중에도 이 값은 계속 증가하므로 26프레임 전체가 스킬 종료까지 반복 재생된다.
+        const animAge=Math.max(0,(v.max||0)-(v.life||0));
+        VFXSprites.draw(cfg.id,x,y,{age:animAge,loop:true,angle:renderA,scaleX:cfg.scale,scaleY:cfg.scale,alpha:vis,flipX,flipY});
       }else{
         VFXSprites.drawOneShot(cfg.id,x,y,{age:progress,angle:renderA,scaleX:cfg.scale,scaleY:cfg.scale,alpha:vis,flipX,flipY});
       }
     }else if(v.type==="skillFistGoldenBeam"){
       const a=v.a||0,len=v.r||700,width=v.width||90;
-      // Beam local source is the left edge; its center is therefore half a beam length forward.
-      const x=v.x+Math.cos(a)*len*.5,y=v.y+Math.sin(a)*len*.5;
+      // v14.9.14: golden_dragon_beam의 실제 발광 시작부 중심은 프레임 좌단(0)이 아니라
+      // 원본 900x308 기준 약 (96,160)이다. 이 내부 포구를 charge의 흰색 구체 앵커와 겹친다.
+      // 오른쪽 끝은 기존 판정 길이 len에 맞도록 sourceX 이후 구간만 len으로 스케일한다.
+      const beamSourceX=96,beamSourceY=160,beamFrameW=900,beamFrameH=308;
+      const scaleX=len/(beamFrameW-beamSourceX),scaleY=width/beamFrameH;
+      const localX=(beamFrameW*.5-beamSourceX)*scaleX;
+      const localY=(beamFrameH*.5-beamSourceY)*scaleY;
+      const x=v.x+Math.cos(a)*localX-Math.sin(a)*localY;
+      const y=v.y+Math.sin(a)*localX+Math.cos(a)*localY;
       const vis=Math.min(1,Math.pow(alpha,.18));
-      VFXSprites.draw("skillFistGoldenBeam",x,y,{age:v.age||0,loop:true,angle:a,scaleX:len/900,scaleY:width/308,alpha:vis});
+      const animAge=Math.max(0,(v.max||0)-(v.life||0));
+      VFXSprites.draw("skillFistGoldenBeam",x,y,{age:animAge,loop:true,angle:a,scaleX,scaleY,alpha:vis});
     }else if(v.type==="skillSaberThunderFan"){
       const a=v.a||0,r=v.r||100,x=v.x+Math.cos(a)*r*.42,y=v.y+Math.sin(a)*r*.42;
       VFXSprites.drawOneShot("skillSaberThunderFan",x,y,{age:progress,angle:a,scale:Math.max(.48,r/108),alpha});

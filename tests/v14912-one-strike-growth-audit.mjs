@@ -7,6 +7,6 @@ ok(meta.includes("Math.min(100,n|0)")&&meta.includes("player.maxHp+=delta*.5")&&
 ok(meta.includes('source==="tenThousand"')&&meta.includes("setOneStrikeStacks((player.oneStrikeStacks||0)+1)"),"만권일극 처치 연동 누락");
 ok(state.includes("일극은 이번 전투 동안 영구 유지")&&state.includes("최대 100"),"만권일극 설명 누락");
 ok(hud.includes("일극 ${o}/100")&&hud.includes("leftX")&&hud.includes("rightX"),"좌우 스택 HUD 누락");
-ok(index.includes("천하생존록 v14.9.13")&&index.includes('content="v14.9.13-golden-dragon-vfx-align"'),"HTML 최신 버전 표기 누락");
-ok(sw.includes('cheonha-v14-9-13-golden-dragon-vfx-align'),"서비스워커 최신 캐시 버전 누락");
+ok(index.includes("천하생존록 v14.9.14")&&index.includes('content="v14.9.14-golden-dragon-muzzle-pixel-anchor"'),"HTML 최신 버전 표기 누락");
+ok(sw.includes('cheonha-v14-9-14-golden-dragon-muzzle-pixel-anchor'),"서비스워커 최신 캐시 버전 누락");
 console.log("v14.9.12 one-strike growth audit passed");

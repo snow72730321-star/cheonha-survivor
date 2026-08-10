@@ -14,7 +14,7 @@ const a=src.indexOf('drawVisuals=function(){');
 const b=src.indexOf('/** 태극검진은',a);
 const visualBlock=src.slice(a,b);
 if(!visualBlock.includes('VFXSprites.drawOneShot('))throw new Error('drawVisuals does not use one-shot renderer');
-const allowedLoops=['VFXSprites.draw("skillFistGoldenBeam"','VFXSprites.draw(cfg.id,x,y,{age:v.age||0,loop:true'];
+const allowedLoops=['VFXSprites.draw("skillFistGoldenBeam"','VFXSprites.draw(cfg.id,x,y,{age:animAge,loop:true'];
 let stripped=visualBlock;
 for(const allowedLoop of allowedLoops)stripped=stripped.replaceAll(allowedLoop,'ALLOWED_PERSISTENT_VFX_LOOP(');
 if(stripped.includes('VFXSprites.draw('))throw new Error('unexpected looping sprite draw remains inside drawVisuals');
