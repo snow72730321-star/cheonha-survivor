@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512" role="img" aria-label="암기 마스터 무기">
+<defs>
+  <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#161d24"/><stop offset=".12" stop-color="#7c8997"/><stop offset=".29" stop-color="#f7fbff"/><stop offset=".43" stop-color="#8996a4"/><stop offset=".58" stop-color="#dce5ed"/><stop offset=".76" stop-color="#4a5663"/><stop offset="1" stop-color="#11171d"/></linearGradient>
+  <linearGradient id="steelEdge" x1="0" x2="1"><stop stop-color="#7f8d9a"/><stop offset=".18" stop-color="#fff"/><stop offset=".5" stop-color="#b9c6d0"/><stop offset=".8" stop-color="#f9fbff"/><stop offset="1" stop-color="#596574"/></linearGradient>
+  <linearGradient id="blackSteel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07090d"/><stop offset=".2" stop-color="#313a45"/><stop offset=".46" stop-color="#0d1218"/><stop offset=".72" stop-color="#4e5964"/><stop offset="1" stop-color="#07090c"/></linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c270c"/><stop offset=".17" stop-color="#9d6c25"/><stop offset=".38" stop-color="#f2cf70"/><stop offset=".55" stop-color="#fff0a8"/><stop offset=".75" stop-color="#b77a28"/><stop offset="1" stop-color="#42290c"/></linearGradient>
+  <linearGradient id="jade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#123329"/><stop offset=".35" stop-color="#3e8e70"/><stop offset=".62" stop-color="#9adac0"/><stop offset="1" stop-color="#16382c"/></linearGradient>
+  <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#140b08"/><stop offset=".18" stop-color="#4f2b1d"/><stop offset=".5" stop-color="#99603a"/><stop offset=".72" stop-color="#4d2a1a"/><stop offset="1" stop-color="#130a07"/></linearGradient>
+  <linearGradient id="leather" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#180b08"/><stop offset=".3" stop-color="#743b28"/><stop offset=".54" stop-color="#b06a47"/><stop offset=".8" stop-color="#4c241a"/><stop offset="1" stop-color="#130908"/></linearGradient>
+  <radialGradient id="gem"><stop stop-color="#fffbe4"/><stop offset=".18" stop-color="#9ee9ff"/><stop offset=".45" stop-color="#3f8fb1"/><stop offset="1" stop-color="#163244"/></radialGradient>
+  <pattern id="damascus" width="36" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><path d="M-8 5 Q8 -2 24 5 T56 5M-8 15 Q8 8 24 15 T56 15" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="2"/></pattern>
+  <pattern id="wrap" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V20" stroke="#d5a570" stroke-width="5"/><path d="M8 0V20" stroke="#5b2e21" stroke-width="5"/></pattern>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="11"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+</defs><ellipse cx="512" cy="420" rx="370" ry="38" fill="#000" opacity=".22" filter="url(#soft)"/><g filter="url(#shadow)" transform="rotate(-8 512 256)">
+<path d="M157 256 L611 132 L806 164 L655 256 L807 348 L611 380 Z" fill="url(#blackSteel)" stroke="#d2dce5" stroke-width="6"/>
+<path d="M188 256 L612 153 L765 174 L636 238 H584 L636 274 L764 337 L612 359 Z" fill="url(#steel)" opacity=".66"/>
+<path d="M214 256 L602 176" stroke="#fff" stroke-width="5" stroke-opacity=".35"/><path d="M214 256 L602 336" stroke="#fff" stroke-width="5" stroke-opacity=".28"/>
+<circle cx="638" cy="256" r="58" fill="#0b1112" stroke="url(#gold)" stroke-width="17"/><circle cx="638" cy="256" r="29" fill="url(#jade)" stroke="#c9f4df" stroke-width="5"/><circle cx="638" cy="256" r="9" fill="#dffff0"/>
+<path d="M126 222 L188 256 L126 290" fill="none" stroke="url(#gold)" stroke-width="21"/>
+<g fill="#75b89a" opacity=".68"><circle cx="500" cy="206" r="7"/><circle cx="527" cy="308" r="5"/><circle cx="565" cy="192" r="4"/><circle cx="570" cy="320" r="6"/></g>
+<path d="M275 256 L560 202 L602 226" fill="none" stroke="#9be5c5" stroke-width="3" stroke-dasharray="12 12" opacity=".68"/>
+</g></svg>

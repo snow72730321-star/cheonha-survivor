@@ -1,3 +1,20 @@
+- 2026-08-14 v14.10.2: 천공각 뽑기 6.1초 전용 연출 추가. 터치/클릭/Space로 즉시 결과 스킵 가능. 결과는 연출 전에 확정·저장되어 스킵이 결과에 영향을 주지 않음.
+- 2026-08-14: 고급 광물 뽑기를 금자 전용 별도 페이지(1/10/100회)로 분리하고 일반 광물 합성을 전설 상한으로 고정. 절월 1~35프레임은 원본 종횡비, 36프레임부터 cover 화면 맞춤 적용.
+## v14.10 시스템·경제 통합 패치
+- 모든 캐릭터 절기 사용 시 무적 보장.
+- 강화 실패 시 단계 하락/저확률 파괴 추가 및 대장간 위험도 표시.
+- 몬스터 광석 드롭 감소, 직접 드롭 최대 전설 제한.
+- 전설 3개 소모 고급 광물 제련(꽝/신화/영원) 추가.
+- 고수/수라 클리어 확률 3택 광석 보상 추가.
+- 플레이어 몸 주변 강화 오오라 제거, 무기 자체 광원만 유지.
+- 검 태극검진 전체 적 전수검사를 공간 해시 기반으로 최적화.
+- 5200×5200 유한 강호 맵과 인게임 미니맵 추가.
+- 왜도 도감 구형 진화 조건 수정.
+- SaveManager +25 강화 및 잠재 줄 등급 보존 수정.
+- 모바일 전투 카메라를 추가 축소해 시야 확대.
+- 대장간 강화/정련 중 보유 금자 실시간 표시.
+- 잠재 확률 보기 버튼/창 추가.
+
 - 2026-08-14: Katana full-moon 4→5 crash fixed; VFX priority/opacity, Moon Forms timing and Form 2 highest-HP targeting updated.
 - 2026-08-14: Katana VFX layout fix — removed baked checkerboards from Balwol/Moon Meteor/Silver Moon sheets, Silver Moon one-shot now counts as execution, moonflower HUD uses evenly spaced arc slots, and Time-Space Cut uses full-screen cover scaling.
 - 2026-08-14: Katana VFX runtime switched to sprite-sheet-only references; removed GIF preload/cache dependence.

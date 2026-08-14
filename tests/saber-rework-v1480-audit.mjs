@@ -1,0 +1,17 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const state=fs.readFileSync("js/core/runtime-state.js","utf8");
+const meta=fs.readFileSync("js/data/characters-meta.js","utf8");
+const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
+assert.match(state,/name:"천마신공",max:3,hidden:true/);
+assert.doesNotMatch(state,/name:"혈전도심"/);
+assert.match(meta,/return "진천마합일"/);
+assert.match(meta,/player\.saberUnityTrue=trueUnity/);
+assert.match(meta,/player\.saberUnityTrue\?1\.25:1\.18/);
+assert.match(meta,/&&player\.saberUnityTrue\)\?\.5:1/);
+assert.match(meta,/&&player\.saberUnityTrue&&!isUltimateSource/);
+assert.match(meta,/const maxBonus=\.06\+lv\*\.03/);
+assert.match(combat,/function saberHeavenRangeMul\(\)\{return 1\+saberHeavenLevel\(\)\*\.04\}/);
+assert.match(combat,/trueUnity\?\.75:unity\?\.80:1/);
+assert.match(combat,/skipVisual:trueUnity/);
+console.log("saber-rework-v1480-audit: OK");
