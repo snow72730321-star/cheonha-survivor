@@ -1,3 +1,4 @@
+- 2026-08-14: Katana VFX layout fix — removed baked checkerboards from Balwol/Moon Meteor/Silver Moon sheets, Silver Moon one-shot now counts as execution, moonflower HUD uses evenly spaced arc slots, and Time-Space Cut uses full-screen cover scaling.
 - 2026-08-14: Katana VFX runtime switched to sprite-sheet-only references; removed GIF preload/cache dependence.
 ## v14.9.15-katana-gif-hit-fix — 왜도 GIF/원킬 은월/발월 지연참격 수정
 - iOS/Safari Canvas에서 animated GIF가 정지하거나 보이지 않는 문제를 피하기 위해 제공 GIF의 프레임을 무손실 PNG sheet로 추출하고 런타임에서 원본 프레임 시간대로 직접 재생합니다.
