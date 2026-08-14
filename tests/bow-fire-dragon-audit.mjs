@@ -1,0 +1,17 @@
+import fs from "node:fs";
+const meta=fs.readFileSync("js/data/characters-meta.js","utf8");
+const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
+const vfx=fs.readFileSync("js/vfx/sprite-vfx-v14-3-8.js","utf8");
+if(!meta.includes('ultimate:"적궁백시"'))throw new Error("bow ultimate name missing");
+if(!meta.includes('quote:"떨어트린다. 해와 달도, 하늘도."'))throw new Error("bow quote missing");
+if(!meta.includes('type:"skillBowRicochetSeal"')||!meta.includes('a,r:360'))throw new Error("bow VFX facing/size config missing");
+if(combat.includes('addVisual({type:"skillTaoFireDragon",x:player.x,y:player.y'))throw new Error("fire dragon still renders on cast");
+if(!combat.includes('p.source==="firedragon"')||!combat.includes('burst:true'))throw new Error("fire dragon impact VFX missing");
+if(!vfx.includes('v.type==="skillTaoFireDragon"&&v.burst'))throw new Error("fire dragon burst renderer missing");
+if(!vfx.includes('frames:37,fps:20'))throw new Error("bow ultimate VFX is still too fast");
+if(!combat.includes('shape:"ultimateArrow"')||!vfx.includes('p.shape==="ultimateArrow"'))throw new Error("distinct ultimate arrow visual missing");
+if(!combat.includes('fireDragonChain')||!combat.includes('Math.floor(lv/2)'))throw new Error("fire dragon chain explosions missing");
+if(!combat.includes('52+a.fivethunder*7'))throw new Error("five thunder splash damage missing");
+if(!combat.includes('stun:.22')||!combat.includes('e.stunTime'))throw new Error("thunder seal stun missing");
+if(!meta.includes('lineHit(sx,sy,ex,ey,180,330'))throw new Error("spear ultimate width buff missing");
+console.log("bow/fire-dragon audit: ok");
