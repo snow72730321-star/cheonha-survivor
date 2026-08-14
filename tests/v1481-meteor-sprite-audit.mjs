@@ -1,0 +1,13 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
+const vfx=fs.readFileSync("js/vfx/sprite-vfx-v14-3-8.js","utf8");
+const loader=fs.readFileSync("js/core/asset-loader.js","utf8");
+assert.ok(fs.existsSync("assets/vfx/skills/sword/meteor_rain.png"));
+assert.ok(!fs.existsSync("assets/vfx/skills/sword_meteor_rain.png"));
+assert.match(vfx,/skillSwordMeteor:\{src:"assets\/vfx\/skills\/sword\/meteor_rain\.png",frameW:183,frameH:284,frames:10,cols:5,fps:11\.11/);
+assert.match(loader,/assets\/vfx\/skills\/sword\/meteor_rain\.png/);
+assert.match(combat,/life:\.9,max:\.9/);
+assert.match(combat,/const impact=\.29\+Math\.random\(\)\*\.06/);
+assert.doesNotMatch(combat,/life:delay,max:delay.*source:"meteor"/);
+console.log("v14.8.1 meteor sprite audit: OK");
