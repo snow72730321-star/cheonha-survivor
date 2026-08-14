@@ -1,3 +1,4 @@
+- 2026-08-14: Katana full-moon 4→5 crash fixed; VFX priority/opacity, Moon Forms timing and Form 2 highest-HP targeting updated.
 - 2026-08-14: Katana VFX layout fix — removed baked checkerboards from Balwol/Moon Meteor/Silver Moon sheets, Silver Moon one-shot now counts as execution, moonflower HUD uses evenly spaced arc slots, and Time-Space Cut uses full-screen cover scaling.
 - 2026-08-14: Katana VFX runtime switched to sprite-sheet-only references; removed GIF preload/cache dependence.
 ## v14.9.15-katana-gif-hit-fix — 왜도 GIF/원킬 은월/발월 지연참격 수정

@@ -9,11 +9,16 @@ for(const f of sheets){ok(fs.existsSync(path.join(root,"assets/vfx/skills/katana
 ok(k.includes("KATANA_ANIM_META")&&k.includes("function drawAnim")&&k.includes("frameAt(meta"),"스프라이트 시트 수동 프레임 재생기 누락");
 ok(!loader.includes("assets/vfx/skills/katana/full_moon.gif")&&!sw.includes("assets/vfx/skills/katana/full_moon.gif"),"왜도 VFX가 여전히 GIF preload/cache에 남아 있음");
 ok(!k.includes('drawImg(img("full_moon.gif")')&&!k.includes('drawAnim("full_moon.gif"'),"만월 VFX가 여전히 GIF 식별자에 의존하고 있음");
+ok(!k.includes("drawGif(")&&k.includes('drawAnim("full_moon",elapsed'),"만월 5스택 HUD가 삭제된 drawGif 호출을 사용함");
 ok(chars.includes("return dealt;")&&remaster.includes("return dealt"),"damageEnemy wrapper 반환값 계약 복구 누락");
 ok(remaster.includes("silver=!!opt.silverMoon")&&remaster.includes('shadowColor="#dff8ff"'),"은월 전용 데미지 폰트 연동 누락");
 ok(k.includes("const hitTargets=lineHit")&&k.includes("target,x:target.x")&&k.includes('damageEnemy(target,q.dmg,"balwolEcho"'),"발월 적중 객체별 지연참격 추적 누락");
 ok(combat.includes("const hitTargets=[]")&&combat.includes("return hitTargets"),"lineHit 적중 객체 반환 계약 누락");
 ok(k.includes("본 타격을 먼저 처리")&&k.includes("silverMoon:silver")&&k.includes("silverOneShotExecution")&&k.includes("katanaExecute"),"은월 원킬 처형 승격 누락");
-ok(k.includes("flowerArc=[Math.PI*.75,Math.PI,Math.PI*1.25]")&&k.includes("flowerRadius=58"),"월은화 균등 호선 배치 누락");
+ok(k.includes("flowerArcCenter=Math.PI")&&k.includes("flowerArcStep=Math.PI*.24")&&k.includes("flowerRadius=74"),"월은화 균등 호선 배치 누락");
 ok(k.includes("Math.max(W/500,H/281)")&&k.includes("500*cover")&&k.includes("281*cover"),"극·시공절 화면 cover 배치 누락");
+ok(k.includes("katanaVfxPriority")&&k.includes('if(v.type==="katanaExecute")return 100;')&&k.includes('if(v.type==="katanaScarBurst")return 90;')&&k.includes('if(v.type==="katanaSilverHit")return 60;'),"왜도 특수 VFX 렌더 우선순위 누락");
+ok(k.includes("const echoOpacity=fx.executed?.12:fx.scarBurst?.18")&&k.includes("opacityScale:echoOpacity"),"발월 추가참격 특수 판정 투명화 누락");
+ok(k.includes("MOON_FORM_STEP_DELAY={1:.90,2:.52,3:.76}")&&k.includes("player.katanaMoonFormTimer=.12"),"월영참 모션 간격/2식 재탐색 대기 누락");
+ok(k.includes("if(step===2)")&&k.includes("sort((x,y)=>y.hp-x.hp)")&&k.includes("Math.hypot(e.x-player.x,e.y-player.y)<=range"),"월영참 2식 최고체력 사거리 타겟팅 누락");
 console.log("v14.9.15 katana sprite-sheet/hit lifecycle audit: OK");

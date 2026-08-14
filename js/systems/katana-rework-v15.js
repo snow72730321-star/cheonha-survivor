@@ -72,11 +72,13 @@ damageEnemy=function(e,dmg,source,opt={}){
  const hpBefore=e.hp;
  const dealt=Number(_damage(e,scaled,source,Object.assign({},opt,{katanaNoSilver:!silver,silverMoon:silver})))||0;
  const silverOneShotExecution=!!(silver&&dealt>0&&hpBefore>0&&e.dead);
- // 원킬이어도 은월 타격 이펙트와 은빛 피해 표시는 남고, 은월 원킬은 처형으로 승격한다.
+ let scarApplied=false,executed=silverOneShotExecution;
+ // 은월은 타격의 우선 VFX다. 월흔이 새로 생기는 경우 표식이 읽히도록 은월 광량을 약간 낮춘다.
  if(silver&&dealt>0){
-  vfx("katanaSilverHit",hitX,hitY,.36,{r:46});
-  if(silverOneShotExecution){vfx("katanaExecute",hitX,hitY,.63,{r:92});scarTrigger();}
-  else if(!e.dead&&!scarBurst)addScar(e,1);
+  if(!silverOneShotExecution&&!e.dead&&!scarBurst){addScar(e,1);scarApplied=true;}
+  const silverOpacity=silverOneShotExecution?.52:scarBurst?.58:scarApplied?.72:1;
+  vfx("katanaSilverHit",hitX,hitY,.36,{r:46,target:e,priority:60,opacityScale:silverOpacity});
+  if(silverOneShotExecution){vfx("katanaExecute",hitX,hitY,.63,{r:92,target:e,priority:100,opacityScale:1});scarTrigger();}
  }
  // 극월 생명력 흡수: 실제 초당 최대 체력 8% 상한.
  if(selectedWeapon==="katana"&&dealt>0&&(player.katanaLifeSteal||0)>0){
@@ -84,20 +86,23 @@ damageEnemy=function(e,dmg,source,opt={}){
   const heal=Math.min(remain,dealt*player.katanaLifeSteal);
   if(heal>0){player.hp=Math.min(player.maxHp,player.hp+heal);player.katanaLifeStealHealed=(player.katanaLifeStealHealed||0)+heal;}
  }
- // 3월흔 소비 추가참격은 본 타격 뒤에 발동한다. 본 타격이 처치했어도 폭발 성립/월은화 획득은 인정한다.
+ // 월흔 폭발은 은월/발월 잔상보다 높은 렌더 우선순위를 갖는다.
  if(scarBurst&&!silverOneShotExecution){
-  vfx("katanaScarBurst",hitX,hitY,.80,{r:78});
+  vfx("katanaScarBurst",hitX,hitY,.80,{r:78,target:e,priority:90,opacityScale:1});
   if(!e.dead)_damage(e,Math.max(1,dmg*1.8),"moonScarBurst",{katanaNoSilver:true,skipImpactVfx:true,color:"#dff7ff"});
   scarTrigger();
   if(!e.dead)e.moonScar=isGyeonghwaActive()?1:0;
  }
  if(!e.dead&&(e.moonScar||0)>0&&e.hp/e.maxHp<=executeThreshold(e.moonScar)){
   const boss=e.type==="boss"||e.type==="midboss";
-  vfx("katanaExecute",e.x,e.y,.63,{r:92});
+  executed=true;
+  vfx("katanaExecute",e.x,e.y,.63,{r:92,target:e,priority:100,opacityScale:1});
   if(boss)_damage(e,Math.max(e.maxHp*.035,scaled*2.2),"moonExecute",{katanaNoSilver:true,skipImpactVfx:true,color:"#f3fbff"});
   else {e.hp=0;killEnemy(e,"moonExecute",{katanaNoSilver:true});}
   e.moonScar=0;scarTrigger();
  }
+ // 발월 지연참격 호출자가 이번 타격의 특수 VFX 상태를 받아 자신의 광량을 낮출 수 있게 한다.
+ opt.katanaFx={silver,scarApplied,scarBurst,executed};
  return dealt;
 };
 
@@ -121,12 +126,22 @@ fireBasic=function(){
  player.fireTimer=Math.max(.38,.88-lv*.045)*(player.timeSpaceBuff>0?.8:1);
 };
 
+const MOON_FORM_STEP_DELAY={1:.90,2:.52,3:.76};
 function startMoonForms(){player.katanaMoonFormActive=true;player.katanaMoonFormStep=1;player.katanaMoonFormTimer=.03}
 function castMoonForm(step){
- const lv=player.arts.moonchain||1,a=facingAngle(),len=(310+lv*24)*player.areaMul,width=(22+lv*3)*Math.sqrt(player.areaMul),mul=[0,1.4,1.8,2.6][step],dmg=(25+lv*9)*mul;
+ const lv=player.arts.moonchain||1,len=(310+lv*24)*player.areaMul,width=(22+lv*3)*Math.sqrt(player.areaMul),mul=[0,1.4,1.8,2.6][step],dmg=(25+lv*9)*mul;
+ let a=facingAngle();
+ // 2식만 현재 사거리 안에서 체력이 가장 높은 적을 새로 지정해 그 방향으로 발동한다.
+ if(step===2){
+  const range=len*.62;
+  const target=enemies.filter(e=>!e.dead&&Math.hypot(e.x-player.x,e.y-player.y)<=range).sort((x,y)=>y.hp-x.hp)[0];
+  if(!target)return false; // 대상이 없으면 짧게 기다렸다 다시 탐색해 2식을 허공에 낭비하지 않는다.
+  a=Math.atan2(target.y-player.y,target.x-player.x);
+ }
  lineHit(player.x-Math.cos(a)*len*.35,player.y-Math.sin(a)*len*.35,player.x+Math.cos(a)*len*.65,player.y+Math.sin(a)*len*.65,width,dmg,"moonForm"+step,{skipVisual:true,shake:4+step,color:"#edf8ff"});
- vfx("katanaMoonForm"+step,player.x+Math.cos(a)*len*.18,player.y+Math.sin(a)*len*.18,[.9,.48,.72,.72][step],{a,r:len,width});
+ vfx("katanaMoonForm"+step,player.x+Math.cos(a)*len*.18,player.y+Math.sin(a)*len*.18,[.9,.9,.52,.76][step],{a,r:len,width,priority:20});
  player.moonFlowerStacks=Math.max(0,(player.moonFlowerStacks||0)-1);
+ return true;
 }
 function gainMoonPhase(){
  if(!(player.arts?.nameless>0))return;
@@ -204,9 +219,12 @@ tickArts=function(dt){
  while(player.katanaEchoQueue?.length&&player.katanaEchoQueue[0].t<=0){
   const q=player.katanaEchoQueue.shift(),target=q.target;
   if(!target||target.dead)continue;
-  const tx=target.x,ty=target.y;
-  damageEnemy(target,q.dmg,"balwolEcho",{skipImpactVfx:true,shake:2,color:C.katana,distance:Math.hypot(tx-player.x,ty-player.y)});
-  vfx("katanaBalwolEcho",tx,ty,.72,{a:q.a,r:q.r||96,target});
+  const tx=target.x,ty=target.y,hitOpt={skipImpactVfx:true,shake:2,color:C.katana,distance:Math.hypot(tx-player.x,ty-player.y)};
+  damageEnemy(target,q.dmg,"balwolEcho",hitOpt);
+  const fx=hitOpt.katanaFx||{};
+  // 은월/월흔/처형이 겹치면 발월 추가참격은 배경 레이어처럼 낮춰 핵심 피드백을 가리지 않는다.
+  const echoOpacity=fx.executed?.12:fx.scarBurst?.18:(fx.silver||fx.scarApplied)?.38:1;
+  vfx("katanaBalwolEcho",tx,ty,.72,{a:q.a,r:q.r||96,target,priority:10,opacityScale:echoOpacity});
  }
 
  for(const q of player.katanaMirrorQueue||[])q.t-=dt;
@@ -225,11 +243,15 @@ tickArts=function(dt){
  if(player.katanaMoonFormActive){
   player.katanaMoonFormTimer-=dt;
   if(player.katanaMoonFormTimer<=0){
-   castMoonForm(player.katanaMoonFormStep);player.katanaMoonFormStep++;
-   if(player.katanaMoonFormStep>3){
+   const step=player.katanaMoonFormStep;
+   if(step>3){
     player.katanaMoonFormActive=false;player.katanaMoonFormCycles=(player.katanaMoonFormCycles||0)+1;
     player.moonFlowerLock=Math.max(2.75,4.85-(player.arts.moonchain||1)*.35);gainMoonPhase();
-   }else player.katanaMoonFormTimer=.22;
+   }else{
+    const casted=castMoonForm(step);
+    if(!casted&&step===2)player.katanaMoonFormTimer=.12;
+    else{player.katanaMoonFormStep=step+1;player.katanaMoonFormTimer=MOON_FORM_STEP_DELAY[step]||.6;}
+   }
   }
  }
  for(const q of player.katanaHiddenQueue||[])q.t-=dt;
@@ -270,11 +292,19 @@ function drawAnim(name,timeSec,x,y,w,h,a=1,rot=0,loop=false){
  const fi=frameAt(meta,Math.max(0,timeSec||0)*1000,loop),sx=(fi%meta.cols)*meta.fw,sy=Math.floor(fi/meta.cols)*meta.fh;
  ctx.save();ctx.globalAlpha=a;ctx.translate(x,y);ctx.rotate(rot);ctx.drawImage(im,sx,sy,meta.fw,meta.fh,-w/2,-h/2,w,h);ctx.restore();
 }
+function katanaVfxPriority(v){
+ if(Number.isFinite(v.priority))return v.priority;
+ if(v.type==="katanaExecute")return 100;
+ if(v.type==="katanaScarBurst")return 90;
+ if(v.type==="katanaSilverHit")return 60;
+ if(v.type==="katanaBalwolEcho")return 10;
+ return 20;
+}
 function drawKatanaVisuals(){
- for(const v of visuals){
-  if(!String(v.type).startsWith("katana"))continue;
+ const ordered=visuals.filter(v=>String(v.type).startsWith("katana")).slice().sort((a,b)=>katanaVfxPriority(a)-katanaVfxPriority(b));
+ for(const v of ordered){
   const alpha=Math.max(0,Math.min(1,v.life/(v.max||v.life||1))),s=v.screen?{x:W/2,y:H/2}:v.followPlayer?{x:W/2,y:H/2}:v.target&&!v.target.dead?ws(v.target.x,v.target.y):ws(v.x,v.y);
-  let f=null,w=90,h=70,rot=v.a||0,opacity=Math.min(1,.35+alpha*.8);
+  let f=null,w=90,h=70,rot=v.a||0,opacity=Math.min(1,.35+alpha*.8)*(Number.isFinite(v.opacityScale)?v.opacityScale:1);
   if(v.type==="katanaSilverHit"){f="silver_moon_hit";w=80;h=66}
   else if(v.type==="katanaScarBurst"){f="moon_scar_burst";w=112;h=98}
   else if(v.type==="katanaExecute"){f="moon_execute";w=126;h=110}
@@ -296,20 +326,20 @@ function drawKatanaHUD(){
  const cx=W/2,cy=H/2;
  // 월은화: 플레이어 좌측 호에 3개. 빈 슬롯은 동일 꽃 실루엣.
  const flower=img("moonflower.png");
- const flowerArc=[Math.PI*.75,Math.PI,Math.PI*1.25],flowerRadius=58;
+ const flowerArcCenter=Math.PI,flowerArcStep=Math.PI*.24,flowerRadius=74;
  for(let i=0;i<3;i++){
-  const ang=flowerArc[i],x=cx+Math.cos(ang)*flowerRadius,y=cy+Math.sin(ang)*flowerRadius;
+  const ang=flowerArcCenter+(i-1)*flowerArcStep,x=cx+Math.cos(ang)*flowerRadius,y=cy+Math.sin(ang)*flowerRadius;
   ctx.save();
   if(i>=(player.moonFlowerStacks||0)){ctx.globalAlpha=player.moonFlowerLock>0?.12:.22;ctx.filter="grayscale(1) brightness(.28)"}
   else{ctx.globalAlpha=.95;ctx.shadowColor="#e7fbff";ctx.shadowBlur=9}
   if(flower?.complete&&flower.naturalWidth)ctx.drawImage(flower,x-13,y-13,26,26);
   ctx.restore();
  }
- // 만월화 1~4는 4칸 sheet, 5는 full_moon GIF.
+ // 만월화 1~4는 4칸 sheet, 5는 full_moon 애니메이션 시트.
  if((player.arts?.nameless||0)>0&&(player.moonPhase||0)>0){
   const phase=player.moonPhase;
   if(phase<5){const m=img("full_moon_stack.png");if(m?.complete&&m.naturalWidth)ctx.drawImage(m,(phase-1)*128,0,128,128,cx-25,cy-92,50,50)}
-  else drawGif("full_moon",elapsed,cx,cy-68,58,56,.96,0,true);
+  else drawAnim("full_moon",elapsed,cx,cy-68,58,56,.96,0,true);
  }
  // 극월: star sheet 24개 셀을 순서대로 원형 배치. 히든2 습득 시 빈 별 실루엣도 항상 표시한다.
  if((player.arts?.voidslash||0)>0){
@@ -330,5 +360,5 @@ function drawKatanaHUD(){
  }
 }
 const _draw=draw;draw=function(){_draw();drawKatanaVisuals();drawKatanaHUD()};
-window.KatanaRework={version:"1.2",flowerGain,addScar,gainMoonPhase,gainExtremeMoon,activateGyeonghwa,isGyeonghwaActive};
+window.KatanaRework={version:"1.3",flowerGain,addScar,gainMoonPhase,gainExtremeMoon,activateGyeonghwa,isGyeonghwaActive};
 })();
