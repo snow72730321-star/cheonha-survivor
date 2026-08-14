@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.9.11-golden-dragon-vfx-continuity";
+  const BUILD="v14.9.15-katana-vfx-loader-gyeonghwa";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -68,6 +68,25 @@ const GameAssets=(()=>{
     "assets/vfx/skills/katana/moon_chain.png",
     "assets/vfx/skills/katana/nameless_cuts.png",
     "assets/vfx/skills/katana/zanshin.png",
+    "assets/vfx/skills/katana/balwol.gif",
+    "assets/vfx/skills/katana/balwol_echo.gif",
+    "assets/vfx/skills/katana/chamwol.gif",
+    "assets/vfx/skills/katana/full_moon.gif",
+    "assets/vfx/skills/katana/jeolwol.gif",
+    "assets/vfx/skills/katana/moon_buff.gif",
+    "assets/vfx/skills/katana/moon_execute.gif",
+    "assets/vfx/skills/katana/moon_scar_burst.gif",
+    "assets/vfx/skills/katana/moon_sword_1.gif",
+    "assets/vfx/skills/katana/moon_sword_2.gif",
+    "assets/vfx/skills/katana/moon_sword_3.gif",
+    "assets/vfx/skills/katana/silver_moon_hit.gif",
+    "assets/vfx/skills/katana/time_space_cut.gif",
+    "assets/vfx/skills/katana/gyeonghwa_suwol.gif",
+    "assets/ui/katana/full_moon_stack.png",
+    "assets/ui/katana/moonflower.png",
+    "assets/ui/katana/star_sheet.png",
+    "assets/ui/katana/star_ring.png",
+    "assets/ui/katana/moon_scar_stack.png",
     "assets/vfx/skills/fist/dragon_return.png",
     "assets/vfx/skills/fist/hundred_step.png",
     "assets/vfx/skills/fist/iron_mountain.png",

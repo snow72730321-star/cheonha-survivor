@@ -1,0 +1,15 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8");
+const ok=(v,m)=>{if(!v)throw new Error(m)};
+const kat=read("js/systems/katana-rework-v15.js");
+const state=read("js/core/runtime-state.js");
+const loader=read("js/core/asset-loader.js");
+const sw=read("service-worker.js");
+ok(kat.includes('typeof GameAssets!=="undefined"?GameAssets:window.GameAssets'),"왜도 VFX가 lexical GameAssets를 참조하지 않음");
+ok(!kat.includes('window.GameAssets?.image'),"깨진 window.GameAssets 이미지 경로가 남아 있음");
+ok(kat.includes('gyeonghwa_suwol.gif')&&loader.includes('gyeonghwa_suwol.gif')&&sw.includes('gyeonghwa_suwol.gif'),"경화수월 VFX 선로드/캐시 누락");
+ok(kat.includes('katanaGyeonghwaStart')&&kat.includes('katanaGyeonghwaEcho'),"경화수월 발동/잔상 VFX 누락");
+ok(kat.includes('player.gyeonghwaTimer')&&kat.includes('?1:0'),"경화수월 월흔 1스택 잔류 누락");
+ok(state.includes('name:"경화수월"')&&state.includes('절월 1회 + 정밀회피 10회')&&state.includes('ready:p=>'),"경화수월 해금 조건 누락");
+ok(fs.existsSync('assets/vfx/skills/katana/gyeonghwa_suwol.gif'),"경화수월 GIF 파일 누락");
+console.log("v14.10.1 katana VFX/gyeonghwa audit: OK");
