@@ -1,0 +1,11 @@
+import fs from "node:fs";import path from "node:path";
+const root=path.resolve(import.meta.dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");const ok=(v,m)=>{if(!v)throw new Error(m)};
+const html=read("index.html"),js=read("js/systems/storage-forge.js"),css=read("css/forge-v13.css"),sw=read("service-worker.js");
+ok(fs.existsSync(path.join(root,"assets/ui/ore-gacha-draw.gif")),"뽑기 연출 GIF 누락");
+ok(html.includes('id="oreGachaCinematic"')&&html.includes('id="oreGachaCinematicMedia"'),"뽑기 연출 오버레이 누락");
+ok(js.includes("ORE_GACHA_ANIM_MS=6100")&&js.includes("playOreGachaCinematic")&&js.includes("finishOreGachaCinematic"),"뽑기 연출 lifecycle 누락");
+ok(js.includes('pointerdown')&&js.includes('touchstart')&&js.includes('e.code==="Space"'),"터치/클릭/Space 스킵 입력 누락");
+ok(js.includes("lastOreGachaResult={summary,wins};saveAccountData();refreshForge();playOreGachaCinematic()"),"결과 선확정/저장 후 연출 순서 누락");
+ok(css.includes(".ore-gacha-cinematic")&&css.includes("z-index:320"),"뽑기 연출 전체화면 스타일 누락");
+ok(sw.includes('assets/ui/ore-gacha-draw.gif')&&(sw.includes('cheonha-v14-10-2-ore-gacha-cinematic')||sw.includes('cheonha-v14-11-0-forge-art-ui')),"뽑기 연출 PWA 캐시 누락");
+console.log("v14.10.2 ore gacha cinematic audit: OK");
