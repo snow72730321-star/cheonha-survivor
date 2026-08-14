@@ -1,0 +1,15 @@
+/* ===== v9.2 mobile field-of-view and compact UI ===== */
+@media (max-width:520px){
+  .panel{width:min(94vw,540px);max-height:92dvh;padding:14px 12px;border-radius:16px}
+  .panel h1{font-size:25px;margin:2px 0 3px}.subtitle{font-size:9px}.desc{font-size:11px;line-height:1.45}
+  .records,.account-strip{gap:5px}.records>div,.account-chip{padding:7px 4px}.records b,.account-chip b{font-size:14px}
+  .difficulty-grid,.weapon-grid{gap:6px}.difficulty-card{min-height:64px;padding:8px}.weapon-card{min-height:76px;padding:8px}
+  .weapon-card img{width:54px;height:54px}.weapon-card b{font-size:13px}.weapon-card small{font-size:9px;line-height:1.35}
+  #characterPreview{height:112px}.character-info{padding:8px;font-size:11px}.menu-actions{gap:6px}.menu-actions button{min-height:38px;font-size:11px}
+  .tip{font-size:9px}.hud{transform:scale(.9);transform-origin:top left}.top-right{transform:scale(.9);transform-origin:top right}
+  #dodgeBtn,#ultimateBtn{width:67px;height:67px;font-size:12px}.joystick{transform:scale(.86)}
+}
+@media (max-width:390px){
+  .panel{width:96vw;padding:11px 9px}.panel h1{font-size:22px}.weapon-grid{grid-template-columns:1fr 1fr}
+  .weapon-card img{width:48px;height:48px}.weapon-card{min-height:69px}.difficulty-card small{font-size:9px}
+}
