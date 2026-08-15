@@ -437,3 +437,32 @@
   padding:0 0 .22em!important;
   font-size:clamp(11px,2.8vw,14px)!important;
 }
+
+
+/* v14.13.4 — mileage shop button positioning fix */
+#oreGacha .ore-gacha-shop-open{
+  position:absolute!important;
+  left:auto!important;
+  right:4.55%!important;
+  top:43.15%!important;
+  width:17.1%!important;
+  height:auto!important;
+  aspect-ratio:1!important;
+  z-index:18!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  color:#f3e3b7!important;
+  font-size:clamp(7px,1.9vw,10px)!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+  text-align:center!important;
+  text-shadow:0 1px 4px #001!important;
+}
+#oreGacha .ore-gacha-shop-open span{display:block!important;pointer-events:none!important}
+#oreGacha .ore-gacha-back{z-index:20!important}
