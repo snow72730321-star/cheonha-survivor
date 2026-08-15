@@ -901,3 +901,11 @@
 - Restored visible mileage-shop text in the right circular Cheongonggak button, retained odds at the left edge, centered draw labels.
 - Centered smith action and rebound enhancement data to distinct painted frames.
 - Forge UI PNGs are network-first in the service worker to prevent stale-art/new-code mismatches.
+
+
+## v14.12.7 — Forge actual-device alignment
+- Weapon filter rows now use flex-centered text inside the painted 5+4 frames.
+- Enhancement popup DOM rebuilt into explicit level/success/down/destroy/breath/guarantee/cost slots.
+- Reroll popup runtime rebound to the existing asset's exact 3 potential rows, odds strip, two reroll buttons and two cost areas.
+- Removed cost text from reroll buttons to avoid overlap; costs now have dedicated fields.
+- Service-worker build/cache key updated for immediate deployment.

@@ -4,8 +4,8 @@ const html=fs.readFileSync('index.html','utf8');
 const ui=fs.readFileSync('js/ui/forge-mobile-final-v14-11-1.js','utf8');
 const sw=fs.readFileSync('service-worker.js','utf8');
 function ok(c,m){if(!c)throw new Error(m)}
-ok((html.includes('v14.12.2-forge-hitbox-scroll-polish')||html.includes('v14.12.6-forge-layout-clean')),'build meta missing');
-ok(sw.includes('cheonha-v14-12-2-forge-hitbox-scroll-polish')||sw.includes('cheonha-v14-12-6-forge-layout-clean'),'cache key missing');
+ok((html.includes('v14.12.2-forge-hitbox-scroll-polish')||(html.includes('v14.12.6-forge-layout-clean')||html.includes('v14.12.7-forge-device-alignment'))||html.includes('v14.12.7-forge-device-alignment')),'build meta missing');
+ok(sw.includes('cheonha-v14-12-2-forge-hitbox-scroll-polish')||(sw.includes('cheonha-v14-12-6-forge-layout-clean')||sw.includes('cheonha-v14-12-7-forge-device-alignment'))||sw.includes('cheonha-v14-12-7-forge-device-alignment'),'cache key missing');
 ok(html.includes('id="oreMileageShopOpen"')&&html.includes('<span>상점</span>'),'mileage shop control missing');
 ok(css.includes('#oreGacha .ore-gacha-shop-open')&&css.includes('right:4.7%!important')&&css.includes('border-radius:50%!important'),'mileage shop not mapped to right circle');
 ok(css.includes('#oreGacha .ore-gacha-odds-toggle')&&css.includes('left:4.5%!important'),'odds control not moved to left edge');
@@ -15,5 +15,5 @@ ok(ui.includes('const previousScroll=host.scrollTop||0')&&ui.includes('host.scro
 ok(ui.includes('summaryHost=$("forgeOreSelectedSummary")'),'ore center frame was not repurposed');
 ok(css.includes('.forge-ore-selected-summary')&&html.includes('id="forgeOreSelectedSummary"'),'ore center frame was not activated');
 ok(html.includes('id="forgeOreActions"')&&css.includes('.forge-ore-actions button:nth-child(1)')&&css.includes('.forge-ore-actions button:nth-child(5)'),'ore action slots not aligned');
-ok(css.includes('.forge-rate-card>div:nth-child(2){top:43.3%!important')&&css.includes('.forge-risk-note{position:absolute!important;left:15%!important'),'enhancement outcomes not remapped');
+ok(css.includes('.forge-enhance-outcomes')&&css.includes('.forge-enhance-outcomes .destroy b'),'enhancement outcomes not remapped');
 console.log('v14.12.2 forge UI scroll/alignment audit: OK');

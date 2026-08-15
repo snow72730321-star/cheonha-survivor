@@ -1,0 +1,13 @@
+import fs from "node:fs";
+const html=fs.readFileSync("index.html","utf8"),css=fs.readFileSync("css/forge-mobile-final-v14-11-1.css","utf8"),forge=fs.readFileSync("js/systems/forge-v13.js","utf8"),sw=fs.readFileSync("service-worker.js","utf8");
+const ok=(c,m)=>{if(!c)throw new Error(m)};
+ok(html.includes('v14.12.7-forge-device-alignment'),"build meta missing");
+ok(sw.includes('cheonha-v14-12-7-forge-device-alignment'),"cache key missing");
+ok(css.includes('v14.12.7 — single iPhone-calibrated forge layout'),"single calibration block missing");
+ok(css.includes('display:flex!important;align-items:center!important;justify-content:center!important')&&css.includes('row-gap:4.0%!important'),"weapon filter centering missing");
+ok(forge.includes('id="enhanceDownRate"')&&forge.includes('id="enhanceDestroyRate"')&&forge.includes('id="enhanceGuarantee"'),"semantic enhancement rows missing");
+ok(forge.includes('id="normalRefineCost"')&&forge.includes('id="blackRefineCost"')&&forge.includes('potential-odds-button'),"reroll dedicated fields missing");
+ok(css.includes('.forge-enhance-outcomes')&&css.includes('.forge-enhance-costs'),"enhance frame mapping missing");
+ok(css.includes('.potential-odds-button')&&css.includes('.refine-costs'),"reroll frame mapping missing");
+ok(!css.includes('v14.12.6 — single calibrated forge layout'),"old calibration block still active");
+console.log("v14.12.7 forge actual-device alignment audit: OK");

@@ -7,13 +7,13 @@ for(const name of ["연무장","청죽림","폐관문","월영지","단애로"])
 ok(map.includes("const ROADS=[")&&map.includes("drawNorth()")&&map.includes("drawEast()")&&map.includes("drawSouth()")&&map.includes("drawWest()")&&map.includes("drawArena()")&&map.includes("drawAuthoredMinimap"),"authored world/minimap implementation missing");
 const oldIdx=html.indexOf('js/systems/system-overhaul-v14-10.js'),newIdx=html.indexOf('js/systems/world-map-v14-12.js');
 ok(oldIdx>=0&&newIdx>oldIdx,"world map script must load after system overhaul");
-ok(html.includes('v14.12.0-codex-map-forge-align')||html.includes('v14.12.1-artisan-breath-nerf')||(html.includes('v14.12.2-forge-hitbox-scroll-polish')||html.includes('v14.12.6-forge-layout-clean')),"v14.12 build metadata missing");
+ok(html.includes('v14.12.0-codex-map-forge-align')||html.includes('v14.12.1-artisan-breath-nerf')||(html.includes('v14.12.2-forge-hitbox-scroll-polish')||(html.includes('v14.12.6-forge-layout-clean')||html.includes('v14.12.7-forge-device-alignment'))),"v14.12 build metadata missing");
 ok(css.includes('grid-template-columns:repeat(5,minmax(0,1fr))')&&css.includes('grid-template-rows:repeat(2,1fr)')&&css.includes('grid-template-columns:repeat(7,1fr)')&&css.includes('grid-template-columns:repeat(5,1fr)'),"weapon/ore slot count alignment missing");
 ok(css.includes('.forge-inspect-potentials')&&css.includes('grid-template-rows:repeat(3,1fr)!important')&&html.includes('id="forgeWeaponActions"'),"weapon detail/action structure missing");
 ok(html.includes('id="forgeOreActions"')&&css.includes('.forge-ore-actions button:nth-child(1)')&&css.includes('.forge-ore-actions button:nth-child(5)'),"ore 3-way selling/alignment missing");
 ok(css.includes('.forge-smith-weapon-types')&&css.includes('grid-template-columns:repeat(4,1fr)!important')&&css.includes('.forge-smith-materials'),"smith 8-family/3-material layout missing");
 ok(storage.includes('smith-preview-rows')&&storage.includes('smith-preview-ability')&&storage.includes('smith-preview-cost'),"smith preview not mapped into art detail panel");
-ok(forge.includes('riskBox.innerHTML')&&forge.includes('단계 하락')&&forge.includes('파괴'),"enhancement 3-row rate mapping source missing");
-ok(css.includes('.combat-power-breakdown{display:none!important}')&&css.includes('#forgeDetail[data-forge-mode="enhance"] .forge-risk-note'),"enhance popup frame alignment missing");
-ok((sw.includes('cheonha-v14-12-0-codex-map-forge-align')||sw.includes('cheonha-v14-12-1-artisan-breath-nerf')||(sw.includes('cheonha-v14-12-2-forge-hitbox-scroll-polish')||sw.includes('cheonha-v14-12-6-forge-layout-clean')))&&sw.includes('js/systems/world-map-v14-12.js'),"v14.12 PWA world map cache missing");
+ok(forge.includes('id="enhanceDownRate"')&&forge.includes('id="enhanceDestroyRate"')&&forge.includes('단계 하락')&&forge.includes('파괴 확률'),"enhancement 3-row rate mapping source missing");
+ok(css.includes('.combat-power-breakdown{display:none!important}')&&css.includes('.forge-enhance-outcomes')&&css.includes('.forge-enhance-costs'),"enhance popup frame alignment missing");
+ok((sw.includes('cheonha-v14-12-0-codex-map-forge-align')||sw.includes('cheonha-v14-12-1-artisan-breath-nerf')||(sw.includes('cheonha-v14-12-2-forge-hitbox-scroll-polish')||(sw.includes('cheonha-v14-12-6-forge-layout-clean')||sw.includes('cheonha-v14-12-7-forge-device-alignment'))))&&sw.includes('js/systems/world-map-v14-12.js'),"v14.12 PWA world map cache missing");
 console.log("v14.12 codex passive + authored map + forge alignment audit: OK");

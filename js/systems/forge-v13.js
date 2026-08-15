@@ -164,6 +164,8 @@
   function refineCost(item,black){return Math.floor((black?360:150) + item.rerolls*(black?35:22) + gradeIndex(item.grade)*28)}
   function baseEnhanceChance(item){const lv=Math.max(0,Number(item?.level)||0);return ENHANCE_CHANCE[lv]||0}
   // 장인의 숨결(장기백): 해당 단계의 평균 성공 기대 시도 횟수(1/p)보다 1.4배 더 실패해야 100에 도달한다.
+  // 기준 요약: 평균 성공 기대 투자 ×1.4 에 해당하는 실패 누적에서 장기백 100.
+  // 장인의 숨결은 단계 하락/복구 시 유지, 실제 강화 성공 시에만 초기화된다.
   // 예) 10%=14회, 5%=28회, 3%=47회, 1%=140회 실패 후 다음 강화 확정.
   function artisanBreathFailureTarget(item){
     const chance=baseEnhanceChance(item);
@@ -223,17 +225,28 @@
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
         <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="forge-fire"></div><div class="anvil-weapon" id="anvilWeapon"><img class="anvil-weapon-img" alt="무기"></div><div class="anvil-hammer asset-hammer"></div><div class="forge-sparks"></div><div class="forge-impact-flash"></div></div>
-        <div class="forge-rate-card"><div><b id="enhanceLevel">+0 → +1</b><small>강화 단계</small></div><div><b id="enhanceRate">100%</b><small>최종 성공률</small></div><div><b id="enhanceCost">80</b><small>필요 금자</small></div><div><b id="forgeGoldLive">0</b><small>보유 금자</small></div></div><div class="forge-risk-note" id="enhanceRisk"></div><div class="artisan-breath" id="artisanBreath"></div><div class="combat-power-breakdown" id="forgeCombatPowerBreakdown"></div>
+        <div class="forge-enhance-level"><span>강화 단계</span><b id="enhanceLevel">+0 → +1</b></div>
+        <div class="forge-enhance-outcomes">
+          <div class="success"><span>성공 확률</span><b id="enhanceRate">100%</b></div>
+          <div class="down"><span>단계 하락</span><b id="enhanceDownRate">0%</b></div>
+          <div class="destroy"><span>파괴 확률</span><b id="enhanceDestroyRate">0%</b></div>
+        </div>
+        <div class="artisan-breath" id="artisanBreath"></div>
+        <div class="forge-enhance-guarantee" id="enhanceGuarantee">장기백까지 예상 -</div>
+        <div class="forge-enhance-costs"><div><span>필요 금자</span><b id="enhanceCost">80</b></div><div><span>보유 금자</span><b id="forgeGoldLive">0</b></div></div>
+        <div class="combat-power-breakdown" id="forgeCombatPowerBreakdown"></div>
         <div class="forge-result-message" id="enhanceMessage">무기를 모루 위에 올렸다.</div>
-        <button class="primary" id="enhanceExecute" type="button">망치를 내리친다</button>
+        <button class="primary" id="enhanceExecute" type="button">강화하기</button>
         <button class="secondary forge-detail-equip" id="forgeDetailEquip" type="button">이 무기 장착</button>
       </div>
       <div class="forge-pane" data-forge-pane="potential">
         <div class="forge-potential-weapon" id="forgePotentialWeapon"></div>
         <div class="potential-grade" id="potentialGrade">희귀 잠재</div>
         <div class="potential-lines" id="potentialLines"></div>
-        <div class="refine-actions"><button class="secondary" id="normalRefine" type="button">일반 정련</button><button class="primary" id="blackRefine" type="button">흑옥 정련</button><button class="secondary" id="potentialOddsBtn" type="button">잠재 확률 보기</button></div>
-        <p class="desc" id="refineHelp">일반 정련은 즉시 적용된다. 흑옥 정련은 기존·신규 옵션을 비교한다.</p><p class="desc forge-live-gold">보유 금자 <b id="forgePotentialGold">0</b></p>
+        <button class="secondary potential-odds-button" id="potentialOddsBtn" type="button">잠재 확률 보기</button>
+        <div class="refine-actions"><button class="secondary" id="normalRefine" type="button">일반 재련</button><button class="primary" id="blackRefine" type="button">흑옥 재련</button></div>
+        <div class="refine-costs"><div><span>일반 비용</span><b id="normalRefineCost">0 금자</b></div><div><span>흑옥 비용</span><b id="blackRefineCost">0 금자</b></div></div>
+        <p class="desc" id="refineHelp">일반 재련은 즉시 적용된다. 흑옥 재련은 기존·신규 옵션을 비교한다.</p><p class="desc forge-live-gold">보유 금자 <b id="forgePotentialGold">0</b></p>
         <div id="potentialCompare"></div>
       </div>
       <div class="forge-pane" data-forge-pane="codex"><div class="recipe-list" id="forgeCodexList"></div></div>
@@ -295,19 +308,27 @@
     }
     if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
     else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
-    root.querySelector("#enhanceLevel").textContent=item.level>=MAX_ENHANCE?"최대 강화":`+${item.level} → +${item.level+1}`;
-    root.querySelector("#enhanceRate").textContent=item.level>=MAX_ENHANCE?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
-    root.querySelector("#enhanceCost").textContent=item.level>=MAX_ENHANCE?"-":enhanceCost(item);
-    const rates=enhancementOutcomeRates(item),riskBox=root.querySelector("#enhanceRisk");if(riskBox)riskBox.innerHTML=item.level>=MAX_ENHANCE?`<div><span>단계 하락</span><b>-</b></div><div><span>파괴</span><b>-</b></div>`:rates.guaranteed?`<div><span>단계 하락</span><b>0%</b></div><div><span>파괴</span><b>0%</b></div>`:`<div><span>단계 하락</span><b>${(rates.down*100).toFixed(rates.down>0&&rates.down<.01?1:0)}%</b></div><div><span>파괴</span><b>${(rates.destroy*100).toFixed(rates.destroy>0&&rates.destroy<.01?1:0)}%</b></div>`;
-    const breath=root.querySelector("#artisanBreath"),breathValue=Math.max(0,Math.min(100,Number(item.artisanBreath)||0));if(breath){const target=artisanBreathFailureTarget(item),gain=artisanBreathGain(item),baseChance=baseEnhanceChance(item);breath.innerHTML=`<div><span>장인의 숨결</span><b>${artisanBreathDisplay(breathValue)} / 100</b></div><div class="artisan-breath-track"><i style="width:${breathValue}%"></i></div><small>${baseChance>=1?"현재 단계 기본 성공률 100%":`현재 단계 실패 1회 +${artisanBreathDisplay(gain)} · 약 ${target}회 실패 시 100 (평균 성공 기대 투자 ×1.4)`} · 단계 하락/복구 시 유지 · 성공 시 초기화</small>`;}
+    root.querySelector("#enhanceLevel").textContent=item.level>=MAX_ENHANCE?"MAX":`+${item.level} → +${item.level+1}`;
+    root.querySelector("#enhanceRate").textContent=item.level>=MAX_ENHANCE?"-":`${Math.round(finalEnhanceChance(item)*100)}%`;
+    root.querySelector("#enhanceCost").textContent=item.level>=MAX_ENHANCE?"-":Math.floor(enhanceCost(item)).toLocaleString();
+    const rates=enhancementOutcomeRates(item),downEl=root.querySelector("#enhanceDownRate"),destroyEl=root.querySelector("#enhanceDestroyRate");
+    if(downEl)downEl.textContent=item.level>=MAX_ENHANCE?"-":rates.guaranteed?"0%":`${(rates.down*100).toFixed(rates.down>0&&rates.down<.01?1:0)}%`;
+    if(destroyEl)destroyEl.textContent=item.level>=MAX_ENHANCE?"-":rates.guaranteed?"0%":`${(rates.destroy*100).toFixed(rates.destroy>0&&rates.destroy<.01?1:0)}%`;
+    const breath=root.querySelector("#artisanBreath"),breathValue=Math.max(0,Math.min(100,Number(item.artisanBreath)||0));
+    const target=artisanBreathFailureTarget(item),gain=artisanBreathGain(item),baseChance=baseEnhanceChance(item),remaining=gain>0?Math.max(0,Math.ceil((100-breathValue)/gain)):0;
+    if(breath)breath.innerHTML=`<div><span>장인의 숨결</span><b>${artisanBreathDisplay(breathValue)} / 100</b></div><div class="artisan-breath-track"><i style="width:${breathValue}%"></i></div>`;
+    const guarantee=root.querySelector("#enhanceGuarantee");if(guarantee)guarantee.textContent=item.level>=MAX_ENHANCE?"최대 강화 완료":baseChance>=1?"현재 단계 기본 성공률 100%":breathValue>=100?"다음 강화 확정 성공":`장기백까지 예상 ${remaining}회 실패`;
     root.querySelector("#enhanceExecute").disabled=item.level>=MAX_ENHANCE;
     const equipBtn=root.querySelector("#forgeDetailEquip"),isEq=account.equipped[item.weapon]===item.id;equipBtn.textContent=isEq?"장착 해제":"이 무기 장착";equipBtn.classList.toggle("is-equipped",isEq);
     const pWeapon=root.querySelector("#forgePotentialWeapon");if(pWeapon){const src=window.WeaponVisuals?WeaponVisuals.asset(item):`assets/weapons/hud/${item.weapon}.png`;pWeapon.innerHTML=`<img src="${src}" alt="${item.name}">`;if(window.WeaponVisuals)WeaponVisuals.decorate(pWeapon,item,item.weapon)}
     root.querySelector("#potentialGrade").textContent=`${POTENTIAL_NAMES[item.potentialGrade]} 잠재 · 최대 ${POTENTIAL_NAMES[maxPotentialGrade(item)]}`;
     root.querySelector("#potentialGrade").style.color=POTENTIAL_COLORS[item.potentialGrade];
     root.querySelector("#potentialLines").innerHTML=item.potentials.map(line=>`<div class="potential-line"><b>${line.name}</b><span>${line.format==="pct"?Math.round(line.value*100)+"%":"+"+line.value}</span></div>`).join("")+`<p class="desc">강화 보너스: +5 / +10 / +15 / +20 / +25에서 추가 전투 효과 해금 · 잠재 3줄 조합에 따라 공명 능력치 보너스 발동</p>`;
-    root.querySelector("#normalRefine").textContent=`일반 정련 · ${refineCost(item,false)}금자`;
-    root.querySelector("#blackRefine").textContent=`흑옥 정련 · ${refineCost(item,true)}금자`;
+    root.querySelector("#normalRefine").textContent="일반 재련";
+    root.querySelector("#blackRefine").textContent="흑옥 재련";
+    const normalCost=root.querySelector("#normalRefineCost"),blackCost=root.querySelector("#blackRefineCost");
+    if(normalCost)normalCost.textContent=`${refineCost(item,false).toLocaleString()} 금자`;
+    if(blackCost)blackCost.textContent=`${refineCost(item,true).toLocaleString()} 금자`;
     root.querySelector("#potentialCompare").innerHTML="";
     updateForgeLiveGold();
   }

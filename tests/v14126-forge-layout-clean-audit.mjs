@@ -6,6 +6,6 @@ must(html.includes('id="forgeOreActions"')&&html.includes('id="forgeOreSelectedS
 must(js.includes('actions=$("forgeWeaponActions")'),"weapon actions not rebound");
 must(js.includes('actionsHost=$("forgeOreActions")'),"ore actions not rebound");
 must(!css.includes('v14.12 forge interaction realignment')&&!css.includes('v14.12.3 — asset realignment'),"legacy coordinate overrides remain");
-must(css.includes('v14.12.6 — single calibrated forge layout'),"final calibrated layout missing");
-must(sw.includes('cheonha-v14-12-6-forge-layout-clean')&&sw.includes('isForgeUiArt'),"forge SW refresh policy missing");
+must(css.includes('v14.12.7 — single iPhone-calibrated forge layout'),"final calibrated layout missing");
+must(sw.includes('cheonha-v14-12-7-forge-device-alignment')&&sw.includes('isForgeUiArt'),"forge SW refresh policy missing");
 console.log("v14.12.6 forge layout clean audit: OK");
