@@ -227,3 +227,18 @@
 #forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions{position:absolute!important;left:10.0%!important;right:10.0%!important;bottom:8.1%!important;height:7.7%!important;display:grid!important;grid-template-columns:1fr 1fr!important;gap:6.6%!important;margin:0!important}
 #forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions button{width:100%!important;height:100%!important;padding:0!important;margin:0!important;border:0!important;background:transparent!important;color:#f2e7d7!important;font-weight:900!important;font-size:clamp(10px,2.7vw,13px)!important;text-shadow:0 1px 3px #000!important;box-shadow:none!important}
 #forgeDetail[data-forge-mode="compare"] #acceptPotential{color:#e8f4ff!important}
+
+
+/* v14.12.9 — artisan breath gauge polish and minor forge popup cleanup */
+#forgeDetail[data-forge-mode="enhance"] .anvil-weapon-meta{display:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath{left:14.6%!important;right:14.6%!important;top:61.95%!important;height:5.15%!important;overflow:visible!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath>div:first-child{left:1.2%!important;right:1.2%!important;top:-28%!important;font-size:clamp(7px,1.8vw,9px)!important;color:#c9bba5!important;z-index:3!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{left:6.9%!important;right:6.7%!important;bottom:10.8%!important;height:28.5%!important;min-height:10px!important;max-height:14px!important;padding:1px!important;border-radius:999px!important;background:rgba(8,18,33,.64)!important;box-shadow:inset 0 0 0 1px rgba(113,166,216,.16),inset 0 1px 4px rgba(0,0,0,.65),0 0 10px rgba(40,93,151,.12)!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{content:"";position:absolute;inset:1px;border-radius:inherit;background:linear-gradient(180deg,rgba(18,32,54,.92),rgba(10,17,31,.78));pointer-events:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{position:relative!important;display:block!important;height:100%!important;border-radius:999px!important;background:linear-gradient(90deg,#1e5ca9 0%,#3c8be4 42%,#61c9ff 78%,#c8f2ff 100%)!important;box-shadow:0 0 10px rgba(74,169,255,.45),0 0 18px rgba(87,195,255,.28),inset 0 0 4px rgba(255,255,255,.38)!important}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-guarantee{top:68.35%!important;color:#cdbca7!important}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-costs{top:72.55%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-weapon-art{top:8.0%!important;width:19.0%!important;height:12.6%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-weapon-title{top:20.0%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line{left:6.0%!important;right:6.0%!important;padding:0 7.2%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-balance{left:15.8%!important;right:15.8%!important;top:73.35%!important;padding:0 7.5%!important}
