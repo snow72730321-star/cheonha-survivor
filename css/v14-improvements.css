@@ -186,3 +186,10 @@ body.left-handed.large-ui #ultimateBtn{transform-origin:bottom left}
 .codex-progress{display:grid;gap:5px;margin-top:9px}.codex-progress>div:first-child{display:flex;justify-content:space-between;color:#a9cfd8;font-size:9px}.codex-progress-bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.codex-progress-bar span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#76b6c6,#e2c665)}.codex-progress small{color:#8f948b;font-size:9px;line-height:1.35}
 .codex-section-head{display:flex;align-items:end;justify-content:space-between;gap:10px}.codex-section-head span{font-size:8px;letter-spacing:.13em;color:#9d8a54}.codex-section-head h3{margin:1px 0 0}.codex-section-head>b{font-size:10px;color:#d7bf79}
 @media(max-width:620px){#codex .codex-panel{width:96vw;padding:13px 10px 16px}.codex-summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.codex-summary>div{min-height:48px}.codex-summary b{font-size:15px}.codex-summary span{font-size:8px}.codex-path-btn{padding:6px 8px}.codex-path-btn b{font-size:10px}.codex-path-hero{grid-template-columns:68px 1fr;min-height:88px;padding:9px}.codex-path-hero img{width:68px;height:68px}.codex-path-copy h3{font-size:17px}.codex-highlight-grid,.codex-skill-grid,.codex-common-grid{grid-template-columns:1fr}.codex-toolbar{align-items:flex-start;flex-direction:column}.codex-filter{width:100%}.codex-filter button{flex:1}.codex-skill-card{padding:10px}}
+
+/* v14.12 codex — every character owns a passive slot; undefined passives stay visually blank. */
+.codex-highlight-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.codex-feature.passive{border-color:rgba(119,180,205,.25);background:rgba(85,137,163,.045)}
+.codex-feature.passive>span{color:#8ec5db}.codex-feature.passive>strong{color:#dff4ff}
+.codex-feature.passive.empty>strong,.codex-feature.passive.empty>p{visibility:hidden;min-height:1.2em}
+@media(max-width:620px){.codex-highlight-grid{grid-template-columns:1fr}.codex-feature.passive.empty{min-height:68px}}

@@ -7,7 +7,7 @@ const characterDefs={
  poison:{name:"당유화",title:"당문독희",ultimate:"추혼비접",quote:"보이지 않는 독이 가장 깊다.",hair:"#32243e",robe:"#5c3c68",accent:"#9fc76b"},
  tao:{name:"제갈청",title:"천문도사",ultimate:"구천뇌겁",quote:"하늘의 뜻을 부적으로 명한다.",hair:"#283b49",robe:"#d9ddd6",accent:"#65b6d4"},
  saber:{name:"마련화",title:"소천마도",ultimate:"천마합일",quote:"한 번 휘두르면 산도 갈라진다.",hair:"#3c211e",robe:"#6f302b",accent:"#d77b52"},
- katana:{name:"카구라 린",title:"월영낭인",ultimate:"극·시공절",quote:"검이 보였다면 이미 늦었다.",hair:"#171a22",robe:"#2f3043",accent:"#c8c9e8"},
+ katana:{name:"카구라 린",title:"월영낭인",ultimate:"극·시공절",quote:"검이 보였다면 이미 늦었다.",passive:{name:"월은신도",desc:"왜도 무공이 은월을 일으킬 수 있다. 은월은 추가 피해를 주고 월흔을 남기며, 월흔은 중첩에 따라 처형과 폭발로 이어진다."},hair:"#171a22",robe:"#2f3043",accent:"#c8c9e8"},
  fist:{name:"소명진",title:"금강권희",ultimate:"항룡진천",quote:"한 걸음, 한 장으로 천하를 울린다.",hair:"#543a2c",robe:"#c59b6b",accent:"#e2c56c"}
 };
 const skinDefs={

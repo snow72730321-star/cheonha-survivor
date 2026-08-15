@@ -7,5 +7,5 @@ for(const n of [1,10,100])assert.ok(html.includes(`data-ore-gacha="${n}"`),`${n}
 assert.ok(html.includes('id="oreGacha"')&&html.includes('id="oreGachaGold"'),"별도 고급 광물 뽑기 페이지 누락");assert.match(css,/\.ore-gacha-panel/);
 assert.ok(!storage.includes("legendaryOreEntries")&&!storage.includes("drawHighOreLottery"),"전설 광석 소모형 구형 뽑기 잔존");
 assert.match(katana,/fi<=35/);assert.match(katana,/Math\.min\(meta\.fw,W\*\.96\)/);assert.match(katana,/const cover=Math\.max\(W\/meta\.fw,H\/meta\.fh\)/,"절월 36프레임 이후 cover 처리 누락");
-assert.match(sw,/cheonha-v14-(?:10-(?:1-ore-gacha-jeolwol|2-ore-gacha-cinematic)|11-(?:1-forge-mobile-final|2-forge-economy-katana))/);
+assert.match(sw,/cheonha-v14-(?:10-(?:1-ore-gacha-jeolwol|2-ore-gacha-cinematic)|11-(?:1-forge-mobile-final|2-forge-economy-katana)|12-0-codex-map-forge-align)/);
 console.log("v14.10.1 ore gacha / jeolwol frame audit: OK");
