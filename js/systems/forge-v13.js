@@ -19,7 +19,8 @@
   const MAX_ENHANCE = 25;
   // 현재 단계에서 다음 단계로 올라갈 기본 성공률(+0→+1 ... +24→+25).
   const ENHANCE_CHANCE = [1,.95,.90,.85,.80,.70,.60,.50,.40,.30,.10,.10,.10,.10,.10,.05,.05,.05,.05,.05,.03,.03,.03,.03,.01];
-  const ARTISAN_BREATH_PER_FAILURE = 10;
+  const ARTISAN_EXPECTED_INVESTMENT_MULTIPLIER = 1.4;
+  const LEGACY_ARTISAN_BREATH_PER_FAILURE = 10;
   // 높은 등급일수록 같은 강화 단계에서 얻는 상대 피해 증가량이 더 크다.
   const GRADE_ENHANCE_SCALE = {common:.82,rare:.90,epic:.98,unique:1.07,legendary:1.17,mythic:1.30,eternal:1.46};
   const POTENTIAL_ORDER = ["rare", "epic", "unique", "legendary"];
@@ -54,7 +55,7 @@
   function normalizeWeapon(item){
     item.level = Math.max(0, Math.min(MAX_ENHANCE, Number(item.level)||0));
     const legacyFailStack=Math.max(0,Math.min(5,Number(item.failStack)||0));
-    item.artisanBreath=Math.max(0,Math.min(100,Number.isFinite(Number(item.artisanBreath))?Number(item.artisanBreath):legacyFailStack*ARTISAN_BREATH_PER_FAILURE));
+    item.artisanBreath=Math.max(0,Math.min(100,Number.isFinite(Number(item.artisanBreath))?Number(item.artisanBreath):legacyFailStack*LEGACY_ARTISAN_BREATH_PER_FAILURE));
     item.failStack=0;
     item.rerolls = Number(item.rerolls)||0;
     item.potentialPity = Math.max(0, Math.min(.05, Number(item.potentialPity)||0));
@@ -162,6 +163,21 @@
   }
   function refineCost(item,black){return Math.floor((black?360:150) + item.rerolls*(black?35:22) + gradeIndex(item.grade)*28)}
   function baseEnhanceChance(item){const lv=Math.max(0,Number(item?.level)||0);return ENHANCE_CHANCE[lv]||0}
+  // 장인의 숨결(장기백): 해당 단계의 평균 성공 기대 시도 횟수(1/p)보다 1.4배 더 실패해야 100에 도달한다.
+  // 예) 10%=14회, 5%=28회, 3%=47회, 1%=140회 실패 후 다음 강화 확정.
+  function artisanBreathFailureTarget(item){
+    const chance=baseEnhanceChance(item);
+    if(chance<=0)return Infinity;
+    return Math.max(1,Math.ceil(ARTISAN_EXPECTED_INVESTMENT_MULTIPLIER/chance));
+  }
+  function artisanBreathGain(item){
+    const failures=artisanBreathFailureTarget(item);
+    return Number.isFinite(failures)?100/failures:0;
+  }
+  function artisanBreathDisplay(value){
+    const rounded=Math.round(Math.max(0,Math.min(100,Number(value)||0))*100)/100;
+    return Number.isInteger(rounded)?String(rounded):rounded.toFixed(2).replace(/0+$/,"" ).replace(/\.$/,"");
+  }
   function finalEnhanceChance(item){return (Number(item?.artisanBreath)||0)>=100?1:baseEnhanceChance(item)}
   // 아래 값은 모두 "전체 강화 시도" 기준 확률이다. 장인의 숨결 100은 이 표보다 우선해 확정 성공한다.
   function failureRisk(item){
@@ -283,7 +299,7 @@
     root.querySelector("#enhanceRate").textContent=item.level>=MAX_ENHANCE?"MAX":`${Math.round(finalEnhanceChance(item)*100)}%`;
     root.querySelector("#enhanceCost").textContent=item.level>=MAX_ENHANCE?"-":enhanceCost(item);
     const rates=enhancementOutcomeRates(item),riskBox=root.querySelector("#enhanceRisk");if(riskBox)riskBox.innerHTML=item.level>=MAX_ENHANCE?`<div><span>단계 하락</span><b>-</b></div><div><span>파괴</span><b>-</b></div>`:rates.guaranteed?`<div><span>단계 하락</span><b>0%</b></div><div><span>파괴</span><b>0%</b></div>`:`<div><span>단계 하락</span><b>${(rates.down*100).toFixed(rates.down>0&&rates.down<.01?1:0)}%</b></div><div><span>파괴</span><b>${(rates.destroy*100).toFixed(rates.destroy>0&&rates.destroy<.01?1:0)}%</b></div>`;
-    const breath=root.querySelector("#artisanBreath"),breathValue=Math.max(0,Math.min(100,Number(item.artisanBreath)||0));if(breath)breath.innerHTML=`<div><span>장인의 숨결</span><b>${breathValue.toFixed(0)} / 100</b></div><div class="artisan-breath-track"><i style="width:${breathValue}%"></i></div><small>강화 실패마다 +${ARTISAN_BREATH_PER_FAILURE} · 100 도달 시 다음 강화 확정 · 단계 하락/복구 시 유지 · 성공 시 초기화</small>`;
+    const breath=root.querySelector("#artisanBreath"),breathValue=Math.max(0,Math.min(100,Number(item.artisanBreath)||0));if(breath){const target=artisanBreathFailureTarget(item),gain=artisanBreathGain(item),baseChance=baseEnhanceChance(item);breath.innerHTML=`<div><span>장인의 숨결</span><b>${artisanBreathDisplay(breathValue)} / 100</b></div><div class="artisan-breath-track"><i style="width:${breathValue}%"></i></div><small>${baseChance>=1?"현재 단계 기본 성공률 100%":`현재 단계 실패 1회 +${artisanBreathDisplay(gain)} · 약 ${target}회 실패 시 100 (평균 성공 기대 투자 ×1.4)`} · 단계 하락/복구 시 유지 · 성공 시 초기화</small>`;}
     root.querySelector("#enhanceExecute").disabled=item.level>=MAX_ENHANCE;
     const equipBtn=root.querySelector("#forgeDetailEquip"),isEq=account.equipped[item.weapon]===item.id;equipBtn.textContent=isEq?"장착 해제":"이 무기 장착";equipBtn.classList.toggle("is-equipped",isEq);
     const pWeapon=root.querySelector("#forgePotentialWeapon");if(pWeapon){const src=window.WeaponVisuals?WeaponVisuals.asset(item):`assets/weapons/hud/${item.weapon}.png`;pWeapon.innerHTML=`<img src="${src}" alt="${item.name}">`;if(window.WeaponVisuals)WeaponVisuals.decorate(pWeapon,item,item.weapon)}
@@ -308,14 +324,14 @@
         scene.className="anvil-scene success";message.className="forge-result-message good";message.textContent=`강화 성공! ${item.name}이 +${item.level}에 도달했다. 장인의 숨결이 초기화됐다.`;
         GameAudio.playUI("forge-success");setTimeout(()=>GameAudio.playUI("forge-success-tail"),75);
       }else{
-        item.artisanBreath=Math.min(100,(Number(item.artisanBreath)||0)+ARTISAN_BREATH_PER_FAILURE);item.failStack=0;
+        item.artisanBreath=Math.min(100,(Number(item.artisanBreath)||0)+artisanBreathGain(item));item.failStack=0;
         scene.className="anvil-scene failure";message.className="forge-result-message bad";
         if(r<rates.success+rates.destroy){
           const name=item.name,lv=item.level;archiveBrokenWeapon(item);selectedItemId=null;
-          message.textContent=`강화 실패 · ${name} +${lv} 파괴. 무혼석으로 복구할 수 있다. 장인의 숨결 ${item.artisanBreath}/100 유지.`;GameAudio.playUI("forge-failure");saveAccountData();renderWeaponInventory();setTimeout(()=>{detailOverlay().classList.remove("show");refreshForge()},850);return;
+          message.textContent=`강화 실패 · ${name} +${lv} 파괴. 무혼석으로 복구할 수 있다. 장인의 숨결 ${artisanBreathDisplay(item.artisanBreath)}/100 유지.`;GameAudio.playUI("forge-failure");saveAccountData();renderWeaponInventory();setTimeout(()=>{detailOverlay().classList.remove("show");refreshForge()},850);return;
         }else if(r<rates.success+rates.destroy+rates.down&&item.level>0){
-          item.level--;item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level,item);message.textContent=`강화 실패 · 단계 하락. ${item.name} +${item.level} · 장인의 숨결 ${item.artisanBreath}/100.`;
-        }else message.textContent=`강화 실패 · 단계 유지. 장인의 숨결 ${item.artisanBreath}/100.`;
+          item.level--;item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level,item);message.textContent=`강화 실패 · 단계 하락. ${item.name} +${item.level} · 장인의 숨결 ${artisanBreathDisplay(item.artisanBreath)}/100.`;
+        }else message.textContent=`강화 실패 · 단계 유지. 장인의 숨결 ${artisanBreathDisplay(item.artisanBreath)}/100.`;
         GameAudio.playUI("forge-failure");
       }
       saveAccountData();renderDetail();setTimeout(()=>scene.className="anvil-scene",650);

@@ -7,5 +7,5 @@ ok(js.includes("ORE_GACHA_ANIM_MS=6100")&&js.includes("playOreGachaCinematic")&&
 ok(js.includes('oreGachaSkipButton')&&js.includes('e.code==="Space"')&&js.includes('desktopGachaSkipAllowed')&&!js.includes('layer.addEventListener("pointerdown"')&&!js.includes('layer.addEventListener("touchstart"'),"전용 스킵 버튼/PC Space 규칙 누락");
 ok(js.includes("lastOreGachaResult={summary,wins};saveAccountData();refreshForge();playOreGachaCinematic()"),"결과 선확정/저장 후 연출 순서 누락");
 ok(css.includes(".ore-gacha-cinematic")&&css.includes("z-index:320"),"뽑기 연출 전체화면 스타일 누락");
-ok(sw.includes('assets/ui/ore-gacha-draw.gif')&&(sw.includes('cheonha-v14-10-2-ore-gacha-cinematic')||sw.includes('cheonha-v14-11-1-forge-mobile-final')||sw.includes('cheonha-v14-11-2-forge-economy-katana')||sw.includes('cheonha-v14-12-0-codex-map-forge-align')),"뽑기 연출 PWA 캐시 누락");
+ok(sw.includes('assets/ui/ore-gacha-draw.gif')&&(sw.includes('cheonha-v14-10-2-ore-gacha-cinematic')||sw.includes('cheonha-v14-11-1-forge-mobile-final')||sw.includes('cheonha-v14-11-2-forge-economy-katana')||(sw.includes('cheonha-v14-12-0-codex-map-forge-align')||sw.includes('cheonha-v14-12-1-artisan-breath-nerf'))),"뽑기 연출 PWA 캐시 누락");
 console.log("v14.10.2 ore gacha cinematic audit: OK");
