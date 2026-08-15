@@ -866,3 +866,29 @@
 - 검/창/궁/독/도술/박도/카타나/권법 문장을 각각 독립적인 상징과 재질로 구성
 - 컷씬 표시용 256×256 투명 PNG로 분리 및 최적화
 - 서비스 워커 및 에셋 캐시 버전 갱신
+
+## v14.12.2 — 대장간 상호작용 UI 정렬/스크롤 보정
+- 천공각 마일리지 상점 버튼을 우측 원형 프레임에 배치하고 확률 버튼을 좌측 끝 탭으로 이동.
+- 무기 관리의 기존 6칸 배경 필터를 가리고 실제 `전체 + 8무기군` 9개 런타임 필터 프레임으로 재구축.
+- 무기 인벤토리 영역만 독립 세로 스크롤되도록 고정하고 렌더 갱신 시 스크롤 위치를 보존.
+- 무기 상세의 무기/이름/잠재 3줄/하단 4버튼 위치를 배경 프레임에 재정렬.
+- 광물 관리의 7종/5등급/신화·영원/판매3/합성2 프레임 좌표를 재측정해 맞춤.
+- 광물 관리의 사용하지 않던 중앙 프레임을 선택 광물·보유량 정보 영역으로 사용.
+- 강화창을 `강화단계 1행 + 성공/하락/파괴 3행 + 필요/보유 금자 2행 + 강화 버튼 1개`에 맞춰 재정렬.
+
+
+## v14.12.3 — Forge regenerated asset patch
+- Replaced weapons/enhance/gacha forge mobile UI art with regenerated mobile-first assets.
+- Realigned weapon filter rows, inventory scroll panel, inspect panel, broken-weapon bar, gacha odds/shop buttons, gacha action/result zones, and enhancement popup overlays to match new art.
+
+
+## v14.12.4 — Katana moonflower / Moon Form 1 direction
+- Prevent Moon Flower from refilling during an active Moon Form 1→2→3 cycle, preserving 3→2→1→0 consumption. Silver Moon and Moon Scar effects still resolve normally.
+- Horizontally flip Moon Form 1 VFX so its source is at the player and the sprite thrusts outward instead of visually entering the player.
+- Jeolwol timing inspected only: unchanged at 52 × 50 ms = 2.6 s, with hit at 2.0 s / frame 41 start.
+
+
+## v14.12.5 — Katana extreme moon star-ring HUD
+- Reworked 극월 HUD to use only star_ring.png.
+- Extreme Moon stacks now fill the star ring one slot at a time clockwise instead of rendering a separate star_sheet + ring overlay.
+- Added a short pulse highlight on the newly gained extreme moon stack.
