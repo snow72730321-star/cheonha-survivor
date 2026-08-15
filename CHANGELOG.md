@@ -909,3 +909,8 @@
 - Reroll popup runtime rebound to the existing asset's exact 3 potential rows, odds strip, two reroll buttons and two cost areas.
 - Removed cost text from reroll buttons to avoid overlap; costs now have dedicated fields.
 - Service-worker build/cache key updated for immediate deployment.
+
+
+## v14.12.8 — Black jade compare alignment
+- Rebuilt the black-jade comparison overlay to use the top weapon slot/name bar, exact 3+3 potential rows, remaining-gold bar, and two decision buttons in black-compare.png.
+- Removed the floating/duplicated grade labels seen on iPhone and aligned existing/new potential grade labels to each panel header.

@@ -378,13 +378,16 @@
   }
 
   function potentialBox(title,grade,lines,cls=""){
-    return `<div class="compare-box ${cls}"><h4 style="color:${POTENTIAL_COLORS[grade]}">${title} · ${POTENTIAL_NAMES[grade]}</h4>${lines.map(x=>`<div class="potential-line"><b>${x.name}</b><span>${x.format==="pct"?Math.round(x.value*100)+"%":"+"+x.value}</span></div>`).join("")}</div>`;
+    return `<div class="compare-box ${cls}"><h4><b>${title}</b><span style="color:${POTENTIAL_COLORS[grade]}">${POTENTIAL_NAMES[grade]}</span></h4>${lines.map(x=>`<div class="potential-line"><b>${x.name}</b><span>${x.format==="pct"?Math.round(x.value*100)+"%":"+"+x.value}</span></div>`).join("")}</div>`;
   }
 
   function renderPotentialCompare(){
     const item=selectedItem(),root=detailOverlay(),box=root.querySelector("#potentialCompare");if(!pendingPotential||!item)return;
     root.dataset.forgeMode="compare";
-    box.innerHTML=`<div class="compare-potentials">${potentialBox("기존",item.potentialGrade,item.potentials)}${potentialBox("신규",pendingPotential.grade,pendingPotential.lines,"new")}</div><div class="refine-actions"><button class="secondary" id="keepPotential">기존 유지</button><button class="primary" id="acceptPotential">신규 적용</button></div>`;
+    const gd=gradeDefs.find(g=>g.id===item.grade),cp=window.CombatPowerSystem?CombatPowerSystem.value(item):0;
+    const art=window.WeaponVisuals?WeaponVisuals.asset(item):`assets/weapons/hud/${item.weapon}.png`;
+    box.innerHTML=`<div class="compare-weapon-art"><img src="${art}" alt="${item.name}"></div><div class="compare-weapon-title"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><span>전투력 ${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</span></div><div class="compare-potentials">${potentialBox("기존",item.potentialGrade,item.potentials)}${potentialBox("신규",pendingPotential.grade,pendingPotential.lines,"new")}</div><div class="compare-balance"><span>보유 금자</span><b>${Math.floor(account.gold||0).toLocaleString()}</b></div><div class="refine-actions"><button class="secondary" id="keepPotential">기존 유지</button><button class="primary" id="acceptPotential">신규 적용</button></div>`;
+    const artBox=box.querySelector('.compare-weapon-art');if(artBox&&window.WeaponVisuals)WeaponVisuals.decorate(artBox,item,item.weapon);
     box.querySelector("#keepPotential").addEventListener("click",()=>{pendingPotential=null;root.dataset.forgeMode="potential";renderDetail();detailOverlay().querySelector("#refineHelp").textContent="기존 잠재옵션을 유지했다."});
     box.querySelector("#acceptPotential").addEventListener("click",()=>{item.potentialGrade=pendingPotential.grade;item.potentials=pendingPotential.lines;pendingPotential=null;root.dataset.forgeMode="potential";saveAccountData();renderDetail();detailOverlay().querySelector("#refineHelp").textContent="신규 잠재옵션을 적용했다.";GameAudio.playUI("potential-accept")});
   }
