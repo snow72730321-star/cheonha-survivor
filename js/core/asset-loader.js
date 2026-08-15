@@ -70,7 +70,6 @@ const GameAssets=(()=>{
     "assets/vfx/skills/katana/zanshin.png",
     "assets/ui/katana/full_moon_stack.png",
     "assets/ui/katana/moonflower.png",
-    "assets/ui/katana/star_sheet.png",
     "assets/ui/katana/star_ring.png",
     "assets/ui/katana/moon_scar_stack.png",
     "assets/vfx/skills/katana/full_moon.sheet.png",

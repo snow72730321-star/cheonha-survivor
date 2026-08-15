@@ -892,3 +892,12 @@
 - Reworked 극월 HUD to use only star_ring.png.
 - Extreme Moon stacks now fill the star ring one slot at a time clockwise instead of rendering a separate star_sheet + ring overlay.
 - Added a short pulse highlight on the newly gained extreme moon stack.
+
+
+## v14.12.6 — Forge UI structural realignment
+- Replaced stacked forge coordinate patches with one calibrated layout block.
+- Weapon actions and ore actions now use page-level containers aligned directly to the painted frames.
+- Weapon inventory remains the only scrolling region.
+- Restored visible mileage-shop text in the right circular Cheongonggak button, retained odds at the left edge, centered draw labels.
+- Centered smith action and rebound enhancement data to distinct painted frames.
+- Forge UI PNGs are network-first in the service worker to prevent stale-art/new-code mismatches.

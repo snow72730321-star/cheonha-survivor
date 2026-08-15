@@ -3,7 +3,7 @@
 (()=>{
 const KPATH="assets/vfx/skills/katana/";
 const UI_PATH="assets/ui/katana/";
-const uiAsset=n=>["full_moon_stack.png","moonflower.png","star_sheet.png","star_ring.png","moon_scar_stack.png"].includes(n);
+const uiAsset=n=>["full_moon_stack.png","moonflower.png","star_ring.png","moon_scar_stack.png"].includes(n);
 const assetPath=n=>(uiAsset(n)?UI_PATH:KPATH)+n;
 // GameAssets는 asset-loader.js의 전역 lexical binding이다. window 속성으로 접근하면 브라우저에서 undefined가 되어
 // 왜도 전용 GIF/UI가 전혀 로드되지 않으므로 반드시 직접 참조한다.
@@ -29,7 +29,7 @@ const KATANA_ANIM_META={
 };
 const JEOLWOL_HIT_DELAY=KATANA_ANIM_META.jeolwol.d.slice(0,40).reduce((a,b)=>a+b,0)/1000; // 40프레임 종료 후(41프레임 시작) 판정
 const KATANA_SHEETS=Object.values(KATANA_ANIM_META).map(m=>m.sheet);
-const KATANA_ASSETS=["full_moon_stack.png","moonflower.png","star_sheet.png","star_ring.png","moon_scar_stack.png",...KATANA_SHEETS];
+const KATANA_ASSETS=["full_moon_stack.png","moonflower.png","star_ring.png","moon_scar_stack.png",...KATANA_SHEETS];
 if(assetStore)Promise.all(KATANA_ASSETS.map(n=>assetStore.load(assetPath(n)))).catch(()=>{});
 
 const katanaSource=s=>["balwol","balwolEcho","moonForm1","moonForm2","moonForm3","moonMeteor"].includes(s);

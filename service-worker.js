@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-12-2-forge-hitbox-scroll-polish";
+const CACHE="cheonha-v14-12-6-forge-layout-clean";
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
   "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css","css/forge-mobile-final-v14-11-1.css",
@@ -82,7 +82,6 @@ const APP_SHELL=[
   "assets/vfx/skills/katana/zanshin.png",
   "assets/ui/katana/full_moon_stack.png",
   "assets/ui/katana/moonflower.png",
-  "assets/ui/katana/star_sheet.png",
   "assets/ui/katana/star_ring.png",
   "assets/ui/katana/moon_scar_stack.png",
 "assets/vfx/skills/katana/full_moon.sheet.png",
@@ -149,6 +148,16 @@ self.addEventListener("fetch",event=>{
   if(url.pathname.includes("/assets/vfx/cutscenes/")&&url.pathname.endsWith(".gif")){event.respondWith(fetch(request));return}
 
   const isCode=/\.(?:js|css|webmanifest)$/i.test(url.pathname);
+  const isForgeUiArt=url.pathname.includes("/assets/ui/forge-mobile-final/");
+
+  // Forge UI art changes frequently during layout iteration: network first, cache fallback.
+  if(isForgeUiArt){
+    event.respondWith(fetch(request).then(response=>{
+      if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(request,copy))}
+      return response;
+    }).catch(()=>caches.match(request)));
+    return;
+  }
 
   // JS/CSS/매니페스트는 네트워크 우선으로 배포 직후 구버전 코드가 한 번 더 실행되는 문제를 막는다.
   if(isCode){

@@ -104,17 +104,19 @@
   }
 
   function syncWeaponInspect(){
-    const host=$("forgeWeaponInspect");if(!host)return;
+    const host=$("forgeWeaponInspect"),actions=$("forgeWeaponActions");if(!host)return;
     const visible=[...root.querySelectorAll("#weaponInventory [data-select-weapon]")].filter(x=>!x.hidden);
     if(!selectedWeaponId&&visible[0])selectedWeaponId=visible[0].dataset.selectWeapon;
     const item=itemById(selectedWeaponId);
     root.querySelectorAll("#weaponInventory [data-select-weapon]").forEach(x=>x.classList.toggle("selected",x.dataset.selectWeapon===selectedWeaponId));
-    if(!item){host.innerHTML='<div class="forge-inspect-empty">보유 무기를 선택하시오.</div>';return}
+    if(!item){host.innerHTML='<div class="forge-inspect-empty">보유 무기를 선택하시오.</div>';if(actions)actions.innerHTML='';return}
     window.CheonHaForgeV13?.normalizeWeapon?.(item);
     const gd=gradeDefs.find(g=>g.id===item.grade),cp=window.CombatPowerSystem?CombatPowerSystem.value(item):0;
     const art=window.WeaponVisuals?WeaponVisuals.asset(item):weaponIconPath(item.weapon);
-    const pots=(item.potentials||[]).map(x=>`<div><b>${x.name}</b><span>${x.format==="pct"?Math.round(x.value*100)+"%":"+"+x.value}</span></div>`).join("");
-    host.innerHTML=`<div class="forge-inspect-art"><img src="${art}" alt="${item.name}"></div><div class="forge-inspect-name"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><small>${weaponDefs[item.weapon]?.name||item.weapon} · ${item.abilityName||""}</small></div><div class="forge-inspect-stats"><span>전투력 <b>${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</b></span><span>기본 피해 <b>${Number(item.damageMul||1).toFixed(2)}x</b></span></div><div class="forge-inspect-potentials">${pots||'<div>잠재 옵션 없음</div>'}</div><div class="forge-inspect-actions"><button id="forgeInspectEquip">${account.equipped[item.weapon]===item.id?"장착 해제":"장착"}</button><button id="forgeInspectEnhance">강화</button><button id="forgeInspectReroll">재련</button><button id="forgeInspectBreak" class="danger">분해</button></div>`;
+    const potLines=(item.potentials||[]).slice(0,3);while(potLines.length<3)potLines.push(null);
+    const pots=potLines.map(x=>x?`<div><b>${x.name}</b><span>${x.format==="pct"?Math.round(x.value*100)+"%":"+"+x.value}</span></div>`:`<div class="empty"><b></b><span></span></div>`).join("");
+    host.innerHTML=`<div class="forge-inspect-art"><img src="${art}" alt="${item.name}"></div><div class="forge-inspect-name"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><small>${weaponDefs[item.weapon]?.name||item.weapon} · ${item.abilityName||""}</small></div><div class="forge-inspect-stats"><span>전투력 <b>${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</b></span><span>기본 피해 <b>${Number(item.damageMul||1).toFixed(2)}x</b></span></div><div class="forge-inspect-potentials">${pots}</div>`;
+    if(actions)actions.innerHTML=`<button id="forgeInspectEquip">${account.equipped[item.weapon]===item.id?"장착 해제":"장착"}</button><button id="forgeInspectEnhance">강화</button><button id="forgeInspectReroll">재련</button><button id="forgeInspectBreak" class="danger">분해</button>`;
     $("forgeInspectEquip")?.addEventListener("click",()=>toggleEquip(item));
     $("forgeInspectEnhance")?.addEventListener("click",()=>window.CheonHaForgeV13?.openDetail(item.id,"enhance"));
     $("forgeInspectReroll")?.addEventListener("click",()=>window.CheonHaForgeV13?.openDetail(item.id,"potential"));
@@ -123,7 +125,7 @@
 
   function renderOrePage(){
     updateGold();
-    const typeHost=$("forgeOreTypeList"),gradeHost=$("forgeOreGradeGrid"),special=$("forgeOreSpecial"),detail=$("forgeOreDetail");
+    const typeHost=$("forgeOreTypeList"),gradeHost=$("forgeOreGradeGrid"),special=$("forgeOreSpecial"),detail=$("forgeOreDetail"),summaryHost=$("forgeOreSelectedSummary"),actionsHost=$("forgeOreActions");
     if(!oreTypes[selectedOreType])selectedOreType=Object.keys(oreTypes)[0];
     if(!synthGrades.includes(selectedOreGrade))selectedOreGrade="common";
     if(typeHost){
@@ -136,8 +138,10 @@
     }
     if(special){const m=account.ores[`${selectedOreType}:mythic`]||0,e=account.ores[`${selectedOreType}:eternal`]||0;special.innerHTML=`<div class="rarity-mythic"><b>신화</b><strong>${fmt(m)}</strong></div><div class="rarity-eternal"><b>영원</b><strong>${fmt(e)}</strong></div>`}
     const key=`${selectedOreType}:${selectedOreGrade}`,have=account.ores[key]||0,next=nextSynthGrade(selectedOreGrade),unit=oreSellValue(selectedOreGrade),max=Math.floor(have/ORE_SYNTH_COUNT),ore=oreTypes[selectedOreType];
-    if(detail){detail.innerHTML=`<div class="forge-ore-copy"><b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>${ore.ability} · ${ore.desc}</span><small>개당 판매 ${fmt(unit)} 금자${next?` · 동일 광물 5개 → ${gradeLabel(next)} 1개`:" · 일반 합성 최종 등급"}</small></div><div class="forge-ore-selected-summary"><b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>보유 ${fmt(have)}개</span></div><div class="forge-ore-actions"><button data-ore-action="synth" ${!next||have<5?"disabled":""}>1회 합성</button><button data-ore-action="synth-max" ${!next||max<1?"disabled":""}>최대 합성</button><button data-ore-action="sell">1개 판매</button><button data-ore-action="sell-ten">10개 판매</button><button data-ore-action="sell-all">전체 판매</button></div>`;
-      detail.querySelectorAll("[data-ore-action]").forEach(b=>b.addEventListener("click",()=>{const a=b.dataset.oreAction;if(a==="synth")synthesizeOre(key,false);else if(a==="synth-max")synthesizeOre(key,true);else if(a==="sell")sellOre(key,"one");else if(a==="sell-ten")sellOre(key,"ten");else if(a==="sell-all")sellOre(key,"all");renderOrePage()}));
+    if(detail)detail.innerHTML=`<div class="forge-ore-copy"><b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>${ore.ability} · ${ore.desc}</span><small>개당 판매 ${fmt(unit)} 금자${next?` · 동일 광물 5개 → ${gradeLabel(next)} 1개`:" · 일반 합성 최종 등급"}</small></div>`;
+    if(summaryHost)summaryHost.innerHTML=`<b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>보유 ${fmt(have)}개</span>`;
+    if(actionsHost){actionsHost.innerHTML=`<button data-ore-action="sell">1개 판매</button><button data-ore-action="sell-ten">10개 판매</button><button data-ore-action="sell-all">전체 판매</button><button data-ore-action="synth" ${!next||have<5?"disabled":""}>1회 합성</button><button data-ore-action="synth-max" ${!next||max<1?"disabled":""}>최대 합성</button>`;
+      actionsHost.querySelectorAll("[data-ore-action]").forEach(b=>b.addEventListener("click",()=>{const a=b.dataset.oreAction;if(a==="synth")synthesizeOre(key,false);else if(a==="synth-max")synthesizeOre(key,true);else if(a==="sell")sellOre(key,"one");else if(a==="sell-ten")sellOre(key,"ten");else if(a==="sell-all")sellOre(key,"all");renderOrePage()}));
     }
   }
 
