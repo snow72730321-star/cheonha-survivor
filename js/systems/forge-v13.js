@@ -225,7 +225,7 @@
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
         <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="forge-fire"></div><div class="anvil-weapon" id="anvilWeapon"><img class="anvil-weapon-img" alt="무기"></div><div class="anvil-hammer asset-hammer"></div><div class="forge-sparks"></div><div class="forge-impact-flash"></div></div>
-        <div class="forge-enhance-level"><span>강화 단계</span><b id="enhanceLevel">+0 → +1</b></div>
+        <div class="forge-enhance-level"><b id="enhanceCurrentLevel">+0</b><b id="enhanceNextLevel">+1</b></div>
         <div class="forge-enhance-outcomes">
           <div class="success"><span>성공 확률</span><b id="enhanceRate">100%</b></div>
           <div class="down"><span>단계 하락</span><b id="enhanceDownRate">0%</b></div>
@@ -308,7 +308,9 @@
     }
     if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
     else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
-    root.querySelector("#enhanceLevel").textContent=item.level>=MAX_ENHANCE?"MAX":`+${item.level} → +${item.level+1}`;
+    const currentLevelEl=root.querySelector("#enhanceCurrentLevel"),nextLevelEl=root.querySelector("#enhanceNextLevel");
+    if(currentLevelEl)currentLevelEl.textContent=`+${item.level}`;
+    if(nextLevelEl)nextLevelEl.textContent=item.level>=MAX_ENHANCE?"MAX":`+${item.level+1}`;
     root.querySelector("#enhanceRate").textContent=item.level>=MAX_ENHANCE?"-":`${Math.round(finalEnhanceChance(item)*100)}%`;
     root.querySelector("#enhanceCost").textContent=item.level>=MAX_ENHANCE?"-":Math.floor(enhanceCost(item)).toLocaleString();
     const rates=enhancementOutcomeRates(item),downEl=root.querySelector("#enhanceDownRate"),destroyEl=root.querySelector("#enhanceDestroyRate");

@@ -1,7 +1,7 @@
 "use strict";
 
 /** v14.6.9 sprite-first VFX architecture cache. 대용량 BGM은 스트리밍하고 SFX는 최초 사용 뒤 캐시한다. */
-const CACHE="cheonha-v14-13-2-cumulative-ui-katana";
+const CACHE="cheonha-v14-13-3-forge-text-align-hotfix";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",

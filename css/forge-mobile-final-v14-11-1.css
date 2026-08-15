@@ -242,3 +242,198 @@
 #forgeDetail[data-forge-mode="compare"] .compare-weapon-title{top:20.0%!important}
 #forgeDetail[data-forge-mode="compare"] .compare-box .potential-line{left:6.0%!important;right:6.0%!important;padding:0 7.2%!important}
 #forgeDetail[data-forge-mode="compare"] .compare-balance{left:15.8%!important;right:15.8%!important;top:73.35%!important;padding:0 7.5%!important}
+
+/* v14.13.3 — forge text-in-frame alignment hotfix */
+/* 강화 단계: 라벨 삭제 후 좌/우 프레임 중앙에 현재/다음 단계만 배치 */
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-level{
+  position:absolute!important;
+  left:14.0%!important;
+  right:14.0%!important;
+  top:35.55%!important;
+  height:5.65%!important;
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:11.6%!important;
+  align-items:center!important;
+  justify-items:center!important;
+  color:#f2e8d8!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-level span{display:none!important}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-level b{
+  width:100%!important;
+  height:100%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:clamp(15px,3.55vw,19px)!important;
+  line-height:1!important;
+  color:#f2e8d8!important;
+  text-shadow:0 1px 3px rgba(0,0,0,.9)!important;
+  letter-spacing:.02em!important;
+  transform:translateY(4%)!important;
+}
+
+/* 장인의 숨결 게이지: 프레임 안쪽으로 폭/높이/수직 위치를 재보정 */
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath{
+  left:14.8%!important;
+  right:14.8%!important;
+  top:62.45%!important;
+  height:5.0%!important;
+  overflow:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath>div:first-child{
+  left:1.4%!important;
+  right:1.4%!important;
+  top:-31%!important;
+  font-size:clamp(7px,1.78vw,9px)!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{
+  left:8.4%!important;
+  right:8.2%!important;
+  bottom:2.8%!important;
+  height:23.5%!important;
+  min-height:9px!important;
+  max-height:12px!important;
+  padding:1px!important;
+  border-radius:999px!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{inset:1px!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
+  border-radius:999px!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-guarantee{top:68.1%!important}
+#forgeDetail[data-forge-mode="enhance"] .forge-enhance-costs{top:72.15%!important}
+
+/* 강화 버튼 텍스트를 버튼 프레임 정중앙으로 */
+#forgeDetail[data-forge-mode="enhance"] #enhanceExecute{
+  left:14.1%!important;
+  right:14.1%!important;
+  bottom:5.35%!important;
+  height:7.55%!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0 0 .35em!important;
+  line-height:1!important;
+  font-size:clamp(13px,3.15vw,17px)!important;
+}
+
+/* 잠재 비교 팝업: 텍스트/버튼을 슬롯 중앙에 재배치 */
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line{
+  left:6.2%!important;
+  right:6.2%!important;
+  height:17.2%!important;
+  padding:0 7.2%!important;
+  align-items:center!important;
+  font-size:clamp(7px,1.9vw,10px)!important;
+  line-height:1.06!important;
+}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(1){top:17.6%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(2){top:47.25%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(3){top:76.9%!important}
+#forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions{
+  left:10.5%!important;
+  right:10.5%!important;
+  bottom:8.15%!important;
+  height:7.55%!important;
+  gap:6.4%!important;
+}
+#forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions button{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0 0 .32em!important;
+  line-height:1!important;
+  font-size:clamp(11px,2.75vw,14px)!important;
+}
+
+/* 단조 예측 패널: 생성 텍스트를 실제 프레임 레이아웃에 맞춤 */
+#forge .forge-mobile-smith #forgePreview{
+  left:5.2%!important;
+  right:5.2%!important;
+  top:55.95%!important;
+  height:20.8%!important;
+  padding:1.3% 2.6%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  gap:2.5%!important;
+  overflow:hidden!important;
+  text-align:left!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-rows{
+  display:grid!important;
+  grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  gap:2.5%!important;
+  min-height:0!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-rows>div{
+  display:grid!important;
+  grid-template-columns:33% 1fr!important;
+  align-items:center!important;
+  min-height:0!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-rows span{
+  font-size:clamp(8px,1.8vw,9px)!important;
+  line-height:1.05!important;
+  color:#cdbba1!important;
+  white-space:nowrap!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-rows b{
+  justify-self:end!important;
+  font-size:clamp(8px,1.9vw,10px)!important;
+  line-height:1.05!important;
+  color:#f1e3ca!important;
+  white-space:nowrap!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-ability{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:1px!important;
+  min-height:0!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-ability b{
+  font-size:clamp(8px,1.95vw,10px)!important;
+  line-height:1.08!important;
+  color:#f0e1b9!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-ability span,
+#forge .forge-mobile-smith #forgePreview .smith-preview-cost{
+  font-size:clamp(7px,1.7vw,9px)!important;
+  line-height:1.12!important;
+  color:#d8cab5!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-cost{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:6px!important;
+  margin-top:auto!important;
+}
+#forge .forge-mobile-smith #forgePreview .smith-preview-cost b{font-size:clamp(8px,1.9vw,10px)!important}
+
+/* 단조 / 단조 도감 버튼 텍스트 정중앙 고정 */
+#forge .forge-smith-execute,
+#forge .forge-codex-open{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  text-shadow:0 2px 4px #000!important;
+}
+#forge .forge-smith-execute{
+  left:18.6%!important;
+  right:25.7%!important;
+  top:80.1%!important;
+  height:6.6%!important;
+  padding:0 0 .28em!important;
+  font-size:clamp(13px,3.45vw,18px)!important;
+}
+#forge .forge-codex-open{
+  right:5.1%!important;
+  top:80.1%!important;
+  width:14.6%!important;
+  height:8.0%!important;
+  padding:0 0 .22em!important;
+  font-size:clamp(11px,2.8vw,14px)!important;
+}
