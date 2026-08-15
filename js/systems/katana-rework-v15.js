@@ -43,7 +43,7 @@ function initKatanaState(){
   katanaScarTriggers:0,katanaMoonFormCycles:0,katanaJeolwolCasts:0,
   katanaMoonFormActive:false,katanaMoonFormStep:0,katanaMoonFormTimer:0,
   katanaEchoQueue:[],katanaHiddenQueue:[],katanaMirrorQueue:[],katanaDodgeCharge:0,
-  moonMeteorBuff:0,timeSpaceBuff:0,gyeonghwaTimer:0,
+  moonMeteorBuff:0,timeSpaceBuff:0,gyeonghwaTimer:0,enemyFreezeTimer:0,
   katanaDamageBonus:0,katanaLifeSteal:0,katanaLifeStealWindow:0,katanaLifeStealHealed:0
  });
 }
@@ -133,19 +133,55 @@ fireBasic=function(){
 
 const MOON_FORM_STEP_DELAY={1:.90,2:.52,3:.76};
 function startMoonForms(){player.katanaMoonFormActive=true;player.katanaMoonFormStep=1;player.katanaMoonFormTimer=.03}
-function castMoonForm(step){
- const lv=player.arts.moonchain||1,len=(310+lv*24)*player.areaMul,width=(22+lv*3)*Math.sqrt(player.areaMul),mul=[0,1.4,1.8,2.6][step],dmg=(25+lv*9)*mul;
- let a=facingAngle();
- // 2식만 현재 사거리 안에서 체력이 가장 높은 적을 새로 지정해 그 방향으로 발동한다.
- if(step===2){
-  const range=len*.62;
-  const target=enemies.filter(e=>!e.dead&&Math.hypot(e.x-player.x,e.y-player.y)<=range).sort((x,y)=>y.hp-x.hp)[0];
-  if(!target)return false; // 대상이 없으면 짧게 기다렸다 다시 탐색해 2식을 허공에 낭비하지 않는다.
-  a=Math.atan2(target.y-player.y,target.x-player.x);
+function densestDirection(range){
+ const list=enemies.filter(e=>!e.dead&&Math.hypot(e.x-player.x,e.y-player.y)<=range*1.15);
+ if(!list.length)return null;
+ let best=null,bestScore=-1;
+ for(const pivot of list){
+  const pa=Math.atan2(pivot.y-player.y,pivot.x-player.x);
+  let score=0;
+  for(const e of list){
+   const ea=Math.atan2(e.y-player.y,e.x-player.x);
+   let da=Math.atan2(Math.sin(ea-pa),Math.cos(ea-pa));
+   da=Math.abs(da);
+   if(da<=0.55){
+    const dist=Math.max(48,Math.hypot(e.x-player.x,e.y-player.y));
+    score+=1+(1-da/0.55)*0.75+Math.max(0,1-dist/(range*1.15))*0.6;
+   }
+  }
+  if(score>bestScore){bestScore=score;best=pa;}
  }
- lineHit(player.x-Math.cos(a)*len*.35,player.y-Math.sin(a)*len*.35,player.x+Math.cos(a)*len*.65,player.y+Math.sin(a)*len*.65,width,dmg,"moonForm"+step,{skipVisual:true,shake:4+step,color:"#edf8ff"});
- const endpointAnchored=step===1||step===3,fxX=endpointAnchored?player.x:player.x+Math.cos(a)*len*.18,fxY=endpointAnchored?player.y:player.y+Math.sin(a)*len*.18;
- vfx("katanaMoonForm"+step,fxX,fxY,[.9,.9,.52,.76][step],{a,r:len,width,priority:20,endAtPlayer:endpointAnchored,anchorX:player.x,anchorY:player.y});
+ return best;
+}
+function castMoonForm(step){
+ const lv=player.arts.moonchain||1;
+ const baseLen=(310+lv*24)*player.areaMul,baseWidth=(22+lv*3)*Math.sqrt(player.areaMul);
+ const mul=[0,1.4,1.8,2.6][step],dmg=(25+lv*9)*mul;
+ let a=facingAngle();
+ // 2식은 사거리 안 최고 체력 대상, 3식은 플레이어 기준 적 밀집 방향으로 발동한다.
+ if(step===2){
+  const range=baseLen*.62;
+  const target=enemies.filter(e=>!e.dead&&Math.hypot(e.x-player.x,e.y-player.y)<=range).sort((x,y)=>y.hp-x.hp)[0];
+  if(!target)return false;
+  a=Math.atan2(target.y-player.y,target.x-player.x);
+ }else if(step===3){
+  a=densestDirection(baseLen*.95)??a;
+ }
+ const cfg={
+  1:{fxLen:baseLen*1.00,hitStart:.03,hitEnd:.82,width:baseWidth*.84,endpoint:true,fxOffset:.00},
+  2:{fxLen:baseLen*.94,hitStart:-.10,hitEnd:.78,width:baseWidth*.96,endpoint:false,fxOffset:.18},
+  3:{fxLen:baseLen*1.10,hitStart:.02,hitEnd:.94,width:baseWidth*1.22,endpoint:true,fxOffset:.00}
+ }[step];
+ const x1=player.x+Math.cos(a)*cfg.fxLen*cfg.hitStart;
+ const y1=player.y+Math.sin(a)*cfg.fxLen*cfg.hitStart;
+ const x2=player.x+Math.cos(a)*cfg.fxLen*cfg.hitEnd;
+ const y2=player.y+Math.sin(a)*cfg.fxLen*cfg.hitEnd;
+ lineHit(x1,y1,x2,y2,cfg.width,dmg,"moonForm"+step,{skipVisual:true,shake:4+step,color:"#edf8ff"});
+ if(step===3){
+  aoe(player.x+Math.cos(a)*cfg.fxLen*.82,player.y+Math.sin(a)*cfg.fxLen*.82,22+lv*4,Math.max(1,dmg*.42),"moonForm3Tip",{skipVisual:true,color:"#edf8ff",shake:2,katanaNoSilver:true,skipImpactVfx:true});
+ }
+ const fxX=cfg.endpoint?player.x:player.x+Math.cos(a)*cfg.fxLen*cfg.fxOffset,fxY=cfg.endpoint?player.y:player.y+Math.sin(a)*cfg.fxLen*cfg.fxOffset;
+ vfx("katanaMoonForm"+step,fxX,fxY,[.9,.9,.52,.76][step],{a,r:cfg.fxLen,width:cfg.width,priority:20,endAtPlayer:cfg.endpoint,anchorX:player.x,anchorY:player.y});
  player.moonFlowerStacks=Math.max(0,(player.moonFlowerStacks||0)-1);
  return true;
 }
@@ -170,13 +206,15 @@ function gainExtremeMoon(){
  player.critChance+=.0075;
  player.katanaDamageBonus=(player.katanaDamageBonus||0)+.0125;
  player.katanaLifeSteal=(player.katanaLifeSteal||0)+.0015;
- player.dodgeCooldownMul*=.995;
+ player.dodgeCooldownMul*=.991;
+ if((player.dodgeCooldown||0)>0)player.dodgeCooldown=Math.max(.34,player.dodgeCooldown*.94);
 }
 function activateGyeonghwa(){
  const lv=player.arts?.voidslash||0;if(lv<=0)return;
  gainExtremeMoon();
  player.gyeonghwaTimer=gyeonghwaDuration(lv);
- vfx("katanaGyeonghwa",player.x,player.y,.69,{followPlayer:true,r:112});
+ for(const e of visibleEnemies(-40))if(!e.dead)e.stunTime=Math.max(e.stunTime||0,.26+.04*lv);
+ vfx("katanaGyeonghwa",player.x,player.y,.82,{followPlayer:true,r:160,opacityScale:.88});
  showMessage(`경화수월 · 극월 ${player.extremeMoonStacks}/24`,1.15);
 }
 function resolveJeolwolHit(){
@@ -200,18 +238,22 @@ performDodge=function(){
  _dodge();
  if(selectedWeapon!=="katana"||(player.metrics?.dodges||0)<=before)return;
  const perfect=(player.metrics?.perfectDodges||0)>pb;
- if(perfect&&isGyeonghwaActive()){
-  const lv=player.arts.voidslash||1,len=190+lv*18;
-  player.katanaMirrorQueue.push({t:.16,type:"dodge",x:sx,y:sy,a,len,width:20+lv*2,dmg:(30+lv*10)*gyeonghwaEchoMul(lv)});
+ if(isGyeonghwaActive()){
+  const lv=player.arts.voidslash||1,len=212+lv*20;
+  player.katanaMirrorQueue.push({t:perfect ? .10 : .06,type:"dodge",x:sx,y:sy,a,len,width:23+lv*2.5,dmg:(28+lv*9)*gyeonghwaEchoMul(lv)*(perfect?1:.78)});
+  player.dodgeCooldown=Math.max(.34,player.dodgeCooldown*(1-Math.min(.34,.18+lv*.05)));
  }
  player.katanaDodgeCharge=(player.katanaDodgeCharge||0)+(perfect?2:1);
  if((player.arts?.zanshin||0)>0&&player.katanaDodgeCharge>=3){
   player.katanaDodgeCharge-=3;
   player.moonMeteorBuff=4.5+.35*player.arts.zanshin;
-  player.dodgeCooldown=Math.max(.55,player.dodgeCooldown*(1-Math.min(.22,.08+player.arts.zanshin*.025)));
-  vfx("katanaMoonBuff",player.x,player.y,1.44,{followPlayer:true,r:105});
-  aoe(player.x,player.y,72+player.arts.zanshin*7,18+player.arts.zanshin*8,"moonMeteor",{skipVisual:true,color:"#e9f7ff",shake:4});
+  player.dodgeCooldown=Math.max(.42,player.dodgeCooldown*(1-Math.min(.38,.16+player.arts.zanshin*.04)));
+  vfx("katanaMoonBuff",player.x,player.y,1.44,{followPlayer:true,r:188+player.arts.zanshin*16});
+  aoe(player.x,player.y,92+player.arts.zanshin*10,24+player.arts.zanshin*10,"moonMeteor",{skipVisual:true,color:"#e9f7ff",shake:4});
   showMessage("월하유성보",.75);
+ }
+ if((player.moonMeteorBuff||0)>0){
+  player.dodgeCooldown=Math.max(.38,player.dodgeCooldown*(1-Math.min(.24,.12+(player.arts?.zanshin||0)*.025)));
  }
 };
 
@@ -224,6 +266,7 @@ tickArts=function(dt){
  player.moonMeteorBuff=Math.max(0,(player.moonMeteorBuff||0)-dt);
  player.timeSpaceBuff=Math.max(0,(player.timeSpaceBuff||0)-dt);
  player.gyeonghwaTimer=Math.max(0,(player.gyeonghwaTimer||0)-dt);
+ player.enemyFreezeTimer=Math.max(0,(player.enemyFreezeTimer||0)-dt);
  player.extremeMoonPulse=Math.max(0,(player.extremeMoonPulse||0)-dt);
  player.katanaLifeStealWindow=(player.katanaLifeStealWindow||0)+dt;
  if(player.katanaLifeStealWindow>=1){player.katanaLifeStealWindow%=1;player.katanaLifeStealHealed=0;}
@@ -326,12 +369,12 @@ function drawKatanaVisuals(){
   else if(v.type==="katanaBalwolEcho"){f="balwol_echo";w=Math.min(136,(v.r||96)*1.02);h=w*129/198}
   else if(v.type==="katanaMirrorBalwol"){f="balwol";w=Math.min(520,(v.r||300)*1.12);h=w*221/517;opacity*=.48}
   else if(v.type==="katanaMirrorDodge"){f="balwol";w=Math.min(310,(v.r||190)*1.18);h=w*221/517;opacity*=.42}
-  else if(v.type.startsWith("katanaMoonForm")){const n=v.type.slice(-1);f=`moon_sword_${n}`;const dims={1:[626,300],2:[494,276],3:[588,345]}[n];w=Math.min(520,(v.r||330)*1.18);h=w*dims[1]/dims[0];if(n==="1")flipX=true}
-  else if(v.type==="katanaMoonBuff"){f="moon_buff";w=145;h=143;rot=0}
-  else if(v.type==="katanaGyeonghwa"){f="gyeonghwa_suwol";w=178;h=165;rot=0;opacity=Math.min(1,.55+alpha*.55)}
+  else if(v.type.startsWith("katanaMoonForm")){const n=v.type.slice(-1);f=`moon_sword_${n}`;const dims={1:[626,300],2:[494,276],3:[588,345]}[n];w=Math.min(540,(v.r||330)*1.18);h=w*dims[1]/dims[0];if(n==="1"||n==="3")flipX=true}
+  else if(v.type==="katanaMoonBuff"){f="moon_buff";w=Math.max(145,v.r||145);h=w*143/145;rot=0}
+  else if(v.type==="katanaGyeonghwa"){f="gyeonghwa_suwol";w=Math.max(178,(v.r||160)*1.16);h=w*165/178;rot=0;opacity=Math.min(1,.46+alpha*.38)*(Number.isFinite(v.opacityScale)?v.opacityScale:1)}
   else if(v.type==="katanaChamwol"){f="chamwol";w=Math.min(Math.max(W,H)*1.15,760);h=w*148/414}
   else if(v.type==="katanaJeolwol"){
-   f="jeolwol";rot=0;const meta=KATANA_ANIM_META.jeolwol,fi=frameAt(meta,Math.max(0,v.age||0)*1000,false)+1;
+   f="jeolwol";rot=0;opacity=Math.min(1,.62+alpha*.34)*(Number.isFinite(v.opacityScale)?v.opacityScale:1);const meta=KATANA_ANIM_META.jeolwol,fi=frameAt(meta,Math.max(0,v.age||0)*1000,false)+1;
    if(fi<=35){w=Math.min(meta.fw,W*.96);h=w*meta.fh/meta.fw;}
    else{const cover=Math.max(W/meta.fw,H/meta.fh);w=meta.fw*cover;h=meta.fh*cover;}
   }
@@ -371,34 +414,47 @@ function drawKatanaHUD(){
   if(ring?.complete&&ring.naturalWidth){
    const rw=145,rh=145,rx=cx-rw/2,ry=(cy-68)-rh/2;
    ctx.save();
-   ctx.globalAlpha=.16;
+   ctx.globalAlpha=.14;
    ctx.filter="grayscale(1) brightness(.34)";
    ctx.drawImage(ring,rx,ry,rw,rh);
    ctx.restore();
-   const revealRadius=10.5;
-   for(let i=0;i<n;i++){
+   const revealRadius=10.8;
+   for(let i=0;i<24;i++){
     const a=-Math.PI/2+i*Math.PI*2/24;
     const sx=cx+Math.cos(a)*57;
     const sy=(cy-68)+Math.sin(a)*57;
+    ctx.save();
+    ctx.globalAlpha=.18;
+    ctx.fillStyle="#5f6f8c";
+    ctx.beginPath();ctx.arc(sx,sy,2.55,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    if(i>=n)continue;
     ctx.save();
     ctx.beginPath();
     ctx.arc(sx,sy,revealRadius,0,Math.PI*2);
     ctx.closePath();
     ctx.clip();
-    let alpha=.98;
+    let lit=.98;
     if((player.extremeMoonPulse||0)>0&&player.extremeMoonPulseIndex===i+1){
       const t=Math.min(1,(player.extremeMoonPulse||0)/.42);
-      alpha=1.1+.35*t;
+      lit=1.1+.35*t;
       ctx.shadowColor="#eefbff";
       ctx.shadowBlur=16+10*t;
     }
-    ctx.globalAlpha=alpha;
+    ctx.globalAlpha=lit;
     ctx.drawImage(ring,rx,ry,rw,rh);
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha=.9;
+    ctx.shadowColor="#eff9ff";
+    ctx.shadowBlur=8;
+    ctx.fillStyle="#dff3ff";
+    ctx.beginPath();ctx.arc(sx,sy,2.1,0,Math.PI*2);ctx.fill();
     ctx.restore();
    }
    if(n>=24){
     const pulse=(Math.sin(elapsed*7)+1)*.5;
-    drawImg(ring,cx,cy-68,145,145,.16+.14*pulse);
+    drawImg(ring,cx,cy-68,145,145,.18+.16*pulse);
    }
   }
  }
@@ -410,5 +466,5 @@ function drawKatanaHUD(){
  }
 }
 const _draw=draw;draw=function(){_draw();drawKatanaVisuals();drawKatanaHUD()};
-window.KatanaRework={version:"1.6",flowerGain,addScar,gainMoonPhase,gainExtremeMoon,activateGyeonghwa,isGyeonghwaActive};
+window.KatanaRework={version:"1.7.1",flowerGain,addScar,gainMoonPhase,gainExtremeMoon,activateGyeonghwa,isGyeonghwaActive};
 })();
