@@ -8,7 +8,7 @@ const SaveManager=(()=>{
   const SAVE_KEY="murimAccountV1";
   const BACKUP_KEY="murimAccountV1.backup";
   const RECORD_KEY="murimSurvivorV2";
-  const VERSION=17;
+  const VERSION=18;
   const MAX_IMPORT_BYTES=5*1024*1024;
   let lastToastTimer=0;
 
@@ -174,6 +174,13 @@ const SaveManager=(()=>{
       forgeCount:Math.floor(finite(source.forgeCount,0,0,1e9)),
       gachaMileage:Math.floor(finite(source.gachaMileage,0,0,1e12)),
       weaponSoulStones:Math.floor(finite(source.weaponSoulStones,0,0,999999)),
+      raidTokens:Math.floor(finite(source.raidTokens,0,0,1e12)),
+      raidStats:{
+        runs:Math.floor(finite(plainObject(source.raidStats).runs,0,0,1e9)),
+        clears:Math.floor(finite(plainObject(source.raidStats).clears,0,0,1e9)),
+        bestProgress:finite(plainObject(source.raidStats).bestProgress,0,0,5),
+        bestFinalDamage:finite(plainObject(source.raidStats).bestFinalDamage,0,0,1)
+      },
       brokenWeapons,
       pendingPotential,
       forgeVersion:Math.floor(finite(source.forgeVersion,13,0,VERSION)),

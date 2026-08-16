@@ -42,6 +42,9 @@ function enforcePlayerLimits(){
 
 /** 게임 종료·중도 포기의 기록을 정확히 한 번만 집계한다. */
 function finalizeRunStats(win=false,reason=""){ 
+  // 레이드는 전용 진행도·보상·통계를 사용한다. 일반 원정 업적의 금자 보상이
+  // 레이드 종료에 섞이지 않도록 활성 레이드는 전용 컨트롤러가 정산한다.
+  if(window.SoloRaidMode?.active)return false;
   if(runFinalized||!player||!selectedWeapon)return false;
   runFinalized=true;
   ensureV6Account();

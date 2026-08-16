@@ -158,6 +158,7 @@
     return best;
   }
   function drawAuthoredMinimap(){
+    if(window.SoloRaidMode?.active)return;
     if(state!=="playing"&&state!=="paused")return;
     const mobile=Math.min(W,H)<=520,size=mobile?100:132,x=W-size-10,y=mobile?76:82,pad=8,inner=size-pad*2,half=map.worldHalf;
     const mx=wx=>x+pad+(wx+half)/(half*2)*inner,my=wy=>y+pad+(wy+half)/(half*2)*inner;

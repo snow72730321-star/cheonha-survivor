@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.15.7-cumulative-root";
+  const BUILD="v14.16.1-raid-three-phase";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -19,6 +19,17 @@ const GameAssets=(()=>{
     "assets/map/terrain/east-ruined-gate.webp",
     "assets/map/terrain/south-moon-pond.webp",
     "assets/map/terrain/west-cliff-road.webp"
+  ];
+  const raidFiles=[
+    "assets/raid/map/cheonma-altar.webp",
+    "assets/raid/bosses/peng-danhui.png",
+    "assets/raid/bosses/namgung-hyeok.png",
+    "assets/raid/bosses/ma-heojin.png",
+    "assets/raid/bosses/cheondan.png",
+    "assets/raid/bosses/cheonma-throne.png",
+    "assets/raid/bosses/cheonma-left-maqi-arm.png",
+    "assets/raid/bosses/cheonma-right-maqi-arm.png",
+    "assets/raid/bosses/cheonma-demon-dragon.png"
   ];
   const vfxFiles=[
     "assets/vfx/forge/enhance-success.gif",
@@ -160,7 +171,7 @@ const GameAssets=(()=>{
       ultimate:Object.freeze(weaponPacks.fist.filter(path=>/[\\/](?:golden_dragon_charge(?:\.part2)?\.png|golden_dragon_beam\.png)$/.test(path)))
     })
   });
-  const files=Object.freeze([...essentialFiles,...new Set(Object.values(weaponPacks).flat())]);
+  const files=Object.freeze([...essentialFiles,...new Set(Object.values(weaponPacks).flat()),...raidFiles]);
 
   const images=new Map();
   const status=new Map();
@@ -249,5 +260,5 @@ const GameAssets=(()=>{
     if(weapon)preloadSkill(weapon,detail?.id).catch(error=>console.warn("신규 무공 에셋 준비 실패",error));
   });
 
-  return Object.freeze({BUILD,preload,preloadEssential,preloadWeapon,preloadSkill,preloadUltimate,preloadList,load,image,character,portrait,enemy,isReady,status,files,essentialFiles:Object.freeze(essentialFiles),weaponPacks,initialWeaponPacks,skillPacks,url});
+  return Object.freeze({BUILD,preload,preloadEssential,preloadWeapon,preloadSkill,preloadUltimate,preloadList,load,image,character,portrait,enemy,isReady,status,files,essentialFiles:Object.freeze(essentialFiles),raidFiles:Object.freeze(raidFiles),weaponPacks,initialWeaponPacks,skillPacks,url});
 })();

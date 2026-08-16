@@ -119,7 +119,7 @@ const assertions=vm.runInContext(`({
   fixed:typeof GameRuntimeV14==="object",
   accountVersion:account.saveVersion
 })`,context);
-if(assertions.version!==17||assertions.skills!==8||assertions.bosses!==1||!assertions.fixed||assertions.accountVersion!==17){
+if(assertions.version!==18||assertions.skills!==8||assertions.bosses!==1||!assertions.fixed||assertions.accountVersion!==18){
   throw new Error(`부팅 검증 실패: ${JSON.stringify(assertions)}`);
 }
 
@@ -379,3 +379,37 @@ if(ultimateRegression.state!=="cutscene"||ultimateRegression.ultimate!==0||ultim
   throw new Error(`절기 오디오 회귀 검증 실패: ${JSON.stringify(ultimateRegression)}`);
 }
 console.log("절기 오디오 회귀 테스트 통과",ultimateRegression);
+
+// v14.16.1 회귀: 천마 최종전은 한쪽 마수 파괴 → 마룡 → 본체의 3페이즈로 전환된다.
+vm.runInContext('state="menu";selectedWeapon="saber";selectedDifficulty="chuchul"',context);
+await vm.runInContext("SoloRaidMode.begin()",context);
+await new Promise(resolve=>setTimeout(resolve,20));
+const raidStart=vm.runInContext(`(()=>({
+  active:SoloRaidMode.active,state,level:player.level,pending:pendingLevelUps,
+  hidden:weaponDefs[selectedWeapon].arts.filter(art=>art.hidden).map(art=>({id:art.id,level:player.arts[art.id]||0,ready:!!player.hiddenReady[art.id]})),
+  spawnTimer,nextMiniBossAt,finalBossAt,runDuration,gold:account.gold,xp:player.xp
+}))()`,context);
+const raidCombat=vm.runInContext(`(()=>{
+  SoloRaidMode.spawnStage(0);const goldBefore=account.gold,xpBefore=player.xp;
+  gainXp(9999);for(let i=0;i<12;i++)update(1/60);
+  const gate={state,enemies:enemies.map(e=>({id:e.raidId,type:e.type})),goldBefore,goldAfter:account.gold,xpBefore,xpAfter:player.xp};
+  SoloRaidMode.spawnStage(4);SoloRaidMode.state.phaseGrace=0;
+  const overseer=boss,left=enemies.find(e=>e.raidId==="cheonma-left-arm"),right=enemies.find(e=>e.raidId==="cheonma-right-arm");
+  player.damageMul=1;player.eliteDamageMul=1;player.critChance=0;
+  const phase1={phase:SoloRaidMode.state.finalPhase,parts:SoloRaidMode.state.parts.map(p=>p.raidId),enemies:enemies.map(e=>e.raidId),overseerDamage:damageEnemy(overseer,100,"test")};
+  left.hp=1;damageEnemy(left,2,"test");const dragon=enemies.find(e=>e.raidId==="cheonma-dragon");
+  const phase2={phase:SoloRaidMode.state.finalPhase,id:dragon?.raidId,parts:SoloRaidMode.state.parts.length};
+  SoloRaidMode.state.phaseGrace=0;dragon.hp=1;damageEnemy(dragon,2,"test");const body=enemies.find(e=>e.raidId==="cheonma-body");
+  const phase3={phase:SoloRaidMode.state.finalPhase,id:body?.raidId,parts:SoloRaidMode.state.parts.length,progress:SoloRaidMode.progress()};
+  SoloRaidMode.state.phaseGrace=0;const hp0=body.hp;damageEnemy(body,100,"test");phase3.directDamage=hp0-body.hp;
+  return {gate,phase1,phase2,phase3};
+})()`,context);
+if(!raidStart.active||raidStart.state!=="levelup"||raidStart.level!==20||raidStart.pending!==19||raidStart.hidden.length<1||raidStart.hidden.some(item=>item.level!==1||!item.ready)||
+   raidStart.spawnTimer!==Infinity||raidStart.nextMiniBossAt!==Infinity||raidStart.finalBossAt!==Infinity||raidStart.runDuration!==Infinity||
+   raidCombat.gate.state!=="playing"||raidCombat.gate.enemies.length!==1||raidCombat.gate.enemies[0].id!=="peng"||raidCombat.gate.goldAfter!==raidCombat.gate.goldBefore||raidCombat.gate.xpAfter!==raidCombat.gate.xpBefore||
+   raidCombat.phase1.phase!==1||raidCombat.phase1.parts.length!==2||raidCombat.phase1.enemies.length!==2||raidCombat.phase1.overseerDamage!==0||
+   raidCombat.phase2.phase!==2||raidCombat.phase2.id!=="cheonma-dragon"||raidCombat.phase2.parts!==0||
+   raidCombat.phase3.phase!==3||raidCombat.phase3.id!=="cheonma-body"||raidCombat.phase3.parts!==0||raidCombat.phase3.progress<=4||Math.abs(raidCombat.phase3.directDamage-100)>.001){
+  throw new Error(`1인 레이드 런타임 검증 실패: ${JSON.stringify({raidStart,raidCombat})}`);
+}
+console.log("1인 레이드 시작·무잡졸·무보상·천마 3페이즈 전환 검증 통과",{raidStart,raidCombat});

@@ -27,9 +27,9 @@ assert.match(forge,/if\(effect==="success"\)[\s\S]*?scene\.appendChild\(vfx\)/);
 assert.match(forge,/setTimeout\(\(\)=>setAnvilEffect\(scene\),successful\?850:650\)/);
 assert.match(css,/\.forge-success-vfx\{[\s\S]*?pointer-events:none[\s\S]*?mix-blend-mode:screen/);
 assert.match(css,/@keyframes enhanceSuccessVfxReveal/);
-assert.match(html,/css\/forge-v13\.css\?v=14157/);
-assert.match(sw,/cheonha-v14-15-7-cumulative-root/);
+assert.match(html,/css\/forge-v13\.css\?v=14161/);
+assert.match(sw,/cheonha-v14-16-1-raid-three-phase/);
 assert.doesNotMatch(sw.match(/const APP_SHELL=\[([\s\S]*?)\];/)?.[1]||"",/assets\/vfx\//,"VFX must stay out of the install-time app shell");
 assert.ok(loader.includes(`"${assetPath}"`),"asset loader must warm enhancement success GIF");
 
-console.log("v14.15.7 transparent enhancement success VFX audit: OK");
+console.log("v14.16.1 transparent enhancement success VFX audit: OK");

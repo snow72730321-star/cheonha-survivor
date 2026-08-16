@@ -1,0 +1,69 @@
+/* v14.16.1 · 천마신교 1인 레이드 3페이즈 */
+#raidHud{
+  position:fixed;z-index:12;top:max(72px,calc(env(safe-area-inset-top) + 58px));left:50%;
+  width:min(430px,calc(100vw - 120px));padding:9px 12px;transform:translateX(-50%);
+  border:1px solid rgba(226,179,91,.62);border-radius:10px;color:#f4ead4;
+  background:linear-gradient(180deg,rgba(25,12,13,.94),rgba(8,11,13,.9));
+  box-shadow:0 8px 28px rgba(0,0,0,.48),inset 0 0 20px rgba(139,35,32,.15);
+  pointer-events:none;opacity:0;visibility:hidden;transition:opacity .18s ease;
+}
+#raidHud.show{opacity:1;visibility:visible}
+.raid-hud-head{display:flex;align-items:center;justify-content:space-between;color:#dbba72;font-size:11px;letter-spacing:.08em}
+#raidHud>strong{display:block;margin-top:2px;overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#fff0cf}
+#raidGimmickText{margin-top:3px;text-align:center;color:#d3c4a4;font-size:10px}
+#raidPartBars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:6px}
+.raid-part-bar{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:5px;font-size:9px;color:#d9caa8}
+.raid-part-track{height:4px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.12)}
+.raid-part-track i{display:block;height:100%;background:linear-gradient(90deg,#9f252e,#e36b59)}
+.raid-part-bar.destroyed{opacity:.42;text-decoration:line-through}
+
+.raid-menu-button{border-color:rgba(192,55,53,.72)!important;color:#ffd6b0!important;background:linear-gradient(135deg,rgba(94,18,22,.55),rgba(31,19,20,.72))!important}
+.solo-raid-lobby{z-index:205;background:radial-gradient(circle at 50% 12%,rgba(101,18,22,.2),rgba(0,0,0,.9) 60%)}
+.solo-raid-lobby .panel{width:min(940px,calc(100vw - 24px));max-height:calc(100dvh - 28px);overflow:auto;border-color:rgba(187,133,63,.62);background:linear-gradient(180deg,rgba(20,14,14,.98),rgba(7,10,12,.98))}
+.raid-lobby-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.raid-lobby-head span{color:#b23e40;font-size:10px;letter-spacing:.28em}
+.raid-lobby-head h2{margin:2px 0 0;color:#f0d39a}
+#raidTokenBalance{flex:none;padding:7px 10px;border:1px solid rgba(207,166,84,.46);border-radius:999px;color:#e5c77c;background:rgba(255,255,255,.035);font-size:11px}
+.raid-roster{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:13px 0}
+.raid-roster article{position:relative;min-height:245px;overflow:hidden;padding:8px;border:1px solid rgba(203,178,124,.24);border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.3));text-align:center}
+.raid-roster article::after{content:"";position:absolute;inset:auto 0 0;height:46%;background:linear-gradient(transparent,rgba(7,8,10,.98));pointer-events:none}
+.raid-roster img{position:absolute;inset:4px 50% auto auto;width:148%;height:185px;transform:translateX(50%);object-fit:contain;object-position:center top;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6))}
+.raid-roster article.final img{width:152%;object-position:center 26%}
+.raid-roster span,.raid-roster b,.raid-roster small{position:relative;z-index:1;display:block}
+.raid-roster span{margin-top:164px;color:#bb4e4e;font-size:9px;letter-spacing:.1em}
+.raid-roster b{margin-top:4px;color:#f0dfbd;font-size:11px;line-height:1.35}
+.raid-roster small{margin-top:4px;color:#998d78;font-size:9px}
+.raid-roster article.final{border-color:rgba(183,52,51,.56);box-shadow:inset 0 0 24px rgba(143,21,29,.16)}
+.raid-rule-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:10px 0 14px}
+.raid-rule-grid div{padding:8px;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:rgba(255,255,255,.025)}
+.raid-rule-grid b,.raid-rule-grid span{display:block}
+.raid-rule-grid b{color:#d2ad64;font-size:10px}
+.raid-rule-grid span{margin-top:3px;color:#aaa18e;font-size:9px;line-height:1.45}
+
+#levelUp.raid-growth h2{color:#f1cf86}
+#levelUp.raid-growth .panel{border-color:rgba(195,148,61,.58);box-shadow:0 16px 60px rgba(0,0,0,.72),inset 0 0 34px rgba(140,48,27,.1)}
+.raid-growth-counter{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;padding:7px 9px;border:1px solid rgba(218,185,95,.25);border-radius:8px;background:rgba(217,185,95,.06);font-size:10px;color:#cab98f}
+.raid-growth-counter b{font-size:12px;color:#f1d082}
+.raid-auto-train{width:auto!important;min-height:34px!important;margin:0!important;padding:6px 9px!important;border-color:rgba(217,185,95,.4)!important;font-size:10px!important}
+
+.raid-pattern-warning{position:fixed;z-index:13;top:calc(max(72px,env(safe-area-inset-top) + 58px) + 105px);left:50%;transform:translateX(-50%);padding:6px 13px;border:1px solid rgba(255,106,87,.58);border-radius:999px;color:#ffe2be;background:rgba(51,10,13,.88);font-size:11px;font-weight:700;letter-spacing:.05em;pointer-events:none;animation:raidWarnPulse .55s ease-in-out infinite alternate}
+@keyframes raidWarnPulse{to{box-shadow:0 0 20px rgba(255,64,53,.42);transform:translateX(-50%) scale(1.025)}}
+
+@media(max-width:760px){
+  #raidHud{top:max(68px,calc(env(safe-area-inset-top) + 54px));width:min(330px,calc(100vw - 104px));padding:7px 9px}
+  #raidHud>strong{font-size:12px}.raid-hud-head{font-size:9px}#raidGimmickText{font-size:8px}
+  .solo-raid-lobby .panel{padding:14px 12px}
+  .raid-lobby-head h2{font-size:20px}
+  .raid-roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .raid-roster article{min-height:210px}.raid-roster article.final{grid-column:1/-1;min-height:226px}
+  .raid-roster img{height:154px}.raid-roster span{margin-top:136px}
+  .raid-roster article.final img{height:170px;width:100%}.raid-roster article.final span{margin-top:150px}
+  .raid-rule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+@media(max-width:390px){
+  #raidHud{left:8px;right:8px;width:auto;transform:none;top:max(66px,calc(env(safe-area-inset-top) + 52px))}
+  .raid-roster b{font-size:10px}
+}
+
+@media(prefers-reduced-motion:reduce){.raid-pattern-warning{animation:none}}

@@ -11,11 +11,11 @@ const combat=read("js/systems/combat-runtime.js"),world=read("js/systems/world-m
 const menu=read("js/render/sprite-remaster-v14-3-18.js"),gacha=read("js/systems/storage-forge.js"),cutscene=read("js/vfx/awakening-cutscene-v14-3-8.js");
 const pkg=JSON.parse(read("package.json"));
 
-assert.equal(pkg.version,"14.15.7");
-assert.match(html,/v14\.15\.7-cumulative-root/);
-assert.match(loader,/const BUILD="v14\.15\.7-cumulative-root"/);
-assert.match(sw,/cheonha-v14-15-7-cumulative-root/);
-assert.match(save,/const VERSION=17/);
+assert.equal(pkg.version,"14.16.1");
+assert.match(html,/v14\.16\.1-raid-three-phase/);
+assert.match(loader,/const BUILD="v14\.16\.1-raid-three-phase"/);
+assert.match(sw,/cheonha-v14-16-1-raid-three-phase/);
+assert.match(save,/const VERSION=18/);
 
 const ctx={console,window:{},document:{getElementById:()=>null},localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},URL:{createObjectURL:()=>"",revokeObjectURL:()=>{}},Blob:class{},Date,Math,Number,JSON,Object,Array,String,Set,
   weaponDefs:{sword:{name:"검"},bow:{name:"활"}},gradeDefs:[{id:"common"},{id:"rare"},{id:"epic"},{id:"unique"},{id:"legendary"},{id:"mythic"},{id:"eternal"}],oreTypes:{han:{name:"한철",ability:"강철심",desc:"기본 피해"}},skinDefs:{default:{},azure:{}},achievementDefs:[{id:"firstClear"}],ui:{},refreshAccountUI:()=>{},GameEvents:{emit:()=>{}},fmtTime:()=>"00:00",account:{},loadAccountData:()=>{},saveAccountData:()=>{},loadRecords:()=>{},saveRecords:()=>{}};
@@ -59,4 +59,4 @@ for(const file of walk(path.join(root,"assets")).filter(file=>file.endsWith(".pn
 }
 
 assert.equal(pkg.scripts.test,"node tests/run-all.mjs","전체 테스트 자동 수집이 연결되지 않음");
-console.log("v14.15.7 stability/memory hardening audit: OK");
+console.log("v14.16.1 stability/memory hardening audit: OK");
