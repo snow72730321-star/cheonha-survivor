@@ -1,3 +1,0 @@
-/* v12 Animation/Audio pass: canvas animation is handled in JS. */
-#soundBtn{transition:transform .12s ease,filter .12s ease}
-#soundBtn:active{transform:scale(.9);filter:brightness(1.35)}
