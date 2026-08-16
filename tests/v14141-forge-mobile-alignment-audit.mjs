@@ -6,8 +6,8 @@ const forge=fs.readFileSync("js/systems/forge-v13.js","utf8");
 const css=fs.readFileSync("css/forge-mobile-v14-14-1-hotfix.css","utf8");
 const sw=fs.readFileSync("service-worker.js","utf8");
 
-assert.match(html,/v14\.16\.0-solo-raid/);
-assert.match(html,/forge-mobile-v14-14-1-hotfix\.css\?v=14161/);
+assert.match(html,/v14\.16\.2-raid-transcend/);
+assert.match(html,/forge-mobile-v14-14-1-hotfix\.css\?v=14162/);
 assert.ok(
   html.indexOf("forge-mobile-v14-14-1-hotfix.css")>html.indexOf("forge-mobile-final-v14-11-1.css"),
   "forge hotfix stylesheet must load last"
@@ -27,7 +27,7 @@ assert.match(css,/\.smith-preview-rows\{[\s\S]*?grid-template-rows:repeat\(4,min
 assert.match(css,/\.forge-smith-execute\{[\s\S]*?width:auto!important/);
 assert.match(css,/\.forge-weapon-filter button,[\s\S]*?align-items:center!important[\s\S]*?justify-content:center!important/);
 
-assert.match(sw,/cheonha-v14-16-1-raid-three-phase/);
+assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
 assert.match(sw,/css\/forge-mobile-v14-14-1-hotfix\.css/);
 assert.match(sw,/caches\.match\(request,\{ignoreSearch:true\}\)/);
 
@@ -42,4 +42,4 @@ const compareLineCenters=[.225,.461,.698].map(top=>(.27+.42*(top+.182/2))*1536);
 [619,771,924].forEach((expected,index)=>near(compareLineCenters[index],expected,3));
 near((1-.118-.077/2)*1536,1296,3); // 비교 선택 버튼 수직 중심
 
-console.log("v14.16.1 forge mobile alignment audit: OK");
+console.log("v14.16.2 forge mobile alignment audit: OK");

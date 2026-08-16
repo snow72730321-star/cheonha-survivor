@@ -173,7 +173,7 @@ levelChoice=function levelChoiceQueued(){
       const levelText=Number.isFinite(choice.max)?` ${Math.min(choice.max,(choice.level||0)+1)}/${choice.max}성`:"";
       showMessage(`${choice.name}${levelText}의 깨달음을 얻었다`,1.5);
       GameEvents.emit("level:choice",{choice,remaining:pendingLevelUps});
-      if(pendingLevelUps>0){setTimeout(levelChoice,0)}else{fixedAccumulator=0;player.levelResumeGrace=LEVEL_CHOICE_RESUME_GRACE;player.invuln=Math.max(player.invuln||0,LEVEL_CHOICE_RESUME_GRACE+.15);state="playing";ui.dodgeBtn.style.display="flex";last=performance.now()}
+      if(pendingLevelUps>0){setTimeout(levelChoice,0)}else if(window.SoloRaidMode?.active&&typeof window.SoloRaidMode.onGrowthReady==="function"){window.SoloRaidMode.onGrowthReady()}else{fixedAccumulator=0;player.levelResumeGrace=LEVEL_CHOICE_RESUME_GRACE;player.invuln=Math.max(player.invuln||0,LEVEL_CHOICE_RESUME_GRACE+.15);state="playing";ui.dodgeBtn.style.display="flex";last=performance.now()}
     },{once:true});
     ui.choices.appendChild(button);
   }

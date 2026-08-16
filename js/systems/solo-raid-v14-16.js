@@ -1,13 +1,13 @@
 "use strict";
 
 /**
- * v14.16.1 · 천마신교 1인 레이드
+ * v14.16.2 · 천마신교 1인 레이드 · 열쇠/전투진입/엔드게임 보상
  *
  * 기존 생존 난이도의 스폰·혈마 승리 판정과 분리된 보스 러시 컨트롤러다.
  * 모든 공격은 raid.telegraphs에 경고 판정을 먼저 등록한 뒤에만 피해를 준다.
  */
 (()=>{
-  const RAID_BUILD="cheonha-solo-raid-v2-three-phase";
+  const RAID_BUILD="cheonha-solo-raid-v3-keyed-transcend";
   const ARENA_RADIUS=545;
   const START_LEVEL=20;
   const GATE_LEVELS=[8,9,10,10];
@@ -23,18 +23,18 @@
     "assets/raid/bosses/cheonma-demon-dragon.png"
   ];
   const STAGES=[
-    {id:"peng",gate:1,name:"도마종 단주 팽단휘",sprite:RAID_ASSETS[1],duration:90,hp:52000,damage:18,speed:64,r:48,gimmick:"혈도세 · 체력 60%에서 파천도진 강화"},
-    {id:"namgung",gate:2,name:"법마종 대주 남궁혁",sprite:RAID_ASSETS[2],duration:90,hp:82000,damage:22,speed:52,r:45,gimmick:"사상법진 · 빛나는 안전 법인으로 이동"},
-    {id:"ma",gate:3,name:"검마종 종주 마허진",sprite:RAID_ASSETS[3],duration:90,hp:125000,damage:26,speed:58,r:47,gimmick:"삼절검총 · 검인 3개 파괴 전 본체 보호"},
-    {id:"cheondan",gate:4,name:"우호법 천단",sprite:RAID_ASSETS[4],duration:90,hp:180000,damage:30,speed:48,r:53,gimmick:"금강반진 · 정면 방어 중 후방을 공략"},
-    {id:"cheonma",gate:5,name:"천마(폭주)",sprite:RAID_ASSETS[5],duration:300,hp:420000,damage:36,speed:0,r:92,gimmick:"마수 한쪽 파괴 → 마룡 변신 → 천마 본체",fixed:true}
+    {id:"peng",gate:1,name:"도마종 단주 팽단휘",sprite:RAID_ASSETS[1],duration:100,hp:140000,damage:26,speed:66,r:48,gimmick:"혈도세 · 체력 60%에서 파천도진 강화"},
+    {id:"namgung",gate:2,name:"법마종 대주 남궁혁",sprite:RAID_ASSETS[2],duration:105,hp:240000,damage:31,speed:54,r:45,gimmick:"사상법진 · 빛나는 안전 법인으로 이동"},
+    {id:"ma",gate:3,name:"검마종 종주 마허진",sprite:RAID_ASSETS[3],duration:110,hp:390000,damage:37,speed:60,r:47,gimmick:"삼절검총 · 검인 3개 파괴 전 본체 보호"},
+    {id:"cheondan",gate:4,name:"우호법 천단",sprite:RAID_ASSETS[4],duration:120,hp:620000,damage:43,speed:50,r:53,gimmick:"금강반진 · 정면 방어 중 후방을 공략"},
+    {id:"cheonma",gate:5,name:"천마(폭주)",sprite:RAID_ASSETS[5],duration:330,hp:1250000,damage:50,speed:0,r:92,gimmick:"마수 한쪽 파괴 → 마룡 변신 → 천마 본체",fixed:true}
   ];
   const FINAL_ASSETS=Object.freeze({body:RAID_ASSETS[5],leftArm:RAID_ASSETS[6],rightArm:RAID_ASSETS[7],dragon:RAID_ASSETS[8]});
-  const FINAL_HP=Object.freeze({arm:125000,dragon:330000,body:420000});
+  const FINAL_HP=Object.freeze({arm:420000,dragon:900000,body:1250000});
 
   const raid={
     active:false,lastRun:false,stageIndex:0,completedGates:0,stageTime:0,currentBoss:null,
-    telegraphs:[],parts:[],patternIndex:0,patternTimer:0,awaitingGrowth:false,nextStage:0,
+    telegraphs:[],parts:[],patternIndex:0,patternTimer:0,awaitingGrowth:false,awaitingCombat:false,keyConsumed:false,nextStage:0,
     previousDifficulty:"chuchul",gimmickTriggered:false,gimmickTimer:0,shieldActive:false,
     shieldAngle:0,autoTraining:false,finishing:false,finalMaxTotal:0,finalDamage:0,
     finalPhase:0,finalCompletedDamage:0,finalPhaseMax:{arm:0,dragon:0,body:0},overseer:null,phaseGrace:0
@@ -48,7 +48,7 @@
   };
 
   function ensureRaidAccount(){
-    account.raidTokens=Math.max(0,Math.floor(Number(account.raidTokens)||0));
+    account.raidKeys=Math.max(0,Math.floor(Number(account.raidKeys)||0));account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));account.eternalOreSelectors=Math.max(0,Math.floor(Number(account.eternalOreSelectors)||0));
     account.raidStats=Object.assign({runs:0,clears:0,bestProgress:0,bestFinalDamage:0},account.raidStats||{});
     return account.raidStats;
   }
@@ -58,10 +58,7 @@
     const vx=x2-x1,vy=y2-y1,l2=vx*vx+vy*vy||1,t=Math.max(0,Math.min(1,((px-x1)*vx+(py-y1)*vy)/l2));
     return Math.hypot(px-(x1+vx*t),py-(y1+vy*t));
   }
-  function raidPowerScale(){
-    const power=window.CombatPowerSystem?CombatPowerSystem.equippedPower(selectedWeapon):0;
-    return 1+Math.min(1.8,Math.max(0,power)/90000);
-  }
+  function raidPowerScale(){return 1}
   function arenaPoint(index,radius=330){const a=-Math.PI/2+index*Math.PI/2;return{x:Math.cos(a)*radius,y:Math.sin(a)*radius}}
 
   function clearCombatObjects(keepBoss=false){
@@ -73,7 +70,7 @@
   }
 
   function makeBoss(stage,overrides={}){
-    const hp=Math.round((overrides.hp||stage.hp)*raidPowerScale()),fixed=overrides.fixed??!!stage.fixed;
+    const hp=Math.round((overrides.hp||stage.hp)),fixed=overrides.fixed??!!stage.fixed;
     return {
       ...overrides,type:"boss",raidBoss:true,raidId:overrides.raidId||stage.id,bossName:overrides.bossName||stage.name,sprite:overrides.sprite||stage.sprite,
       x:overrides.x??0,y:overrides.y??(fixed?-355:-310),homeX:overrides.x??0,homeY:overrides.y??(fixed?-355:-310),r:overrides.r||stage.r,hp,maxHp:hp,speed:overrides.speed??stage.speed,damage:overrides.damage??stage.damage,
@@ -90,7 +87,7 @@
     raid.parts.push(part);enemies.push(part);return part;
   }
 
-  function finalHp(key){return Math.round(FINAL_HP[key]*raidPowerScale())}
+  function finalHp(key){return Math.round(FINAL_HP[key])}
   function spawnFinalPhaseOne(stage){
     raid.finalPhase=1;raid.finalCompletedDamage=0;raid.phaseGrace=2.4;
     raid.finalPhaseMax={arm:finalHp("arm"),dragon:finalHp("dragon"),body:finalHp("body")};
@@ -121,7 +118,7 @@
 
   function spawnStage(index){
     if(!raid.active||index<0||index>=STAGES.length)return;
-    clearCombatObjects();raid.stageIndex=index;raid.nextStage=index;raid.patternIndex=0;raid.patternTimer=2.8;
+    clearCombatObjects();raid.awaitingCombat=false;raid.stageIndex=index;raid.nextStage=index;raid.patternIndex=0;raid.patternTimer=2.8;
     if(index!==4){raid.finalPhase=0;raid.phaseGrace=0}
     raid.gimmickTriggered=false;raid.gimmickTimer=0;raid.shieldActive=false;raid.stageTime=STAGES[index].duration;
     player.x=0;player.y=index===4?245:250;player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.3);
@@ -329,17 +326,18 @@
     account.ores[key]=(account.ores[key]||0)+1;return `${gradeName(grade)} ${oreTypes[type].name}`;
   }
   function settleRaidRewards(progress,win,reason){
-    ensureRaidAccount();const tokens=reason==="quit"?0:Math.max(0,Math.floor(progress*22)+(win?40:0)),items=[];
-    account.raidTokens+=tokens;
+    ensureRaidAccount();const items=[];
     if(reason!=="quit"){
-      if(progress>=1)items.push(randomOre("epic"));
-      if(progress>=2)items.push(randomOre("unique"));
-      if(progress>=4)items.push(randomOre("legendary"));
-      if(progress>=4.5){account.weaponSoulStones++;items.push("무혼석 1개")}
-      if(win){items.push(randomOre("mythic"));account.weaponSoulStones++;items.push("완주 무혼석 1개")}
+      if(win){account.eternalOreSelectors++;account.weaponSoulStones+=5;account.divineStones+=3;items.push("영원 광석 선택권 1장","무혼석 5개","무신석 3개")}
+      else if(raid.stageIndex===4&&raid.finalPhase>=3){items.push(randomOre("mythic"));account.weaponSoulStones+=3;account.divineStones+=2;items.push("무혼석 3개","무신석 2개")}
+      else if(raid.stageIndex===4&&raid.finalPhase>=2){items.push(randomOre("mythic"));account.weaponSoulStones+=2;account.divineStones+=1;items.push("무혼석 2개","무신석 1개")}
+      else if(progress>=4){items.push(randomOre("legendary"));account.weaponSoulStones+=2;account.divineStones+=1;items.push("무혼석 2개","무신석 1개")}
+      else if(progress>=3){items.push(randomOre("legendary"));account.weaponSoulStones+=1;items.push("무혼석 1개")}
+      else if(progress>=2){items.push(randomOre("unique"));account.weaponSoulStones+=1;items.push("무혼석 1개")}
+      else if(progress>=1)items.push(randomOre("epic"));
     }
-    const stats=account.raidStats;stats.runs++;if(win)stats.clears++;stats.bestProgress=Math.max(stats.bestProgress,progress);stats.bestFinalDamage=Math.max(stats.bestFinalDamage,raid.finalDamage||0);
-    saveAccountData();return{tokens,items};
+    const stats=account.raidStats;if(raid.keyConsumed){stats.runs++;if(win)stats.clears++;stats.bestProgress=Math.max(stats.bestProgress,progress);stats.bestFinalDamage=Math.max(stats.bestFinalDamage,raid.finalDamage||0);}
+    saveAccountData();return{items};
   }
 
   function finishRaid(win,reason="defeat"){
@@ -352,7 +350,7 @@
     if(typeof runFinalized!=="undefined")runFinalized=true;
     const pct=Math.round((progress-Math.floor(progress))*100),where=win?"최종 완주":raid.stageIndex<4?`${raid.stageIndex+1}관문 · ${stage.name} ${pct}% 피해`:`최종 천마 ${Math.round((raid.finalDamage||0)*100)}% 피해`;
     ui.resultTitle.textContent=win?"천마를 굴복시켰다":"사대관문에서 패퇴했다";
-    ui.finalStats.innerHTML=`콘텐츠 <b>천마신교 1인 레이드</b><br>도달 기록 <b>${where}</b><br>레이드 진행도 <b>${progress.toFixed(2)} / 5.00</b><br>최종 경지 <b>${player.level}</b> · 금자/경험치 획득 <b>0</b><br>천마패 <b>+${reward.tokens}</b>${reward.items.length?`<br>추가 보상 <b>${reward.items.join(" · ")}</b>`:""}${reason==="quit"?'<br><span class="danger-note">중도 이탈은 보상이 지급되지 않는다.</span>':""}`;
+    ui.finalStats.innerHTML=`콘텐츠 <b>천마신교 1인 레이드</b><br>도달 기록 <b>${where}</b><br>레이드 진행도 <b>${progress.toFixed(2)} / 5.00</b><br>최종 경지 <b>${player.level}</b> · 금자/경험치 획득 <b>0</b><br>보상 <b>${reward.items.length?reward.items.join(" · "):"없음"}</b>${reason==="quit"?'<br><span class="danger-note">중도 이탈은 보상이 지급되지 않는다.</span>':""}`;
     document.getElementById("restartBtn").textContent="같은 협객으로 레이드 재도전";
     ui.result.classList.add("show");GameAudio.playUI(win?"victory":"defeat");raid.previousDifficulty&& (selectedDifficulty=raid.previousDifficulty);
     clearCombatObjects();raid.finishing=false;
@@ -392,30 +390,31 @@
     player.level=START_LEVEL;player.xp=0;player.xpNeed=xpRequirement(START_LEVEL);
     const arts=weaponDefs[selectedWeapon].arts.filter(art=>art.hidden);
     for(const art of arts){player.hiddenReady[art.id]=true;player.hiddenNotified[art.id]=true;if((player.arts[art.id]||0)<1){player.arts[art.id]=1;art.onLearn?.(player,1);GameEvents.emit("skill:learned",{id:art.id,name:art.name,hidden:true,raid:true})}}
-    pendingLevelUps=START_LEVEL-1;raid.awaitingGrowth=true;raid.nextStage=0;state="levelup";levelChoice();
+    pendingLevelUps=START_LEVEL-1;raid.awaitingGrowth=true;raid.awaitingCombat=false;raid.nextStage=0;state="levelup";levelChoice();
   }
 
   async function beginRaid(){
     if(!selectedWeapon){showMessage("먼저 협객을 선택하시오",1.4);return}
+    ensureRaidAccount();if(account.raidKeys<1){showMessage("천마전의 열쇠가 필요하다",1.5);openLobby();return}
     const button=document.getElementById("soloRaidStart");button.disabled=true;button.textContent="레이드 에셋 준비 중…";
     try{
       const [weaponResult,raidResult]=await Promise.all([GameAssets.preloadWeapon(selectedWeapon),GameAssets.preloadList(RAID_ASSETS,()=>{},3)]);
       if(weaponResult.failed.length||raidResult.failed.length)showSystemToast("일부 레이드 에셋을 불러오지 못했습니다. 네트워크 연결을 확인해 주세요.",true);
-      ensureRaidAccount();raid.active=true;raid.lastRun=false;raid.finishing=false;raid.stageIndex=0;raid.completedGates=0;raid.finalDamage=0;raid.finalPhase=0;raid.finalCompletedDamage=0;raid.phaseGrace=0;raid.previousDifficulty=selectedDifficulty;selectedDifficulty="chuchul";
+      ensureRaidAccount();raid.active=true;raid.lastRun=false;raid.finishing=false;raid.keyConsumed=false;raid.awaitingCombat=false;raid.stageIndex=0;raid.completedGates=0;raid.finalDamage=0;raid.finalPhase=0;raid.finalCompletedDamage=0;raid.phaseGrace=0;raid.previousDifficulty=selectedDifficulty;selectedDifficulty="chuchul";
       initAudio();resetGame();clearCombatObjects();elapsed=0;spawnTimer=Infinity;nextMiniBossAt=Infinity;finalBossAt=Infinity;runDuration=Infinity;bossSpawned=true;
       updateCombatPortrait();[ui.menu,ui.result,ui.pause,ui.augment,ui.forge,hud.lobby].forEach(layer=>layer?.classList.remove("show"));
-      ui.ultimateBtn.style.display="flex";hud.root?.classList.add("show");startRaidGrowth();last=performance.now();
+      ui.ultimateBtn.style.display="none";ui.dodgeBtn.style.display="none";hud.root?.classList.add("show");startRaidGrowth();last=performance.now();
     }catch(error){console.error("레이드 시작 실패",error);showSystemToast("레이드를 시작하지 못했습니다. 다시 시도해 주세요.",true)}
     finally{button.disabled=false;button.textContent="선택 협객으로 레이드 출전"}
   }
 
   function openLobby(){
     if(!selectedWeapon){showMessage("레이드에 출전할 협객을 먼저 선택하시오",1.5);return}
-    ensureRaidAccount();if(hud.tokens)hud.tokens.textContent=`천마패 ${account.raidTokens.toLocaleString()}`;hud.lobby?.classList.add("show");
+    ensureRaidAccount();const cp=window.CombatPowerSystem?CombatPowerSystem.equippedPower(selectedWeapon):0,rec=window.CombatPowerSystem?.recommended?.("raid")||55000;if(hud.tokens)hud.tokens.textContent=`천마전의 열쇠 ${account.raidKeys.toLocaleString()}개`;const start=document.getElementById("soloRaidStart");if(start){start.disabled=account.raidKeys<1;start.textContent=account.raidKeys<1?"천마전의 열쇠가 필요합니다":`레이드 준비 · 권장 전투력 ${CombatPowerSystem?.format?CombatPowerSystem.format(rec):rec}`};const power=document.getElementById("raidPowerHint");if(power)power.innerHTML=`현재 전투력 <b>${window.CombatPowerSystem?CombatPowerSystem.format(cp):cp}</b> / 권장 <b>${window.CombatPowerSystem?CombatPowerSystem.format(rec):rec}</b>${cp<rec?" · <span class='danger-note'>영원 +15 이상 권장</span>":" · 출전 권장"}`;hud.lobby?.classList.add("show");
   }
   function decorateGrowth(){
     if(!raid.active||state!=="levelup")return;ui.levelUp.classList.add("raid-growth");
-    const title=ui.levelUp.querySelector("h2"),desc=ui.levelUp.querySelector(".desc");if(title)title.textContent=raid.stageIndex===0&&raid.completedGates===0?"레이드 사전 수련":"관문 돌파 · 전투 재정비";if(desc)desc.textContent="적은 완전히 정지해 있다. 남은 깨달음을 모두 배분하면 다음 관문이 시작된다.";
+    const title=ui.levelUp.querySelector("h2"),desc=ui.levelUp.querySelector(".desc");if(title)title.textContent=raid.stageIndex===0&&raid.completedGates===0?"레이드 사전 수련":"관문 돌파 · 전투 재정비";if(desc)desc.textContent="적은 생성되지 않는다. 남은 깨달음을 모두 배분한 뒤 전투진입을 눌러야 다음 구간이 시작된다.";
     const counter=document.createElement("div");counter.className="raid-growth-counter";counter.innerHTML=`<span>남은 성장</span><b>${pendingLevelUps}회</b><button class="secondary raid-auto-train" type="button">남은 성장 자동 수련</button>`;
     ui.hiddenBanner.prepend(counter);counter.querySelector("button").addEventListener("click",autoTrainRaid,{once:true});
   }
@@ -510,19 +509,21 @@
   const baseUpdateHud=updateHud;
   updateHud=function(){
     baseUpdateHud.apply(this,arguments);if(!raid.active)return;
-    ui.levelText.textContent=`경지 ${player.level}`;ui.timeText.textContent=fmtClock(raid.stageTime);ui.killText.textContent=raid.stageIndex<4?`관문 ${raid.stageIndex+1}/4`:"최종전";ui.xpFill.style.width="0%";ui.goldHud.textContent="금자 획득 없음";ui.oreHud.textContent=`천마패 ${Math.floor(account.raidTokens||0)}`;updateRaidHud();
+    ui.levelText.textContent=`경지 ${player.level}`;ui.timeText.textContent=fmtClock(raid.stageTime);ui.killText.textContent=raid.stageIndex<4?`관문 ${raid.stageIndex+1}/4`:"최종전";ui.xpFill.style.width="0%";ui.goldHud.textContent="금자 획득 없음";ui.oreHud.textContent=`열쇠 ${Math.floor(account.raidKeys||0)} · 무신석 ${Math.floor(account.divineStones||0)}`;updateRaidHud();
   };
   const baseLevelChoice=levelChoice;
   levelChoice=function(){const result=baseLevelChoice.apply(this,arguments);setTimeout(decorateGrowth,0);return result};
   const baseRenderPause=renderPause;
   renderPause=function(){baseRenderPause.apply(this,arguments);if(!raid.active)return;const stage=STAGES[raid.stageIndex];ui.pauseContent.insertAdjacentHTML("afterbegin",`<h3>1인 레이드</h3><div class="stat-grid"><div class="stat"><b>${raid.stageIndex<4?`${raid.stageIndex+1}관문`:"최종"}</b><span>현재 구간</span></div><div class="stat"><b>${fmtClock(raid.stageTime)}</b><span>제한시간</span></div><div class="stat"><b>${currentProgress().toFixed(2)}</b><span>진행도</span></div></div><div class="unlock-banner">${stage.name}<br>${stage.gimmick}</div>`)};
 
-  GameEvents.on("level:choice",detail=>{
-    if(!raid.active||!raid.awaitingGrowth||detail?.remaining!==0)return;raid.awaitingGrowth=false;ui.levelUp.classList.remove("raid-growth");
-    setTimeout(()=>{if(raid.active)spawnStage(raid.nextStage)},850);
-  });
+  function onGrowthReady(){
+    if(!raid.active)return;raid.awaitingGrowth=false;raid.awaitingCombat=true;state="levelup";ui.dodgeBtn.style.display="none";ui.ultimateBtn.style.display="none";ui.levelUp.classList.add("show","raid-growth","raid-ready");const title=ui.levelUp.querySelector("h2"),desc=ui.levelUp.querySelector(".desc");if(title)title.textContent=raid.nextStage===0?"레이드 준비 완료":"관문 재정비 완료";if(desc)desc.textContent="전투진입 전에는 보스·패턴·제한시간이 시작되지 않는다.";ui.choices.innerHTML="";ui.hiddenBanner.innerHTML=`<div class="unlock-banner"><b>${raid.nextStage===0?"사대관문 출전 준비":"다음 관문 준비 완료"}</b><br>${raid.nextStage===0?"첫 전투진입 시 천마전의 열쇠 1개가 소모된다.":"성장을 확인한 뒤 다음 구간으로 진입하시오."}</div><button class="primary raid-combat-enter" id="raidCombatEnter" type="button">${raid.nextStage===0&&!raid.keyConsumed?"전투진입 · 천마전의 열쇠 ×1":"전투진입"}</button>`;document.getElementById("raidCombatEnter")?.addEventListener("click",enterRaidCombat,{once:true});last=performance.now();
+  }
+  function enterRaidCombat(){
+    if(!raid.active||!raid.awaitingCombat)return;ensureRaidAccount();if(!raid.keyConsumed){if(account.raidKeys<1){showMessage("천마전의 열쇠가 필요하다",1.4);onGrowthReady();return}account.raidKeys--;raid.keyConsumed=true;saveAccountData()}raid.awaitingCombat=false;ui.levelUp.classList.remove("show","raid-growth","raid-ready");ui.hiddenBanner.innerHTML="";fixedAccumulator=0;player.levelResumeGrace=1;player.invuln=Math.max(player.invuln||0,1.4);spawnStage(raid.nextStage);last=performance.now();
+  }
+  GameEvents.on("level:choice",detail=>{if(raid.active&&raid.awaitingGrowth&&detail?.remaining===0)setTimeout(()=>{},0)});
 
-  document.getElementById("soloRaidOpen")?.addEventListener("click",openLobby);
   document.getElementById("soloRaidClose")?.addEventListener("click",()=>hud.lobby?.classList.remove("show"));
   document.getElementById("soloRaidStart")?.addEventListener("click",beginRaid);
   document.getElementById("restartBtn")?.addEventListener("click",event=>{if(!raid.lastRun)return;event.preventDefault();event.stopImmediatePropagation();ui.result.classList.remove("show");beginRaid()},{capture:true});
@@ -531,6 +532,6 @@
 
   window.SoloRaidMode=Object.freeze({
     BUILD:RAID_BUILD,get active(){return raid.active},get state(){return raid},stages:STAGES,assets:RAID_ASSETS,
-    begin:beginRaid,progress:currentProgress,spawnStage
+    begin:beginRaid,openLobby,onGrowthReady,enterCombat:enterRaidCombat,progress:currentProgress,spawnStage
   });
 })();

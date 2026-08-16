@@ -15,7 +15,7 @@
  * - menu-codex.js: applyForgedWeapon
  */
 (function installForgeV13(){
-  const BUILD = 16;
+  const BUILD = 17;
   const MAX_ENHANCE = 25;
   const ENHANCE_SUCCESS_VFX = "assets/vfx/forge/enhance-success.gif";
   // 현재 단계에서 다음 단계로 올라갈 기본 성공률(+0→+1 ... +24→+25).
@@ -29,6 +29,17 @@
   const POTENTIAL_COLORS = {rare:"#68a7ff",epic:"#bd79ff",unique:"#ef9c4c",legendary:"#ff5d57"};
   const TIER_UP_NORMAL = {rare:.08,epic:.04,unique:.015};
   const TIER_UP_BLACK = {rare:.12,epic:.06,unique:.025};
+  const TRANSCEND_EFF=Object.freeze([1,1.10,1.22,1.35]);
+  const TRANSCEND_OPTIONS=Object.freeze({
+    sword:[{id:"sword_blade_sea",name:"검해무진",desc:"서로 다른 검 무공 3종이 같은 적을 연속 적중하면 검흔이 폭발한다."},{id:"sword_tenk_mastery",name:"만검조종",desc:"만검귀종이 서로 다른 적을 우선 추적하고 잉여 귀검을 거대 귀검으로 융합한다."}],
+    spear:[{id:"spear_point_heaven",name:"일점파천",desc:"관통이 진행될수록 창 투사체 피해가 상승한다."},{id:"spear_vein_burst",name:"용맥폭발",desc:"낙성창진·무극패왕창 적중 시 추가 창기 폭발이 발생한다."}],
+    bow:[{id:"bow_endless_volley",name:"무진연시",desc:"기본 사격을 일정 횟수 누적하면 추가 화살 일제사격을 발동한다."},{id:"bow_sunmoon_cycle",name:"일월교대",desc:"같은 대상에게 태양·달을 번갈아 적중시키면 일월 폭발이 발생한다."}],
+    poison:[{id:"poison_return",name:"만독귀원",desc:"중독 5중첩 적 처치 시 주변 적에게 독을 전파한다."},{id:"poison_deadheart",name:"사독심장",desc:"사독 상태 대상에게 만천화우 계열 피해가 증가한다. 보스에는 상한이 적용된다."}],
+    tao:[{id:"tao_five_cycle",name:"오행순환",desc:"속성 타격 누적으로 오행귀일 버프를 획득한다."},{id:"tao_thunderfall",name:"천뢰강림",desc:"속성 타격을 누적하면 대상 위치에 강화 벼락이 떨어진다."}],
+    saber:[{id:"saber_bloodwar",name:"혈전무쌍",desc:"체력이 낮을수록 피해가 증가하고 위기 구간에서 추가 피해 감소를 얻는다."},{id:"saber_demon_mark",name:"천마멸도",desc:"천마군림도가 마흔을 남겨 다음 강타의 피해를 강화한다."}],
+    katana:[{id:"katana_eclipse_echo",name:"월식잔향",desc:"은월·월흔 폭발 시 일정 확률로 추가 잔월참이 발생한다."},{id:"katana_extreme_open",name:"극월개방",desc:"극월 누적에 따라 절월 이후 경화수월의 지속·화력이 추가 상승한다."}],
+    fist:[{id:"fist_unbreakable",name:"불괴금강",desc:"금강호체 발동 후 짧은 시간 추가 피해 감소를 얻는다."},{id:"fist_one_world",name:"일극천하",desc:"보스에게 일극개방 적중 시 일정 주기로 처치 없이 일극 스택을 얻는다."}]
+  });
 
   /** 강화 단계에 따른 총 피해 배율. 등급이 높을수록 강화 효율이 커진다. */
   function enhancementMultiplier(level,itemOrGrade){
@@ -60,6 +71,9 @@
     item.failStack=0;
     item.rerolls = Number(item.rerolls)||0;
     item.potentialPity = Math.max(0, Math.min(.05, Number(item.potentialPity)||0));
+    item.transcendLevel=Math.max(0,Math.min(3,Math.floor(Number(item.transcendLevel)||0)));
+    item.transcendAttempts=Math.max(0,Math.min(10,Math.floor(Number(item.transcendAttempts)||0)));
+    item.transcendOption=typeof item.transcendOption==="string"?item.transcendOption:null;
     if(!item.baseDamageMul){
       // 구버전 강화로 증가한 피해량을 보존하면서 새 계산식으로 전환한다.
       item.baseDamageMul = (Number(item.damageMul)||1) / enhancementMultiplier(item.level,item);
@@ -78,15 +92,16 @@
 
   function migrateForgeData(){
     // 실제 데이터가 바뀐 경우에만 저장해 정상 백업을 불필요하게 교체하지 않는다.
-    const before=JSON.stringify({forgeVersion:account.forgeVersion,weapons:account.weapons,brokenWeapons:account.brokenWeapons,forgeCodex:account.forgeCodex,gachaMileage:account.gachaMileage,weaponSoulStones:account.weaponSoulStones});
+    const before=JSON.stringify({forgeVersion:account.forgeVersion,weapons:account.weapons,brokenWeapons:account.brokenWeapons,forgeCodex:account.forgeCodex,gachaMileage:account.gachaMileage,weaponSoulStones:account.weaponSoulStones,divineStones:account.divineStones,raidKeys:account.raidKeys,eternalOreSelectors:account.eternalOreSelectors});
     account.forgeVersion = BUILD;
     account.weapons = (account.weapons||[]).map(normalizeWeapon);
     account.brokenWeapons=(Array.isArray(account.brokenWeapons)?account.brokenWeapons:[]).map(normalizeWeapon);
     account.gachaMileage=Math.max(0,Math.floor(Number(account.gachaMileage)||0));
     account.weaponSoulStones=Math.max(0,Math.floor(Number(account.weaponSoulStones)||0));
+    account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));account.raidKeys=Math.max(0,Math.floor(Number(account.raidKeys)||0));account.eternalOreSelectors=Math.max(0,Math.floor(Number(account.eternalOreSelectors)||0));
     account.forgeCodex = account.forgeCodex || {};
     for(const item of account.weapons) account.forgeCodex[item.ability] = true;
-    const after=JSON.stringify({forgeVersion:account.forgeVersion,weapons:account.weapons,brokenWeapons:account.brokenWeapons,forgeCodex:account.forgeCodex,gachaMileage:account.gachaMileage,weaponSoulStones:account.weaponSoulStones});
+    const after=JSON.stringify({forgeVersion:account.forgeVersion,weapons:account.weapons,brokenWeapons:account.brokenWeapons,forgeCodex:account.forgeCodex,gachaMileage:account.gachaMileage,weaponSoulStones:account.weaponSoulStones,divineStones:account.divineStones,raidKeys:account.raidKeys,eternalOreSelectors:account.eternalOreSelectors});
     return before!==after;
   }
 
@@ -224,6 +239,7 @@
       <div class="forge-tabs">
         <button class="forge-tab active" data-forge-tab="enhance">모루 강화</button>
         <button class="forge-tab" data-forge-tab="potential">내공 잠재</button>
+        <button class="forge-tab" data-forge-tab="transcend">무신 초월</button>
         <button class="forge-tab" data-forge-tab="codex">단조 도감</button>
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
@@ -252,6 +268,7 @@
         <p class="desc" id="refineHelp">일반 재련은 즉시 적용된다. 흑옥 재련은 기존·신규 옵션을 비교한다.</p><p class="desc forge-live-gold">보유 금자 <b id="forgePotentialGold">0</b></p>
         <div id="potentialCompare"></div>
       </div>
+      <div class="forge-pane" data-forge-pane="transcend"><div class="transcend-panel" id="forgeTranscendPanel"></div></div>
       <div class="forge-pane" data-forge-pane="codex"><div class="recipe-list" id="forgeCodexList"></div></div>
       <button class="secondary" id="forgeDetailClose" type="button">무기를 내려놓는다</button>
     </div>`;
@@ -349,7 +366,7 @@
     if(cpBox&&cp){
       const nextItem=item.level<MAX_ENHANCE?{...item,level:item.level+1}:null;
       const next=nextItem?CombatPowerSystem.calculate(nextItem):null;
-      cpBox.innerHTML=`<div class="cp-main"><b>${CombatPowerSystem.format(cp.total)}</b><span>무기 전투력</span></div><div class="cp-components"><span>기초·강화 <b>${CombatPowerSystem.format(cp.core)}</b></span><span>제작 품질 <b>+${CombatPowerSystem.format(cp.quality)}</b></span><span>속성 <b>+${CombatPowerSystem.format(cp.ability)}</b></span><span>잠재 <b>+${CombatPowerSystem.format(cp.potential)}</b></span><span>공명 능력치 <b>+${CombatPowerSystem.format(cp.resonance)}</b></span></div>${next?`<div class="cp-next">강화 성공 시 <b>${CombatPowerSystem.format(next.total)}</b> <em>+${CombatPowerSystem.format(next.total-cp.total)}</em></div>`:`<div class="cp-next max">최대 강화 전투력</div>`}`;
+      cpBox.innerHTML=`<div class="cp-main"><b>${CombatPowerSystem.format(cp.total)}</b><span>무기 전투력</span></div><div class="cp-components"><span>기초·강화 <b>${CombatPowerSystem.format(cp.core)}</b></span><span>제작 품질 <b>+${CombatPowerSystem.format(cp.quality)}</b></span><span>속성 <b>+${CombatPowerSystem.format(cp.ability)}</b></span><span>잠재 <b>+${CombatPowerSystem.format(cp.potential)}</b></span><span>초월 <b>+${CombatPowerSystem.format(cp.transcend||0)}</b></span><span>공명 능력치 <b>+${CombatPowerSystem.format(cp.resonance)}</b></span></div>${next?`<div class="cp-next">강화 성공 시 <b>${CombatPowerSystem.format(next.total)}</b> <em>+${CombatPowerSystem.format(next.total-cp.total)}</em></div>`:`<div class="cp-next max">최대 강화 전투력</div>`}`;
     }
     renderAnvilSelection(root.querySelector("#anvilScene"),item);
     const currentLevelEl=root.querySelector("#enhanceCurrentLevel"),nextLevelEl=root.querySelector("#enhanceNextLevel");
@@ -375,7 +392,7 @@
     const normalCost=root.querySelector("#normalRefineCost"),blackCost=root.querySelector("#blackRefineCost");
     if(normalCost)normalCost.textContent=`${refineCost(item,false).toLocaleString()} 금자`;
     if(blackCost)blackCost.textContent=`${refineCost(item,true).toLocaleString()} 금자`;
-    root.querySelector("#potentialCompare").innerHTML="";
+    root.querySelector("#potentialCompare").innerHTML="";renderTranscendPane(item);
     updateForgeLiveGold();
   }
 
@@ -451,6 +468,15 @@
     box.querySelector("#acceptPotential").addEventListener("click",()=>{item.potentialGrade=pendingPotential.grade;item.potentials=pendingPotential.lines;pendingPotential=null;account.pendingPotential=null;root.dataset.forgeMode="potential";saveAccountData();renderDetail();detailOverlay().querySelector("#refineHelp").textContent="신규 잠재옵션을 적용했다.";GameAudio.playUI("potential-accept")});
   }
 
+  function transcendOption(item){return (TRANSCEND_OPTIONS[item?.weapon]||[]).find(x=>x.id===item?.transcendOption)||null}
+  function renderTranscendPane(item=selectedItem()){
+    const root=detailOverlay(),box=root.querySelector("#forgeTranscendPanel");if(!box||!item)return;normalizeWeapon(item);const eligible=item.grade==="eternal",lv=item.transcendLevel||0,attempts=item.transcendAttempts||0,eff=Math.round(((TRANSCEND_EFF[lv]||1)-1)*100),opt=transcendOption(item),choices=TRANSCEND_OPTIONS[item.weapon]||[];account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));
+    box.innerHTML=`<div class="potential-grade">무신 초월 · ${lv}/3</div><div class="forge-rate-card"><div><b>${lv}/3</b><small>초월 단계</small></div><div><b>${attempts}/10</b><small>누적 시도</small></div><div><b>+${eff}%</b><small>잠재 효율</small></div></div><p class="desc">영원 등급 무기 전용 · 시도당 무신석 1개 · 기본 성공률 10% · 최대 3초월 · 무기당 총 10회 제한. 10번째까지 0초월이면 첫 초월만 확정된다.</p><div class="ore-mileage-balance">보유 무신석 <b>${account.divineStones.toLocaleString()}</b></div>${opt?`<div class="unlock-banner"><b>초월 옵션 · ${opt.name}</b><br>${opt.desc}</div>`:lv>0?`<div class="transcend-choice"><p class="desc">첫 초월 옵션을 하나 선택하시오. 선택 후 변경할 수 없다.</p>${choices.map(o=>`<button class="secondary" data-transcend-option="${o.id}" type="button"><b>${o.name}</b><small>${o.desc}</small></button>`).join("")}</div>`:""}<button class="primary" id="transcendExecute" type="button" ${!eligible||lv>=3||attempts>=10||account.divineStones<1?"disabled":""}>${!eligible?"영원 등급만 초월 가능":lv>=3?"3초월 완료":attempts>=10?"초월 시도 한도 소진":"초월 시도 · 무신석 1개"}</button><p class="forge-result-message" id="transcendMessage">${eligible?"초월은 강화 단계와 무관하게 시도할 수 있다.":"영원 등급 무기를 선택하시오."}</p>`;
+    box.querySelector("#transcendExecute")?.addEventListener("click",attemptTranscend);box.querySelectorAll("[data-transcend-option]").forEach(b=>b.addEventListener("click",()=>chooseTranscendOption(b.dataset.transcendOption)));
+  }
+  function attemptTranscend(){const item=selectedItem();if(!item)return;normalizeWeapon(item);if(item.grade!=="eternal"||item.transcendLevel>=3||item.transcendAttempts>=10)return;account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));if(account.divineStones<1){showMessage("무신석이 필요하다",1.2);return}account.divineStones--;item.transcendAttempts++;const guaranteed=item.transcendLevel===0&&item.transcendAttempts===10,success=guaranteed||Math.random()<.10;if(success){item.transcendLevel++;showMessage(`초월 성공 · ${item.transcendLevel}초월`,1.4);GameAudio.playUI("forge-success")}else{showMessage(`초월 실패 · ${item.transcendAttempts}/10`,1.2);GameAudio.playUI("forge-failure")}saveAccountData();renderWeaponInventory();renderDetail()}
+  function chooseTranscendOption(id){const item=selectedItem();if(!item||item.transcendLevel<1||item.transcendOption)return;const opt=(TRANSCEND_OPTIONS[item.weapon]||[]).find(x=>x.id===id);if(!opt)return;item.transcendOption=opt.id;saveAccountData();renderWeaponInventory();renderDetail();showMessage(`초월 옵션 · ${opt.name}`,1.4);GameAudio.playUI("potential-accept")}
+
   function renderCodex(){
     const root=detailOverlay(),recipes=Object.entries(oreTypes).map(([id,ore])=>{
       const unlocked=!!account.forgeCodex[id];
@@ -499,7 +525,7 @@
       normalizeWeapon(item);const gd=gradeDefs.find(g=>g.id===item.grade),eq=account.equipped[item.weapon]===item.id;
       const art=window.WeaponVisuals?WeaponVisuals.asset(item):"";const color=window.WeaponVisuals?WeaponVisuals.element(item).color:"#d6bc72";
       const cp=window.CombatPowerSystem?CombatPowerSystem.value(item):0;
-      return `<div class="weapon-item v13-item art-weapon-card ${eq?"equipped":""}" style="--weapon-aura:${color}"><div class="weapon-card-art" data-art-id="${item.id}"><img src="${art}" alt="${item.name}"></div><div class="weapon-card-copy"><strong><span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span><span>${cp?"전투력 "+CombatPowerSystem.format(cp):item.damageMul.toFixed(2)+"x"}</span></strong><p>${weaponDefs[item.weapon].name} · ${item.abilityName}: ${item.abilityDesc}</p><div class="potential-mini">${item.potentials.map(x=>`<span>• ${potentialText(x)}</span>`).join("")}</div><div class="weapon-actions"><button class="equip-toggle ${eq?"is-equipped":""}" data-equip="${item.id}">${eq?"장착 해제":"장착"}</button><button data-detail="${item.id}">모루·잠재</button><button data-break="${item.id}">분해</button></div></div></div>`;
+      return `<div class="weapon-item v13-item art-weapon-card ${eq?"equipped":""}" style="--weapon-aura:${color}"><div class="weapon-card-art" data-art-id="${item.id}"><img src="${art}" alt="${item.name}"></div><div class="weapon-card-copy"><strong><span class="rarity-${item.grade}">${gd.name} ${item.name} +${item.level}</span><span>${cp?"전투력 "+CombatPowerSystem.format(cp):item.damageMul.toFixed(2)+"x"}</span></strong><p>${weaponDefs[item.weapon].name} · ${item.abilityName}: ${item.abilityDesc}</p><div class="potential-mini">${item.transcendLevel?`<span>◆ 초월 ${["","I","II","III"][item.transcendLevel]}${item.transcendOption?` · ${transcendOption(item)?.name||"초월 옵션"}`:""}</span>`:""}${item.potentials.map(x=>`<span>• ${potentialText(x)}</span>`).join("")}</div><div class="weapon-actions"><button class="equip-toggle ${eq?"is-equipped":""}" data-equip="${item.id}">${eq?"장착 해제":"장착"}</button><button data-detail="${item.id}">모루·잠재·초월</button><button data-break="${item.id}">분해</button></div></div></div>`;
     }).join(""):'<p class="desc">아직 제작한 무기가 없다.</p>';
     if(window.WeaponVisuals)ui.weaponInventory.querySelectorAll("[data-art-id]").forEach(box=>{const item=account.weapons.find(x=>x.id===box.dataset.artId);if(item)WeaponVisuals.decorate(box,item,item.weapon)});
     ui.weaponInventory.querySelectorAll("[data-equip]").forEach(b=>b.addEventListener("click",()=>{const item=account.weapons.find(x=>x.id===b.dataset.equip);if(!item)return;const wasEquipped=account.equipped[item.weapon]===item.id;if(wasEquipped)delete account.equipped[item.weapon];else account.equipped[item.weapon]=item.id;saveAccountData();renderWeaponInventory();if(selectedItemId===item.id)renderDetail();if(typeof buildWeaponMenu==="function")buildWeaponMenu();if(typeof buildDifficultyMenu==="function")buildDifficultyMenu();if(typeof updateStartButton==="function")updateStartButton();showMessage(wasEquipped?`${item.name} 장착을 해제했다.`:`${item.name}을 장착했다.`,1.1);GameAudio.playUI(wasEquipped?"cancel":"equip")}));
@@ -540,20 +566,20 @@
 
   /** 잠재옵션을 실제 플레이어 능력치에 반영한다. */
   function applyPotentialStats(item){
-    for(const line of item.potentials||[]){
+    const eff=TRANSCEND_EFF[item.transcendLevel||0]||1;for(const line of item.potentials||[]){const v=(line.key==="projectile"||line.key==="pierce")?line.value:line.value*eff;
       switch(line.key){
-        case "damage":player.damageMul*=1+line.value*1.15;break;
-        case "crit":player.critChance+=line.value;break;
-        case "critDamage":player.critDamage+=line.value;break;
-        case "boss":player.eliteDamageMul*=1+line.value*1.18;break;
-        case "attackSpeed":player.attackSpeedMul*=Math.max(.55,1-line.value);break;
-        case "cooldown":player.cooldownRate*=1+line.value;break;
-        case "area":player.areaMul*=1+line.value*1.12;break;
-        case "hp":player.maxHp+=line.value;player.hp+=line.value;break;
-        case "reduction":player.damageReduction=Math.min(.65,player.damageReduction+line.value);break;
-        case "projectile":player.projectileBonus+=line.value;break;
-        case "pierce":player.pierceBonus+=line.value;break;
-        case "speed":player.speed*=1+line.value;break;
+        case "damage":player.damageMul*=1+v*1.15;break;
+        case "crit":player.critChance+=v;break;
+        case "critDamage":player.critDamage+=v;break;
+        case "boss":player.eliteDamageMul*=1+v*1.18;break;
+        case "attackSpeed":player.attackSpeedMul*=Math.max(.55,1-v);break;
+        case "cooldown":player.cooldownRate*=1+v;break;
+        case "area":player.areaMul*=1+v*1.12;break;
+        case "hp":player.maxHp+=v;player.hp+=v;break;
+        case "reduction":player.damageReduction=Math.min(.65,player.damageReduction+v);break;
+        case "projectile":player.projectileBonus+=v;break;
+        case "pierce":player.pierceBonus+=v;break;
+        case "speed":player.speed*=1+v;break;
       }
     }
   }
@@ -561,11 +587,11 @@
   const legacyApplyForgedWeapon=window.applyForgedWeapon;
   window.applyForgedWeapon=function(){
     legacyApplyForgedWeapon();
-    if(player.forgedWeapon){normalizeWeapon(player.forgedWeapon);applyPotentialStats(player.forgedWeapon);applyEnhanceMilestones(player.forgedWeapon);applyPotentialResonance(player.forgedWeapon)}
+    if(player.forgedWeapon){normalizeWeapon(player.forgedWeapon);player.weaponTranscend={level:player.forgedWeapon.transcendLevel||0,option:player.forgedWeapon.transcendOption||null};applyPotentialStats(player.forgedWeapon);applyEnhanceMilestones(player.forgedWeapon);applyPotentialResonance(player.forgedWeapon);if(player.forgedWeapon.transcendLevel)player.forgeMilestones.push(`${player.forgedWeapon.transcendLevel}초월 · 잠재 효율 +${Math.round(((TRANSCEND_EFF[player.forgedWeapon.transcendLevel]||1)-1)*100)}%${transcendOption(player.forgedWeapon)?` · ${transcendOption(player.forgedWeapon).name}`:""}`)}else player.weaponTranscend={level:0,option:null}
   };
 
   // 저장 데이터를 불러오기 전 기본 계정을 덮어쓰지 않는다.
   detailOverlay();
   GameEvents.on("save:loaded",()=>{if(migrateForgeData())saveAccountData()});
-  window.CheonHaForgeV13={openDetail,normalizeWeapon,enhancementMultiplier,potentialText,MAX_ENHANCE,GRADE_ENHANCE_SCALE,failureRisk,enhancementOutcomeRates,recoverBrokenWeapon,showPotentialOdds};
+  window.CheonHaForgeV13={openDetail,normalizeWeapon,enhancementMultiplier,potentialText,MAX_ENHANCE,GRADE_ENHANCE_SCALE,failureRisk,enhancementOutcomeRates,recoverBrokenWeapon,showPotentialOdds,TRANSCEND_OPTIONS,attemptTranscend,chooseTranscendOption};
 })();

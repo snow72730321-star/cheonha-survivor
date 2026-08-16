@@ -7,7 +7,7 @@ ok(combat.includes('updateProjectiles(dt);updateGems(dt);if(state!=="playing")re
 ok(combat.includes('damage:(16+lv*6)*(n>1?.82:1)*.82'),"검 기본기 너프 누락");
 ok(combat.includes('damage:(18+a.meteor*9)*.84'),"유성검우 너프 누락");
 ok(combat.includes('damageEnemy(e,(8+a.taiji*7)*.82'),"태극검진 너프 누락");
-ok(combat.includes('damage:(24+a.tenk*10)*.84*damageScale'),"만검귀종 너프 누락");
+ok(combat.includes('baseDamage=(24+a.tenk*10)*.84*damageScale')&&combat.includes('n===1?.70:n===2?.50:n===3?.35:.25'),"만검귀종 너프 누락");
 ok(combat.includes('namelessCutV1454')&&combat.includes('visualSource:"namelessV1454"'),"신규 무명참 호출 누락");
 ok(sprite.includes('v.type==="namelessCutV1454"'),"신규 무명참 렌더러 누락");
 ok(remaster.includes('playerVisualEnvelope')&&remaster.includes('player.shieldMax')&&remaster.includes('ctx.ellipse(cx,sy,rx,ry'),"방어막 가독성 렌더 누락");

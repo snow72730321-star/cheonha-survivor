@@ -1,7 +1,7 @@
 import fs from "node:fs";import assert from "node:assert/strict";
 const read=p=>fs.readFileSync(p,"utf8"),storage=read("js/systems/storage-forge.js"),html=read("index.html"),css=read("css/forge-v13.css"),katana=read("js/systems/katana-rework-v15.js"),sw=read("service-worker.js");
 assert.match(storage,/function nextSynthGrade\(grade\).*i<gradeIndex\("legendary"\)/,"일반 광물 합성 상한이 전설이 아님");
-assert.match(storage,/HIGH_ORE_GACHA=Object\.freeze\(\{cost:3000,mythic:\.005,eternal:\.0007,soulStone:\.001\}\)/,"금자 뽑기 비용\/고급 광물/무혼석 확률 누락");
+assert.match(storage,/HIGH_ORE_GACHA=Object\.freeze\(\{cost:3000,mythic:\.005,eternal:\.0007,soulStone:\.001,raidKey:\.02\}\)/,"금자 뽑기 비용\/고급 광물/무혼석 확률 누락");
 assert.match(storage,/account\.gold-=cost/);assert.match(storage,/grade="eternal"/);assert.match(storage,/grade="mythic"/);
 for(const n of [1,10,100])assert.ok(html.includes(`data-ore-gacha="${n}"`),`${n}뽑 버튼 누락`);
 assert.ok(html.includes('id="oreGacha"')&&html.includes('id="oreGachaGold"'),"별도 고급 광물 뽑기 페이지 누락");assert.match(css,/\.ore-gacha-panel/);

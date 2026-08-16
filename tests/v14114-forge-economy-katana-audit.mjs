@@ -13,5 +13,5 @@ ok(abyss.includes('Math.random()<.10')&&abyss.includes('dropWeaponSoulStone'),"a
 ok(katana.includes('slice(0,40)')&&katana.includes('type:"jeolwolHit"')&&katana.includes('resolveJeolwolHit'),"jeolwol frame-40 hit delay missing");
 ok((katana.includes('endAtPlayer:endpointAnchored')||katana.includes('endAtPlayer:cfg.endpoint'))&&katana.includes('katanaMoonForm1')&&katana.includes('katanaMoonForm3')&&katana.includes('w*.48'),"moon form 1/3 endpoint anchoring missing");
 ok(save.includes('const VERSION=18')&&save.includes('gachaMileage')&&save.includes('weaponSoulStones')&&save.includes('brokenWeapons')&&save.includes('artisanBreath'),"save migration missing");
-ok(sw.includes('cheonha-v14-16-1-raid-three-phase'),"cache version missing");
+ok(sw.includes('cheonha-v14-16-2-raid-transcend'),"cache version missing");
 console.log("v14.11.2 forge economy + katana audit: OK");

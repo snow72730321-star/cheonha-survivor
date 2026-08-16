@@ -5,7 +5,7 @@
  * 핵심 캘리브레이션: 전설 +15(무옵션 기준) ~= 신화 +0 = 수라 권장 전투력 20,000.
  */
 const CombatPowerSystem=(()=>{
-  const RECOMMENDED=Object.freeze({chuchul:5000,beombu:8500,gosu:13000,sura:20000,abyss:100000});
+  const RECOMMENDED=Object.freeze({chuchul:5000,beombu:8500,gosu:13000,sura:20000,abyss:100000,raid:55000});
   const GRADE_BASE={common:.32,rare:.42,epic:.56,unique:.74,legendary:1,mythic:0,eternal:2.36};
   const GRADE_EXPECTED_BASE={common:1.06,rare:1.18,epic:1.30,unique:1.42,legendary:1.54,mythic:1.66,eternal:1.78};
   const OFFENSIVE=new Set(["damage","crit","critDamage","boss","attackSpeed","cooldown","area","projectile","pierce"]);
@@ -64,7 +64,9 @@ const CombatPowerSystem=(()=>{
       default:return 1;
     }
   }
-  function potentialFactor(item){return (item?.potentials||[]).reduce((f,line)=>f*lineFactor(line,item.weapon),1)}
+  function transcendEfficiency(item){return [1,1.10,1.22,1.35][Math.max(0,Math.min(3,Number(item?.transcendLevel)||0))]||1}
+  function effectiveLine(line,item){if(line?.key==="projectile"||line?.key==="pierce")return line;return Object.assign({},line,{value:(Number(line?.value)||0)*transcendEfficiency(item)})}
+  function potentialFactor(item){return (item?.potentials||[]).reduce((f,line)=>f*lineFactor(effectiveLine(line,item),item.weapon),1)}
   function resonanceFactor(item){
     const lines=item?.potentials||[],off=lines.filter(x=>OFFENSIVE.has(x.key)).length,def=lines.filter(x=>DEFENSIVE.has(x.key)).length;
     const score=lines.reduce((n,x)=>n+(POT_GRADE_SCORE[x.grade]||1),0);
@@ -87,8 +89,9 @@ const CombatPowerSystem=(()=>{
     const af=abilityFactor(item),ability=Math.max(0,Math.round(running*(af-1)));running+=ability;
     const pf=potentialFactor(item),potential=Math.max(0,Math.round(running*(pf-1)));running+=potential;
     const rf=resonanceFactor(item),resonance=Math.max(0,Math.round(running*(rf-1)));running+=resonance;
+    const tf=1+[0,.045,.09,.15][Math.max(0,Math.min(3,Number(item.transcendLevel)||0))],transcend=Math.max(0,Math.round(running*(tf-1)));running+=transcend;
     const total=Math.max(1,Math.round(running));
-    return {total,core,quality,ability,potential,resonance,ratio:total/RECOMMENDED.sura,recommended:total>=RECOMMENDED.sura};
+    return {total,core,quality,ability,potential,resonance,transcend,ratio:total/RECOMMENDED.sura,recommended:total>=RECOMMENDED.sura};
   }
   function value(item){return calculate(item).total}
   function format(n){return Math.max(0,Math.round(Number(n)||0)).toLocaleString("ko-KR")}

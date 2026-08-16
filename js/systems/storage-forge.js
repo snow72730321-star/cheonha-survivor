@@ -1,5 +1,5 @@
 "use strict";
-function loadAccountData(){try{const a=JSON.parse(localStorage.getItem("murimAccountV1")||"null");if(a)account=Object.assign(account,a)}catch(_){}account.ores=account.ores||{};account.weapons=account.weapons||[];account.equipped=account.equipped||{};account.gachaMileage=Math.max(0,Math.floor(Number(account.gachaMileage)||0));account.weaponSoulStones=Math.max(0,Math.floor(Number(account.weaponSoulStones)||0));account.brokenWeapons=Array.isArray(account.brokenWeapons)?account.brokenWeapons:[];refreshAccountUI()}
+function loadAccountData(){try{const a=JSON.parse(localStorage.getItem("murimAccountV1")||"null");if(a)account=Object.assign(account,a)}catch(_){}account.ores=account.ores||{};account.weapons=account.weapons||[];account.equipped=account.equipped||{};account.gachaMileage=Math.max(0,Math.floor(Number(account.gachaMileage)||0));account.weaponSoulStones=Math.max(0,Math.floor(Number(account.weaponSoulStones)||0));account.raidKeys=Math.max(0,Math.floor(Number(account.raidKeys)||0));account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));account.eternalOreSelectors=Math.max(0,Math.floor(Number(account.eternalOreSelectors)||0));account.brokenWeapons=Array.isArray(account.brokenWeapons)?account.brokenWeapons:[];refreshAccountUI()}
 function saveAccountData(){try{localStorage.setItem("murimAccountV1",JSON.stringify(account))}catch(_){}refreshAccountUI()}
 function oreKey(type,grade){return `${type}:${grade}`}
 function totalOres(){return Object.values(account.ores).reduce((a,b)=>a+(b||0),0)}
@@ -24,13 +24,16 @@ function sellOre(key,amount="one"){
 function managedOreEntries(){
  return Object.entries(account.ores).filter(([,n])=>n>0).sort(([a],[b])=>{const [ta,ga]=a.split(":"),[tb,gb]=b.split(":");return gradeIndex(gb)-gradeIndex(ga)||oreTypes[ta].name.localeCompare(oreTypes[tb].name)})
 }
-const HIGH_ORE_GACHA=Object.freeze({cost:3000,mythic:.005,eternal:.0007,soulStone:.001});
+const HIGH_ORE_GACHA=Object.freeze({cost:3000,mythic:.005,eternal:.0007,soulStone:.001,raidKey:.02});
 const ORE_GACHA_ANIM_MS=6100;
-const MILEAGE_SHOP=Object.freeze({soulStone:100,eternalRandom:500,eternalSelect:1000});
+const MILEAGE_SHOP=Object.freeze({raidKey:80,soulStone:100,eternalRandom:500,eternalSelect:1000});
 let lastOreGachaResult=null,oreGachaCinematicActive=false,oreGachaCinematicTimer=0,oreGachaSkipArmed=false;
 function ensureForgeCurrencies(){
  account.gachaMileage=Math.max(0,Math.floor(Number(account.gachaMileage)||0));
  account.weaponSoulStones=Math.max(0,Math.floor(Number(account.weaponSoulStones)||0));
+ account.raidKeys=Math.max(0,Math.floor(Number(account.raidKeys)||0));
+ account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));
+ account.eternalOreSelectors=Math.max(0,Math.floor(Number(account.eternalOreSelectors)||0));
  account.brokenWeapons=Array.isArray(account.brokenWeapons)?account.brokenWeapons:[];
 }
 function finishOreGachaCinematic(skipped=false){
@@ -69,12 +72,13 @@ function rollHighOreGacha(count){
  count=Math.max(1,Math.floor(count||1));const cost=HIGH_ORE_GACHA.cost*count;
  if((account.gold||0)<cost){showMessage(`금자가 부족하다 · ${cost.toLocaleString()} 필요`,1.25);return null}
  account.gold-=cost;account.gachaMileage+=count;
- const types=Object.keys(oreTypes),wins=[],summary={blank:0,mythic:0,eternal:0,soulStone:0,cost,count,mileage:count};
+ const types=Object.keys(oreTypes),wins=[],summary={blank:0,mythic:0,eternal:0,soulStone:0,raidKey:0,cost,count,mileage:count};
  for(let i=0;i<count;i++){
   const r=Math.random();let grade=null;
   if(r<HIGH_ORE_GACHA.eternal)grade="eternal";
   else if(r<HIGH_ORE_GACHA.eternal+HIGH_ORE_GACHA.mythic)grade="mythic";
   else if(r<HIGH_ORE_GACHA.eternal+HIGH_ORE_GACHA.mythic+HIGH_ORE_GACHA.soulStone){account.weaponSoulStones++;summary.soulStone++;wins.push({kind:"soulStone"});continue}
+  else if(r<HIGH_ORE_GACHA.eternal+HIGH_ORE_GACHA.mythic+HIGH_ORE_GACHA.soulStone+HIGH_ORE_GACHA.raidKey){account.raidKeys++;summary.raidKey++;wins.push({kind:"raidKey"});continue}
   if(!grade){summary.blank++;continue}
   const type=types[Math.floor(Math.random()*types.length)],key=oreKey(type,grade);
   account.ores[key]=(account.ores[key]||0)+1;summary[grade]++;wins.push({kind:"ore",type,grade});
@@ -86,32 +90,38 @@ function renderOreGacha(){
  const goldEl=$("oreGachaGold");if(goldEl)goldEl.textContent=gold.toLocaleString();const mileageEl=$("oreGachaMileage");if(mileageEl)mileageEl.textContent=account.gachaMileage.toLocaleString();
  page.querySelectorAll("[data-ore-gacha]").forEach(btn=>{const n=Number(btn.dataset.oreGacha)||1;btn.disabled=oreGachaCinematicActive||gold<cost*n;const c=btn.querySelector("small");if(c)c.textContent=`${(cost*n).toLocaleString()} 금자`});
  const result=$("oreGachaResult");if(!result)return;
- if(!lastOreGachaResult){result.innerHTML=`<p class="ore-gacha-empty">아직 뽑기 기록이 없다.</p><small class="ore-gacha-mileage-earned">보유 마일리지 ${account.gachaMileage.toLocaleString()} · 무혼석 ${account.weaponSoulStones.toLocaleString()}</small>`;return}
+ if(!lastOreGachaResult){result.innerHTML=`<p class="ore-gacha-empty">아직 뽑기 기록이 없다.</p><small class="ore-gacha-mileage-earned">보유 마일리지 ${account.gachaMileage.toLocaleString()} · 무혼석 ${account.weaponSoulStones.toLocaleString()} · 열쇠 ${account.raidKeys.toLocaleString()}</small>`;return}
  const {summary,wins}=lastOreGachaResult;
- result.innerHTML=`<div class="ore-gacha-summary"><b>${summary.count}회 결과</b><span>소모 ${(summary.cost||0).toLocaleString()} 금자</span><span>마일리지 +${summary.mileage||summary.count}</span><span>꽝 ${summary.blank} · 신화 ${summary.mythic} · 영원 ${summary.eternal} · 무혼석 ${summary.soulStone||0}</span></div>${wins.length?`<div class="ore-gacha-wins">${wins.map(w=>w.kind==="soulStone"?`<article class="soul-stone-win"><b>무혼석</b><span>파괴 무기 복구</span></article>`:`<article class="rarity-border-${w.grade}"><b class="rarity-${w.grade}">${gradeName(w.grade)}</b><span>${oreTypes[w.type].name}</span></article>`).join("")}</div>`:'<p class="ore-gacha-empty">당첨 보상이 없다.</p>'}<small class="ore-gacha-mileage-earned">보유 마일리지 ${account.gachaMileage.toLocaleString()} · 무혼석 ${account.weaponSoulStones.toLocaleString()}</small>`;
+ result.innerHTML=`<div class="ore-gacha-summary"><b>${summary.count}회 결과</b><span>소모 ${(summary.cost||0).toLocaleString()} 금자</span><span>마일리지 +${summary.mileage||summary.count}</span><span>꽝 ${summary.blank} · 신화 ${summary.mythic} · 영원 ${summary.eternal} · 무혼석 ${summary.soulStone||0} · 열쇠 ${summary.raidKey||0}</span></div>${wins.length?`<div class="ore-gacha-wins">${wins.map(w=>w.kind==="soulStone"?`<article class="soul-stone-win"><b>무혼석</b><span>파괴 무기 복구</span></article>`:w.kind==="raidKey"?`<article class="soul-stone-win"><b>천마전의 열쇠</b><span>1인 레이드 입장 재화</span></article>`:`<article class="rarity-border-${w.grade}"><b class="rarity-${w.grade}">${gradeName(w.grade)}</b><span>${oreTypes[w.type].name}</span></article>`).join("")}</div>`:'<p class="ore-gacha-empty">당첨 보상이 없다.</p>'}<small class="ore-gacha-mileage-earned">보유 마일리지 ${account.gachaMileage.toLocaleString()} · 무혼석 ${account.weaponSoulStones.toLocaleString()} · 열쇠 ${account.raidKeys.toLocaleString()}</small>`;
 }
 function openOreGacha(){const page=$("oreGacha");if(!page)return;renderOreGacha();page.classList.add("show")}
 function closeOreGacha(){const page=$("oreGacha");if(page)page.classList.remove("show")}
 function mileageShopOverlay(){
  let overlay=$("oreMileageShop");if(overlay)return overlay;
  overlay=document.createElement("section");overlay.id="oreMileageShop";overlay.className="overlay ore-mileage-shop";
- overlay.innerHTML=`<div class="panel"><div class="ore-mileage-head"><h2>천공각 마일리지 상점</h2><button id="oreMileageShopClose" class="secondary" type="button">닫기</button></div><div class="ore-mileage-balance">보유 마일리지 <b id="oreMileageShopBalance">0</b> · 무혼석 <b id="oreMileageSoulBalance">0</b></div><div class="ore-mileage-items"><article><b>무혼석</b><span>파괴 무기 1개 복구에 사용</span><button data-mileage-buy="soulStone" type="button">100 마일리지</button></article><article><b>영원 광석 · 무작위</b><span>7종 중 1개 무작위 지급</span><button data-mileage-buy="eternalRandom" type="button">500 마일리지</button></article><article><b>영원 광석 · 선택</b><select id="oreMileageSelect"></select><button data-mileage-buy="eternalSelect" type="button">1,000 마일리지</button></article></div></div>`;
+ overlay.innerHTML=`<div class="panel"><div class="ore-mileage-head"><h2>천공각 마일리지 상점</h2><button id="oreMileageShopClose" class="secondary" type="button">닫기</button></div><div class="ore-mileage-balance">보유 마일리지 <b id="oreMileageShopBalance">0</b> · 무혼석 <b id="oreMileageSoulBalance">0</b> · 열쇠 <b id="oreMileageRaidKeyBalance">0</b></div><div class="ore-mileage-items"><article><b>천마전의 열쇠</b><span>천마신교 1인 레이드 입장 1회</span><button data-mileage-buy="raidKey" type="button">80 마일리지</button></article><article><b>무혼석</b><span>파괴 무기 1개 복구에 사용</span><button data-mileage-buy="soulStone" type="button">100 마일리지</button></article><article><b>영원 광석 · 무작위</b><span>7종 중 1개 무작위 지급</span><button data-mileage-buy="eternalRandom" type="button">500 마일리지</button></article><article><b>영원 광석 · 선택</b><select id="oreMileageSelect"></select><button data-mileage-buy="eternalSelect" type="button">1,000 마일리지</button></article></div></div>`;
  document.body.appendChild(overlay);$("oreMileageShopClose").addEventListener("click",()=>overlay.classList.remove("show"));overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.classList.remove("show")});overlay.querySelectorAll("[data-mileage-buy]").forEach(b=>b.addEventListener("click",()=>buyMileageItem(b.dataset.mileageBuy)));return overlay;
 }
 function renderMileageShop(){
- ensureForgeCurrencies();const overlay=mileageShopOverlay(),m=$("oreMileageShopBalance"),soul=$("oreMileageSoulBalance"),sel=$("oreMileageSelect");if(m)m.textContent=account.gachaMileage.toLocaleString();if(soul)soul.textContent=account.weaponSoulStones.toLocaleString();if(sel&&!sel.options.length)sel.innerHTML=Object.entries(oreTypes).map(([id,o])=>`<option value="${id}">${o.name}</option>`).join("");overlay.querySelectorAll("[data-mileage-buy]").forEach(b=>b.disabled=account.gachaMileage<(MILEAGE_SHOP[b.dataset.mileageBuy]||Infinity));
+ ensureForgeCurrencies();const overlay=mileageShopOverlay(),m=$("oreMileageShopBalance"),soul=$("oreMileageSoulBalance"),key=$("oreMileageRaidKeyBalance"),sel=$("oreMileageSelect");if(m)m.textContent=account.gachaMileage.toLocaleString();if(soul)soul.textContent=account.weaponSoulStones.toLocaleString();if(key)key.textContent=account.raidKeys.toLocaleString();if(sel&&!sel.options.length)sel.innerHTML=Object.entries(oreTypes).map(([id,o])=>`<option value="${id}">${o.name}</option>`).join("");overlay.querySelectorAll("[data-mileage-buy]").forEach(b=>b.disabled=account.gachaMileage<(MILEAGE_SHOP[b.dataset.mileageBuy]||Infinity));
 }
 function openMileageShop(){renderMileageShop();mileageShopOverlay().classList.add("show")}
 function buyMileageItem(kind){
  ensureForgeCurrencies();const price=MILEAGE_SHOP[kind];if(!price||account.gachaMileage<price){showMessage("마일리지가 부족하다",1);return false}account.gachaMileage-=price;
- if(kind==="soulStone"){account.weaponSoulStones++;showMessage("무혼석 1개 구매",1.1)}
+ if(kind==="raidKey"){account.raidKeys++;showMessage("천마전의 열쇠 1개 구매",1.1)}
+ else if(kind==="soulStone"){account.weaponSoulStones++;showMessage("무혼석 1개 구매",1.1)}
  else{const types=Object.keys(oreTypes),type=kind==="eternalSelect"?($("oreMileageSelect")?.value||types[0]):types[Math.floor(Math.random()*types.length)],key=oreKey(type,"eternal");account.ores[key]=(account.ores[key]||0)+1;showMessage(`영원 ${oreTypes[type].name} 1개 구매`,1.1)}
  saveAccountData();refreshForge();renderOreGacha();renderMileageShop();GameAudio.playUI("forge-success");return true
 }
+function eternalSelectorOverlay(){
+ let overlay=$("eternalSelectorOverlay");if(overlay)return overlay;overlay=document.createElement("section");overlay.id="eternalSelectorOverlay";overlay.className="overlay ore-mileage-shop";overlay.innerHTML=`<div class="panel"><h2>영원 광석 선택권</h2><p class="desc">보상 선택권 1장을 원하는 영원 광석 1개로 교환한다.</p><div class="ore-mileage-balance">보유 선택권 <b id="eternalSelectorBalance">0</b></div><select id="eternalSelectorType">${Object.entries(oreTypes).map(([id,o])=>`<option value="${id}">${o.name}</option>`).join("")}</select><button class="primary" id="eternalSelectorUse" type="button">선택권 사용</button><button class="secondary" id="eternalSelectorClose" type="button">닫기</button></div>`;document.body.appendChild(overlay);$("eternalSelectorClose").addEventListener("click",()=>overlay.classList.remove("show"));$("eternalSelectorUse").addEventListener("click",redeemEternalSelector);return overlay;
+}
+function openEternalSelector(){ensureForgeCurrencies();const o=eternalSelectorOverlay(),b=$("eternalSelectorBalance");if(b)b.textContent=account.eternalOreSelectors.toLocaleString();o.classList.add("show")}
+function redeemEternalSelector(){ensureForgeCurrencies();if(account.eternalOreSelectors<1){showMessage("영원 광석 선택권이 없다",1.1);return}const type=$("eternalSelectorType")?.value||Object.keys(oreTypes)[0],key=oreKey(type,"eternal");account.eternalOreSelectors--;account.ores[key]=(account.ores[key]||0)+1;saveAccountData();refreshForge();openEternalSelector();showMessage(`영원 ${oreTypes[type].name} 1개 획득`,1.2);GameAudio.playUI("forge-success")}
 function renderOreManagement(){
  if(!ui.oreManagement)return;const entries=managedOreEntries(),count=totalOres();
- ui.oreManagement.innerHTML=`<button class="ore-manager-launch" id="oreManagerOpen" type="button" ${entries.length?"":"disabled"}><span><b>광물 관리</b><small>${entries.length?"합성 · 판매":"관리할 광물이 없다"}</small></span><strong>${count.toLocaleString()}개 · ${entries.length}종</strong><i aria-hidden="true">›</i></button>`;
- const open=$("oreManagerOpen");if(open)open.addEventListener("click",openOreManager)
+ ui.oreManagement.innerHTML=`<button class="ore-manager-launch" id="oreManagerOpen" type="button" ${entries.length?"":"disabled"}><span><b>광물 관리</b><small>${entries.length?"합성 · 판매":"관리할 광물이 없다"}</small></span><strong>${count.toLocaleString()}개 · ${entries.length}종</strong><i aria-hidden="true">›</i></button>${account.eternalOreSelectors>0?`<button class="ore-manager-launch" id="eternalSelectorOpen" type="button"><span><b>영원 광석 선택권</b><small>레이드 완주 보상</small></span><strong>${account.eternalOreSelectors.toLocaleString()}장</strong><i aria-hidden="true">›</i></button>`:""}`;
+ const open=$("oreManagerOpen");if(open)open.addEventListener("click",openOreManager);$("eternalSelectorOpen")?.addEventListener("click",openEternalSelector)
 }
 function openOreManager(){
  const modal=$("oreManagerModal");if(!modal)return;modal.hidden=false;modal.classList.add("show");renderOreManagerModal();const select=$("oreManagerSelect");if(select)requestAnimationFrame(()=>select.focus())

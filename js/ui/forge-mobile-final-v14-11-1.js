@@ -115,11 +115,12 @@
     const art=window.WeaponVisuals?WeaponVisuals.asset(item):weaponIconPath(item.weapon);
     const potLines=(item.potentials||[]).slice(0,3);while(potLines.length<3)potLines.push(null);
     const pots=potLines.map(x=>x?`<div><b>${x.name}</b><span>${x.format==="pct"?Math.round(x.value*100)+"%":"+"+x.value}</span></div>`:`<div class="empty"><b></b><span></span></div>`).join("");
-    host.innerHTML=`<div class="forge-inspect-art"><img src="${art}" alt="${item.name}"></div><div class="forge-inspect-name"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><small>${weaponDefs[item.weapon]?.name||item.weapon} · ${item.abilityName||""}</small></div><div class="forge-inspect-stats"><span>전투력 <b>${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</b></span><span>기본 피해 <b>${Number(item.damageMul||1).toFixed(2)}x</b></span></div><div class="forge-inspect-potentials">${pots}</div>`;
-    if(actions)actions.innerHTML=`<button id="forgeInspectEquip">${account.equipped[item.weapon]===item.id?"장착 해제":"장착"}</button><button id="forgeInspectEnhance">강화</button><button id="forgeInspectReroll">재련</button><button id="forgeInspectBreak" class="danger">분해</button>`;
+    host.innerHTML=`<div class="forge-inspect-art"><img src="${art}" alt="${item.name}"></div><div class="forge-inspect-name"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><small>${weaponDefs[item.weapon]?.name||item.weapon} · ${item.abilityName||""}${item.transcendLevel?` · ${item.transcendLevel}초월`:""}</small></div><div class="forge-inspect-stats"><span>전투력 <b>${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</b></span><span>기본 피해 <b>${Number(item.damageMul||1).toFixed(2)}x</b></span></div><div class="forge-inspect-potentials">${pots}</div>`;
+    if(actions)actions.innerHTML=`<button id="forgeInspectEquip">${account.equipped[item.weapon]===item.id?"장착 해제":"장착"}</button><button id="forgeInspectEnhance">강화</button><button id="forgeInspectReroll">재련</button><button id="forgeInspectTranscend">초월</button><button id="forgeInspectBreak" class="danger">분해</button>`;
     $("forgeInspectEquip")?.addEventListener("click",()=>toggleEquip(item));
     $("forgeInspectEnhance")?.addEventListener("click",()=>window.CheonHaForgeV13?.openDetail(item.id,"enhance"));
     $("forgeInspectReroll")?.addEventListener("click",()=>window.CheonHaForgeV13?.openDetail(item.id,"potential"));
+    $("forgeInspectTranscend")?.addEventListener("click",()=>window.CheonHaForgeV13?.openDetail(item.id,"transcend"));
     $("forgeInspectBreak")?.addEventListener("click",()=>dismantle(item));
   }
 

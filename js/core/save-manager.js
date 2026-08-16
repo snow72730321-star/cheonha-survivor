@@ -79,7 +79,10 @@ const SaveManager=(()=>{
       rerolls:Math.floor(finite(item?.rerolls,0,0,100000)),
       potentialGrade:["rare","epic","unique","legendary"].includes(item?.potentialGrade)?item.potentialGrade:"rare",
       potentialPity:finite(item?.potentialPity,0,0,.05),
-      potentials:sanitizePotentials(item?.potentials)
+      potentials:sanitizePotentials(item?.potentials),
+      transcendLevel:Math.floor(finite(item?.transcendLevel,0,0,3)),
+      transcendAttempts:Math.floor(finite(item?.transcendAttempts,0,0,10)),
+      transcendOption:safeId(item?.transcendOption,"")||null
     };
   }
 
@@ -174,6 +177,9 @@ const SaveManager=(()=>{
       forgeCount:Math.floor(finite(source.forgeCount,0,0,1e9)),
       gachaMileage:Math.floor(finite(source.gachaMileage,0,0,1e12)),
       weaponSoulStones:Math.floor(finite(source.weaponSoulStones,0,0,999999)),
+      raidKeys:Math.floor(finite(source.raidKeys,0,0,999999)),
+      divineStones:Math.floor(finite(source.divineStones,0,0,999999)),
+      eternalOreSelectors:Math.floor(finite(source.eternalOreSelectors,0,0,999999)),
       raidTokens:Math.floor(finite(source.raidTokens,0,0,1e12)),
       raidStats:{
         runs:Math.floor(finite(plainObject(source.raidStats).runs,0,0,1e9)),

@@ -11,5 +11,5 @@ assert.match(combat,/range=\(100\+lv\*12\)\*saberHeavenRangeMul\(\),half=\(\.56\
 assert.match(combat,/damage:\(16\+lv\*6\)\*\(n>1\?\.82:1\)\*\.82/);
 assert.match(combat,/damage:\(18\+a\.meteor\*9\)\*\.84/);
 assert.match(combat,/damageEnemy\(e,\(8\+a\.taiji\*7\)\*\.82/);
-assert.match(combat,/damage:\(24\+a\.tenk\*10\)\*\.84/);
+assert.match(combat,/baseDamage=\(24\+a\.tenk\*10\)\*\.84\*damageScale/);
 console.log("v14.7.1 balance hotfix audit: ok");

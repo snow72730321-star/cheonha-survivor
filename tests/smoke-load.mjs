@@ -380,8 +380,8 @@ if(ultimateRegression.state!=="cutscene"||ultimateRegression.ultimate!==0||ultim
 }
 console.log("절기 오디오 회귀 테스트 통과",ultimateRegression);
 
-// v14.16.1 회귀: 천마 최종전은 한쪽 마수 파괴 → 마룡 → 본체의 3페이즈로 전환된다.
-vm.runInContext('state="menu";selectedWeapon="saber";selectedDifficulty="chuchul"',context);
+// v14.16.2 회귀: 천마 최종전은 한쪽 마수 파괴 → 마룡 → 본체의 3페이즈로 전환된다.
+vm.runInContext('state="menu";selectedWeapon="saber";selectedDifficulty="chuchul";account.raidKeys=1',context);
 await vm.runInContext("SoloRaidMode.begin()",context);
 await new Promise(resolve=>setTimeout(resolve,20));
 const raidStart=vm.runInContext(`(()=>({
@@ -390,7 +390,7 @@ const raidStart=vm.runInContext(`(()=>({
   spawnTimer,nextMiniBossAt,finalBossAt,runDuration,gold:account.gold,xp:player.xp
 }))()`,context);
 const raidCombat=vm.runInContext(`(()=>{
-  SoloRaidMode.spawnStage(0);const goldBefore=account.gold,xpBefore=player.xp;
+  const keyBefore=account.raidKeys;pendingLevelUps=0;SoloRaidMode.onGrowthReady();SoloRaidMode.enterCombat();const keyAfter=account.raidKeys;const goldBefore=account.gold,xpBefore=player.xp;
   gainXp(9999);for(let i=0;i<12;i++)update(1/60);
   const gate={state,enemies:enemies.map(e=>({id:e.raidId,type:e.type})),goldBefore,goldAfter:account.gold,xpBefore,xpAfter:player.xp};
   SoloRaidMode.spawnStage(4);SoloRaidMode.state.phaseGrace=0;
@@ -402,11 +402,11 @@ const raidCombat=vm.runInContext(`(()=>{
   SoloRaidMode.state.phaseGrace=0;dragon.hp=1;damageEnemy(dragon,2,"test");const body=enemies.find(e=>e.raidId==="cheonma-body");
   const phase3={phase:SoloRaidMode.state.finalPhase,id:body?.raidId,parts:SoloRaidMode.state.parts.length,progress:SoloRaidMode.progress()};
   SoloRaidMode.state.phaseGrace=0;const hp0=body.hp;damageEnemy(body,100,"test");phase3.directDamage=hp0-body.hp;
-  return {gate,phase1,phase2,phase3};
+  return {keyBefore,keyAfter,gate,phase1,phase2,phase3};
 })()`,context);
 if(!raidStart.active||raidStart.state!=="levelup"||raidStart.level!==20||raidStart.pending!==19||raidStart.hidden.length<1||raidStart.hidden.some(item=>item.level!==1||!item.ready)||
    raidStart.spawnTimer!==Infinity||raidStart.nextMiniBossAt!==Infinity||raidStart.finalBossAt!==Infinity||raidStart.runDuration!==Infinity||
-   raidCombat.gate.state!=="playing"||raidCombat.gate.enemies.length!==1||raidCombat.gate.enemies[0].id!=="peng"||raidCombat.gate.goldAfter!==raidCombat.gate.goldBefore||raidCombat.gate.xpAfter!==raidCombat.gate.xpBefore||
+   raidCombat.keyBefore!==1||raidCombat.keyAfter!==0||raidCombat.gate.state!=="playing"||raidCombat.gate.enemies.length!==1||raidCombat.gate.enemies[0].id!=="peng"||raidCombat.gate.goldAfter!==raidCombat.gate.goldBefore||raidCombat.gate.xpAfter!==raidCombat.gate.xpBefore||
    raidCombat.phase1.phase!==1||raidCombat.phase1.parts.length!==2||raidCombat.phase1.enemies.length!==2||raidCombat.phase1.overseerDamage!==0||
    raidCombat.phase2.phase!==2||raidCombat.phase2.id!=="cheonma-dragon"||raidCombat.phase2.parts!==0||
    raidCombat.phase3.phase!==3||raidCombat.phase3.id!=="cheonma-body"||raidCombat.phase3.parts!==0||raidCombat.phase3.progress<=4||Math.abs(raidCombat.phase3.directDamage-100)>.001){

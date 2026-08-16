@@ -11,9 +11,9 @@ const deviceCss=read("css/forge-mobile-v14-15-3-device-fix.css");
 const html=read("index.html");
 const sw=read("service-worker.js");
 
-assert.match(html,/v14\.16\.0-solo-raid/);
-assert.match(html,/css\/v14-improvements\.css\?v=14161/);
-assert.match(sw,/cheonha-v14-16-1-raid-three-phase/);
+assert.match(html,/v14\.16\.2-raid-transcend/);
+assert.match(html,/css\/v14-improvements\.css\?v=14162/);
+assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
 
 for(const token of ["forge-sparks","forge-impact-flash","anvil-hammer","forge-fire"]){
   assert.doesNotMatch(forge,new RegExp(token),`legacy forge DOM remains: ${token}`);
@@ -40,4 +40,4 @@ for(const family of ["sword","spear","bow","poison","tao","saber","katana","fist
   assert.ok(fs.existsSync(`assets/weapons/master/${family}.png`),`missing forge fallback weapon: ${family}`);
 }
 
-console.log("v14.16.1 legacy forge effect removal + weapon visibility audit: OK");
+console.log("v14.16.2 legacy forge effect removal + weapon visibility audit: OK");
