@@ -7,7 +7,7 @@ const html=read("index.html"),source=read("js/systems/world-map-v14-15.js"),load
 const data=JSON.parse(read("assets/map/data/map-v1.json"));
 const pkg=JSON.parse(read("package.json"));
 
-assert.equal(pkg.version,"14.15.0");
+assert.equal(pkg.version,"14.15.1");
 assert.equal(data.schema,1);
 assert.equal(data.version,"cheonha-world-v1");
 assert.equal(data.seed,"cheonha-v14.15.0-world-v1");

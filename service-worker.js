@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.15.0: 고정 수제 강호도와 버전 고정 시드 장식 맵. */
+/** v14.15.1: 전투 안전성, 첫 나락혈마 패턴, 최대 레벨 표기 보정. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-15-0-authored-seeded-world-map";
+const CACHE="cheonha-v14-15-1-combat-safety-balance-ui";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",

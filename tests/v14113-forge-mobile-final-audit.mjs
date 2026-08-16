@@ -4,7 +4,7 @@ const ok=(v,m)=>{if(!v)throw new Error(m)};
 const html=read("index.html"),css=read("css/forge-mobile-final-v14-11-1.css"),js=read("js/ui/forge-mobile-final-v14-11-1.js"),forge=read("js/systems/forge-v13.js"),sw=read("service-worker.js");
 const assets=["main.png","weapons.png","ores.png","smith.png","gacha.png","enhance.png","reroll.png","black-compare.png"];
 for(const a of assets)ok(fs.existsSync(`assets/ui/forge-mobile-final/${a}`),`final forge asset missing: ${a}`);
-ok(html.includes('v14.15.0-authored-seeded-world-map')&&html.includes('forge-mobile-final-v14-11-1.css')&&html.includes('forge-mobile-final-v14-11-1.js'),"build/css/js wiring missing");
+ok(html.includes('v14.15.1-combat-safety-balance-ui')&&html.includes('forge-mobile-final-v14-11-1.css')&&html.includes('forge-mobile-final-v14-11-1.js'),"build/css/js wiring missing");
 ok((html.match(/data-smith-weapon=/g)||[]).length===8,"smith must expose exactly 8 weapon groups");
 ok(html.includes('data-forge-nav="weapons"')&&html.includes('data-forge-nav="ores"')&&html.includes('data-forge-nav="smith"')&&html.includes('id="oreGachaOpen"'),"forge hub navigation missing");
 ok(js.includes('장착 해제')&&js.includes('openDetail(item.id,"enhance")')&&js.includes('openDetail(item.id,"potential")')&&js.includes('dismantle(item)'),"weapon manage actions missing");
@@ -14,5 +14,5 @@ ok(!html.includes('forge_main_bg_landscape')&&!css.includes('_landscape')&&!css.
 ok(!html.includes('잠금')&&!js.includes('잠금'),"nonexistent potential lock UI reintroduced");
 ok(forge.includes('root.dataset.forgeMode=tab')&&forge.includes('root.dataset.forgeMode="compare"'),"separate enhance/reroll/black compare modes missing");
 ok(css.includes("forge-mobile-final/main.png")&&css.includes("forge-mobile-final/black-compare.png"),"final backgrounds not wired");
-ok(sw.includes('cheonha-v14-15-0-authored-seeded-world-map')&&sw.includes('isForgeUiArt')&&sw.includes('js/ui/forge-mobile-final-v14-11-1.js'),"PWA runtime cache missing final forge policy");
+ok(sw.includes('cheonha-v14-15-1-combat-safety-balance-ui')&&sw.includes('isForgeUiArt')&&sw.includes('js/ui/forge-mobile-final-v14-11-1.js'),"PWA runtime cache missing final forge policy");
 console.log("v14.11.1 mobile-first final forge audit: OK");

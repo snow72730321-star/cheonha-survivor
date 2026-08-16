@@ -148,8 +148,9 @@ const CombatProgressionV1431=(()=>{
       }
     }
     if(boss&&!boss.dead&&!boss.finalRage&&boss.hp/boss.maxHp<=.18){
-      boss.finalRage=true;boss.speed*=1.22;boss.damage*=1.25;boss.summon=Math.min(boss.summon,.35);boss.blast=Math.min(boss.blast,.3);
-      if(boss.dash)boss.dash=Math.min(boss.dash,.42);if(boss.orbs)boss.orbs=Math.min(boss.orbs,.5);
+      const patternMul=Math.max(1,Number(boss.patternIntervalMul)||1);
+      boss.finalRage=true;boss.speed*=1.22;boss.damage*=1.25;boss.summon=Math.min(boss.summon,.35)*patternMul;boss.blast=Math.min(boss.blast,.3)*patternMul;
+      if(boss.dash)boss.dash=Math.min(boss.dash,.42)*patternMul;if(boss.orbs)boss.orbs=Math.min(boss.orbs,.5)*patternMul;
       for(let i=0;i<2+difficultyDefs[selectedDifficulty].rank;i++)spawnAround(i%2?"assassin":"master",130+i*28);
       showMessage("혈마 최종 폭주 · 만혈귀원",2.2);screenShake=Math.max(screenShake,20);GameAudio.duck(.75,.5);
     }

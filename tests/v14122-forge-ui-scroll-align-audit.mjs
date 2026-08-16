@@ -4,8 +4,8 @@ const html=fs.readFileSync('index.html','utf8');
 const ui=fs.readFileSync('js/ui/forge-mobile-final-v14-11-1.js','utf8');
 const sw=fs.readFileSync('service-worker.js','utf8');
 function ok(c,m){if(!c)throw new Error(m)}
-ok(html.includes('v14.15.0-authored-seeded-world-map'),'build meta missing');
-ok(sw.includes('cheonha-v14-15-0-authored-seeded-world-map'),'cache key missing');
+ok(html.includes('v14.15.1-combat-safety-balance-ui'),'build meta missing');
+ok(sw.includes('cheonha-v14-15-1-combat-safety-balance-ui'),'cache key missing');
 ok(html.includes('id="oreMileageShopOpen"')&&html.includes('<span>마일리지<br>상점</span>'),'mileage shop control missing');
 ok(css.includes('#oreGacha .ore-gacha-shop-open')&&css.includes('right:4.7%!important')&&css.includes('border-radius:50%!important'),'mileage shop not mapped to right circle');
 ok(css.includes('#oreGacha .ore-gacha-odds-toggle')&&css.includes('left:4.5%!important'),'odds control not moved to left edge');

@@ -83,11 +83,13 @@ const AbyssModeV1487=(()=>{
     if(active()&&boss){
       const n=Math.max(1,Math.floor(elapsed/180)),s=stageProgress();
       boss.bossName=`나락혈마 · ${n}겁`;
+      // 첫 혈마만 패턴 간격을 1.25배로 늘려 단위 시간당 패턴 빈도를 정확히 20% 낮춘다.
+      boss.patternIntervalMul=n===1?1.25:1;
       boss.hp*=1.32+s*.18;boss.maxHp=boss.hp;boss.damage*=1.18+s*.065;boss.speed*=1.04+Math.min(.16,s*.016);
-      boss.summon=Math.max(.72,(boss.summon||2)*(.88-Math.min(.24,s*.025)));
-      boss.blast=Math.max(.68,(boss.blast||2)*(.88-Math.min(.24,s*.025)));
-      boss.dash=Math.max(.72,(boss.dash||2)*(.9-Math.min(.22,s*.022)));
-      boss.orbs=Math.max(.8,(boss.orbs||2)*(.9-Math.min(.22,s*.022)));
+      boss.summon=Math.max(.72,(boss.summon||2)*(.88-Math.min(.24,s*.025)))*boss.patternIntervalMul;
+      boss.blast=Math.max(.68,(boss.blast||2)*(.88-Math.min(.24,s*.025)))*boss.patternIntervalMul;
+      boss.dash=Math.max(.72,(boss.dash||2)*(.9-Math.min(.22,s*.022)))*boss.patternIntervalMul;
+      boss.orbs=Math.max(.8,(boss.orbs||2)*(.9-Math.min(.22,s*.022)))*boss.patternIntervalMul;
       ui.bossText.textContent=`${Math.ceil(boss.hp)} / ${Math.ceil(boss.maxHp)}`;
     }
     return result;

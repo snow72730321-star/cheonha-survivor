@@ -3,7 +3,7 @@ const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
 const sprite=fs.readFileSync("js/vfx/sprite-vfx-v14-3-8.js","utf8");
 const remaster=fs.readFileSync("js/render/sprite-remaster-v14-3-18.js","utf8");
 function ok(v,m){if(!v)throw new Error(m)}
-ok(combat.includes('updateProjectiles(dt);updateGems(dt);if(state!=="playing")return;updateEnemies(dt)'),"레벨업 즉시 적 업데이트 차단 누락");
+ok(combat.includes('updateProjectiles(dt);updateGems(dt);if(state!=="playing")return;updateDelayed(dt);updateEnemies(dt)'),"레벨업 차단 또는 플레이어 지연타 선처리 누락");
 ok(combat.includes('damage:(16+lv*6)*(n>1?.82:1)*.82'),"검 기본기 너프 누락");
 ok(combat.includes('damage:(18+a.meteor*9)*.84'),"유성검우 너프 누락");
 ok(combat.includes('damageEnemy(e,(8+a.taiji*7)*.82'),"태극검진 너프 누락");

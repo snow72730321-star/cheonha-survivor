@@ -292,6 +292,49 @@ console.log("브라우저 스모크 로드 통과",assertions);
 console.log("전투 스모크 테스트 통과",gameplay);
 console.log("신규 무공·동적 난이도 테스트 통과",skillGate);
 
+// v14.15.1 회귀: 낙성창진 넉백은 같은 틱의 접촉 피해보다 먼저 판정하며, 레벨 선택 뒤 재개 유예가 실제 전투를 멈춘다.
+const combatSafety=vm.runInContext(`(()=>{
+  selectedWeapon="spear";selectedDifficulty="chuchul";startGame();state="playing";
+  enemies=[];projectiles=[];delayed=[];hazards=[];fields=[];visuals=[];
+  player.fireTimer=999;spawnTimer=999;nextMiniBossAt=999;finalBossAt=999;
+  for(const key of Object.keys(player.cooldowns))player.cooldowns[key]=999;
+  spawnEnemy("bandit",player.x+24.5,player.y);const target=enemies[0];
+  target.speed=0;target.damage=25;target.hp=target.maxHp=5000;player.hp=100;player.invuln=0;
+  GameSpatial.rebuild(enemies);
+  delayed.push({time:0,type:"strike",owner:"player",x:target.x,y:target.y,r:40,damage:1,color:C.spear,source:"starfall",knock:110,contactBreak:.16});
+  update(1/60);
+  const starfall={hp:player.hp,targetHp:target.hp,pushX:target.pushX,contactGrace:target.contactGrace,distance:Math.hypot(target.x-player.x,target.y-player.y),contact:(player.hitRadius||player.r)+target.r,delayed:delayed.length};
+
+  pendingLevelUps=1;state="playing";levelChoice();
+  const choice=ui.choices.children[0];choice.click();
+  enemies=[];spawnEnemy("bandit",player.x,player.y);enemies[0].speed=100;enemies[0].damage=99;GameSpatial.rebuild(enemies);
+  const elapsedBefore=elapsed,hpBefore=player.hp,graceBefore=player.levelResumeGrace;
+  update(.2);
+  const levelResume={state,graceBefore,graceAfter:player.levelResumeGrace,elapsedBefore,elapsedAfter:elapsed,hpBefore,hpAfter:player.hp};
+  return {starfall,levelResume};
+})()`,context);
+if(combatSafety.starfall.hp!==100||combatSafety.starfall.pushX<=0||combatSafety.starfall.contactGrace<=0||
+   combatSafety.levelResume.state!=="playing"||combatSafety.levelResume.graceBefore<.69||
+   !(combatSafety.levelResume.graceAfter<combatSafety.levelResume.graceBefore)||
+   combatSafety.levelResume.elapsedAfter!==combatSafety.levelResume.elapsedBefore||
+   combatSafety.levelResume.hpAfter!==combatSafety.levelResume.hpBefore){
+  throw new Error(`낙성창진·레벨업 재개 안전성 검증 실패: ${JSON.stringify(combatSafety)}`);
+}
+console.log("낙성창진·레벨업 재개 안전성 런타임 검증 통과",combatSafety);
+
+const firstAbyssBoss=vm.runInContext(`(()=>{
+  selectedWeapon="sword";selectedDifficulty="abyss";startGame();state="playing";
+  enemies=[];boss=null;bossSpawned=false;elapsed=180;spawnBoss();
+  const first={name:boss.bossName,mul:boss.patternIntervalMul,summon:boss.summon,blast:boss.blast};
+  enemies=[];boss=null;bossSpawned=false;elapsed=360;spawnBoss();
+  return {first,second:{name:boss.bossName,mul:boss.patternIntervalMul,summon:boss.summon,blast:boss.blast}};
+})()`,context);
+if(firstAbyssBoss.first.name!=="나락혈마 · 1겁"||firstAbyssBoss.first.mul!==1.25||
+   firstAbyssBoss.second.name!=="나락혈마 · 2겁"||firstAbyssBoss.second.mul!==1){
+  throw new Error(`첫 나락혈마 패턴 완화 검증 실패: ${JSON.stringify(firstAbyssBoss)}`);
+}
+console.log("첫 나락혈마 20% 패턴 완화 런타임 검증 통과",firstAbyssBoss);
+
 
 // v14.5.2 후반 안정성 회귀: hazard 수명, XP 병합, 장수명 객체 강제 회수, profiler를 검증한다.
 const lifecycleStress=vm.runInContext(`(()=>{
