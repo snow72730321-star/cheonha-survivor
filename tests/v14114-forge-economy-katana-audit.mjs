@@ -1,0 +1,17 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8"),ok=(v,m)=>{if(!v)throw new Error(m)};
+const forge=read("js/systems/forge-v13.js"),storage=read("js/systems/storage-forge.js"),katana=read("js/systems/katana-rework-v15.js"),abyss=read("js/systems/abyss-mode-v14-8-7.js"),html=read("index.html"),save=read("js/core/save-manager.js"),sw=read("service-worker.js"),mobile=read("js/ui/forge-mobile-final-v14-11-1.js");
+ok(forge.includes('.10,.10,.10,.10,.10,.05,.05,.05,.05,.05,.03,.03,.03,.03,.01'),"enhance success table missing");
+ok(forge.includes('if(lv<15)return {down:.01,destroy:0}')&&forge.includes('if(lv<20)return {down:.02,destroy:.005}')&&forge.includes('if(lv<24)return {down:.05,destroy:.01}')&&forge.includes('return {down:.10,destroy:.05}'),"enhance risk table missing");
+ok(forge.includes('ARTISAN_EXPECTED_INVESTMENT_MULTIPLIER = 1.4')&&forge.includes('artisanBreathFailureTarget')&&forge.includes('artisanBreathGain')&&forge.includes('item.artisanBreath=0')&&forge.includes('>=100?1:baseEnhanceChance'),"artisan breath semantics missing");
+ok(forge.includes('recoverBrokenWeapon'),"recovery hook missing");
+ok(forge.includes('Math.max(0,(Number(broken.level)||0)-3)')&&mobile.includes('무혼석 1개')&&mobile.includes('복구 +${Math.max(0,(item.level||0)-3)}'),"soul stone recovery level loss missing");
+ok(storage.includes('mythic:.005,eternal:.0007,soulStone:.001')&&storage.includes('account.gachaMileage+=count'),"gacha rates/mileage missing");
+ok(storage.includes('soulStone:100,eternalRandom:500,eternalSelect:1000'),"mileage shop costs missing");
+ok(html.includes('id="oreGachaSkipButton"')&&storage.includes('e?.currentTarget?.id!=="oreGachaSkipButton"')&&storage.includes('desktopGachaSkipAllowed')&&!storage.includes('layer.addEventListener("pointerdown"')&&!storage.includes('layer.addEventListener("touchstart"'),"skip controls incorrect");
+ok(abyss.includes('Math.random()<.10')&&abyss.includes('dropWeaponSoulStone'),"abyss soul stone drop missing");
+ok(katana.includes('slice(0,40)')&&katana.includes('type:"jeolwolHit"')&&katana.includes('resolveJeolwolHit'),"jeolwol frame-40 hit delay missing");
+ok((katana.includes('endAtPlayer:endpointAnchored')||katana.includes('endAtPlayer:cfg.endpoint'))&&katana.includes('katanaMoonForm1')&&katana.includes('katanaMoonForm3')&&katana.includes('w*.48'),"moon form 1/3 endpoint anchoring missing");
+ok(save.includes('const VERSION=17')&&save.includes('gachaMileage')&&save.includes('weaponSoulStones')&&save.includes('brokenWeapons')&&save.includes('artisanBreath'),"save migration missing");
+ok(sw.includes('cheonha-v14-15-3-cumulative-root'),"cache version missing");
+console.log("v14.11.2 forge economy + katana audit: OK");

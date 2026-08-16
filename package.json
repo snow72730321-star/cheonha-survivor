@@ -1,0 +1,9 @@
+{
+  "name": "cheonha-survivor",
+  "version": "14.15.3",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run-all.mjs",
+    "check": "find js -name '*.js' -type f -print0 | xargs -0 -n1 node --check && node --check service-worker.js"
+  }
+}

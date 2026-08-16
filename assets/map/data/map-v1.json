@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "cheonha-world-v1",
+  "seed": "cheonha-v14.15.0-world-v1",
+  "worldHalf": 2600,
+  "tileWorldSize": 720,
+  "baseArt": "assets/map/terrain/common-ground.webp",
+  "zones": [
+    {
+      "id": "center",
+      "name": "연무장",
+      "x": 0,
+      "y": 0,
+      "radius": 690,
+      "drawWidth": 1500,
+      "drawHeight": 1406,
+      "art": "assets/map/terrain/center-training-ground.webp",
+      "minimapColor": "rgba(187, 165, 104, 0.42)"
+    },
+    {
+      "id": "north",
+      "name": "청죽림",
+      "x": -260,
+      "y": -1540,
+      "radius": 720,
+      "drawWidth": 1500,
+      "drawHeight": 1371,
+      "art": "assets/map/terrain/north-bamboo-grove.webp",
+      "minimapColor": "rgba(62, 132, 105, 0.48)"
+    },
+    {
+      "id": "east",
+      "name": "폐관문",
+      "x": 1650,
+      "y": -180,
+      "radius": 700,
+      "drawWidth": 1500,
+      "drawHeight": 1371,
+      "art": "assets/map/terrain/east-ruined-gate.webp",
+      "minimapColor": "rgba(148, 99, 69, 0.46)"
+    },
+    {
+      "id": "south",
+      "name": "월영지",
+      "x": 360,
+      "y": 1580,
+      "radius": 760,
+      "drawWidth": 1600,
+      "drawHeight": 1067,
+      "art": "assets/map/terrain/south-moon-pond.webp",
+      "minimapColor": "rgba(55, 117, 142, 0.48)"
+    },
+    {
+      "id": "west",
+      "name": "단애로",
+      "x": -1660,
+      "y": 330,
+      "radius": 720,
+      "drawWidth": 1600,
+      "drawHeight": 1067,
+      "art": "assets/map/terrain/west-cliff-road.webp",
+      "minimapColor": "rgba(123, 88, 73, 0.44)"
+    }
+  ],
+  "roads": [
+    [[0, 0], [-80, -560], [-180, -1050], [-260, -1540]],
+    [[0, 0], [560, -35], [1090, -90], [1650, -180]],
+    [[0, 0], [110, 560], [240, 1090], [360, 1580]],
+    [[0, 0], [-560, 95], [-1080, 220], [-1660, 330]],
+    [[-260, -1540], [400, -1770], [980, -1350], [1650, -180]],
+    [[1650, -180], [1780, 620], [1170, 1220], [360, 1580]],
+    [[360, 1580], [-440, 1760], [-1080, 1260], [-1660, 330]]
+  ],
+  "decor": {
+    "pebbles": 150,
+    "leaves": 120,
+    "grass": 90
+  }
+}
