@@ -21,7 +21,7 @@ ok(codex.includes("codex-path-nav")&&codex.includes("codex-filter")&&codex.inclu
 ok(codex.includes("해금 조건")&&codex.includes("진화 조건")&&codex.includes("현재 진행"),"도감 조건/진행 정보 누락");
 ok(menus.includes('buildCodex();ui.codex.classList.add("show")')&&html.includes('id="pauseCodexBtn"'),"도감 열기/일시정지 도감 동선 누락");
 ok(css.includes("v14.9.15 martial codex overhaul")&&css.includes(".codex-skill-grid")&&css.includes("@media(max-width:620px)"),"도감 반응형 스타일 누락");
-ok(html.includes("v14.14.0-stability-memory-hardening")&&html.includes("panel codex-panel"),"도감 HTML/현재 빌드 표기 누락");
-ok(sw.includes("cheonha-v14-14-0-stability-memory-hardening"),"현재 캐시 키 누락");
-ok(pkg.version==="14.14.0","package version not bumped to 14.14.0");
+ok(html.includes("v14.15.0-authored-seeded-world-map")&&html.includes("panel codex-panel"),"도감 HTML/현재 빌드 표기 누락");
+ok(sw.includes("cheonha-v14-15-0-authored-seeded-world-map"),"현재 캐시 키 누락");
+ok(pkg.version==="14.15.0","package version not bumped to 14.15.0");
 console.log("v14.9.15 fist defense/codex audit: OK");

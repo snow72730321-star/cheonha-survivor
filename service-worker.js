@@ -1,20 +1,21 @@
 "use strict";
 
-/** v14.14.0: 작은 앱 셸, 앱 전용 캐시 정리, 안전한 업데이트 활성화. */
+/** v14.15.0: 고정 수제 강호도와 버전 고정 시드 장식 맵. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-14-0-stability-memory-hardening";
+const CACHE="cheonha-v14-15-0-authored-seeded-world-map";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest",
-  "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css","css/forge-mobile-final-v14-11-1.css",
+  "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css","css/forge-mobile-final-v14-11-1.css","css/forge-mobile-v14-14-1-hotfix.css",
   "js/core/runtime-state.js","js/core/game-events.js","js/core/save-manager.js","js/core/asset-loader.js","js/core/pwa.js","js/core/startup.js",
   "js/data/balance-v14.js","js/data/characters-meta.js",
-  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/combat-power-v14-7-7.js","js/systems/katana-rework-v15.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js","js/systems/abyss-mode-v14-8-7.js","js/systems/system-overhaul-v14-10.js","js/systems/world-map-v14-12.js",
+  "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/combat-power-v14-7-7.js","js/systems/katana-rework-v15.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js","js/systems/abyss-mode-v14-8-7.js","js/systems/system-overhaul-v14-10.js","js/systems/world-map-v14-15.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster-v14-3-18.js","js/render/weapon-visuals-v14-4.js",
   "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js","js/ui/forge-mobile-final-v14-11-1.js",
   "js/audio/audio-manager-v14-3-8.js","js/vfx/awakening-cutscene.js","js/vfx/awakening-cutscene-v14-3-8.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-8.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
-  "assets/icons/icon-192.png","assets/icons/icon-512.png"
+  "assets/icons/icon-192.png","assets/icons/icon-512.png",
+  "assets/map/data/map-v1.json","assets/map/terrain/common-ground.webp","assets/map/terrain/center-training-ground.webp","assets/map/terrain/north-bamboo-grove.webp","assets/map/terrain/east-ruined-gate.webp","assets/map/terrain/south-moon-pond.webp","assets/map/terrain/west-cliff-road.webp"
 ];
 
 async function cacheAppShell(){
@@ -59,9 +60,10 @@ self.addEventListener("fetch",event=>{
   if(isLargeStream){event.respondWith(fetch(request));return}
 
   const isCode=/\.(?:js|css|webmanifest)$/i.test(url.pathname);
+  const isMapData=url.pathname.includes("/assets/map/data/");
   const isForgeUiArt=url.pathname.includes("/assets/ui/forge-mobile-final/");
-  if(isCode||isForgeUiArt){
-    event.respondWith(fetchAndCache(request).catch(()=>caches.match(request)));
+  if(isCode||isMapData||isForgeUiArt){
+    event.respondWith(fetchAndCache(request).catch(()=>caches.match(request,{ignoreSearch:true})));
     return;
   }
 

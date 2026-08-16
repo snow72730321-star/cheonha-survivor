@@ -8,10 +8,18 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.14.0-stability-memory-hardening";
+  const BUILD="v14.15.0-authored-seeded-world-map";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
+  const mapFiles=[
+    "assets/map/terrain/common-ground.webp",
+    "assets/map/terrain/center-training-ground.webp",
+    "assets/map/terrain/north-bamboo-grove.webp",
+    "assets/map/terrain/east-ruined-gate.webp",
+    "assets/map/terrain/south-moon-pond.webp",
+    "assets/map/terrain/west-cliff-road.webp"
+  ];
   const vfxFiles=[
     "assets/vfx/common/beam_blue.png",
     "assets/vfx/common/beam_red.png",
@@ -123,6 +131,7 @@ const GameAssets=(()=>{
     ...enemyIds.map(id=>`assets/enemies/${id}.png`),
     ...weaponVisualIds.map(id=>`assets/weapons/master/${id}.png`),
     ...weaponVisualIds.map(id=>`assets/weapons/hud/${id}.png`),
+    ...mapFiles,
     // 기본 타격·투사체·문장은 모든 무기군이 공유하므로 부팅 시 한 번만 준비한다.
     ...sharedVfxFiles
   ];

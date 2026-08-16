@@ -1,11 +1,11 @@
 import fs from "node:fs";
 const read=p=>fs.readFileSync(p,"utf8");
 const ok=(v,m)=>{if(!v)throw new Error(m)};
-const meta=read("js/data/characters-meta.js"),codex=read("js/ui/menu-codex.js"),map=read("js/systems/world-map-v14-12.js"),html=read("index.html"),css=read("css/forge-mobile-final-v14-11-1.css"),storage=read("js/systems/storage-forge.js"),forge=read("js/systems/forge-v13.js"),sw=read("service-worker.js");
+const meta=read("js/data/characters-meta.js"),codex=read("js/ui/menu-codex.js"),map=read("js/systems/world-map-v14-15.js"),html=read("index.html"),css=read("css/forge-mobile-final-v14-11-1.css"),storage=read("js/systems/storage-forge.js"),forge=read("js/systems/forge-v13.js"),sw=read("service-worker.js");
 ok(meta.includes('passive:{name:"월은신도"')&&codex.includes('<span>패시브</span>')&&codex.includes('ch?.passive?')&&codex.includes('aria-hidden="true">&nbsp;'),"character passive codex slot/blank behavior missing");
 for(const name of ["연무장","청죽림","폐관문","월영지","단애로"])ok(map.includes(`name:"${name}"`),`map zone missing: ${name}`);
-ok(map.includes("const ROADS=[")&&map.includes("drawNorth()")&&map.includes("drawEast()")&&map.includes("drawSouth()")&&map.includes("drawWest()")&&map.includes("drawArena()")&&map.includes("drawAuthoredMinimap"),"authored world/minimap implementation missing");
-const oldIdx=html.indexOf('js/systems/system-overhaul-v14-10.js'),newIdx=html.indexOf('js/systems/world-map-v14-12.js');
+ok(map.includes("MAP_ART")&&map.includes("drawMirroredGround")&&map.includes("drawRoads")&&map.includes("drawZonePlates")&&map.includes("drawAuthoredMinimap"),"authored world/minimap implementation missing");
+const oldIdx=html.indexOf('js/systems/system-overhaul-v14-10.js'),newIdx=html.indexOf('js/systems/world-map-v14-15.js');
 ok(oldIdx>=0&&newIdx>oldIdx,"world map script must load after system overhaul");
 ok(html.includes('v14.12.0-codex-map-forge-align')||html.includes('v14.12.1-artisan-breath-nerf')||(html.includes('v14.12.2-forge-hitbox-scroll-polish')||(html.includes('v14.12.6-forge-layout-clean')||(html.includes('v14.12.7-forge-device-alignment')||html.includes('v14.12.8-black-compare-align')))),"v14.12 build metadata missing");
 ok(css.includes('grid-template-columns:repeat(5,minmax(0,1fr))')&&css.includes('grid-template-rows:repeat(2,1fr)')&&css.includes('grid-template-columns:repeat(7,1fr)')&&css.includes('grid-template-columns:repeat(5,1fr)'),"weapon/ore slot count alignment missing");
@@ -15,5 +15,5 @@ ok(css.includes('.forge-smith-weapon-types')&&css.includes('grid-template-column
 ok(storage.includes('smith-preview-rows')&&storage.includes('smith-preview-ability')&&storage.includes('smith-preview-cost'),"smith preview not mapped into art detail panel");
 ok(forge.includes('id="enhanceDownRate"')&&forge.includes('id="enhanceDestroyRate"')&&forge.includes('단계 하락')&&forge.includes('파괴 확률'),"enhancement 3-row rate mapping source missing");
 ok(css.includes('.combat-power-breakdown{display:none!important}')&&css.includes('.forge-enhance-outcomes')&&css.includes('.forge-enhance-costs'),"enhance popup frame alignment missing");
-ok((sw.includes('cheonha-v14-12-0-codex-map-forge-align')||sw.includes('cheonha-v14-12-1-artisan-breath-nerf')||(sw.includes('cheonha-v14-12-2-forge-hitbox-scroll-polish')||(sw.includes('cheonha-v14-12-6-forge-layout-clean')||(sw.includes('cheonha-v14-12-7-forge-device-alignment')||sw.includes('cheonha-v14-12-8-black-compare-align')))))&&sw.includes('js/systems/world-map-v14-12.js'),"v14.12 PWA world map cache missing");
+ok(sw.includes('cheonha-v14-15-0-authored-seeded-world-map')&&sw.includes('js/systems/world-map-v14-15.js'),"current PWA world map cache missing");
 console.log("v14.12 codex passive + authored map + forge alignment audit: OK");

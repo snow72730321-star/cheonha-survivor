@@ -10,6 +10,8 @@
   resize();loadAccountData();AdvancedSettings.apply();
 
   try{
+    // 지도 JSON과 비트맵 준비를 공용 이미지 프리로드와 함께 시작한다.
+    const mapReady=window.GameWorldMap?.prepare?.();
     const result=await GameAssets.preloadEssential((done,total,src)=>{
       if(loaderFill)loaderFill.style.width=`${Math.round(done/total*100)}%`;
       if(loaderText)loaderText.textContent=`${done}/${total} · ${src.split("/").pop()}`;
@@ -20,6 +22,10 @@
       showSystemToast(`이미지 에셋 ${result.failed.length}개 로드 실패: ${names}`,true);
     }else{
       console.info(`[에셋 렌더러] ${GameAssets.BUILD} · 공용 이미지 ${result.total}개 준비 완료`);
+    }
+    if(mapReady){
+      const mapResult=await mapReady;
+      console.info(`[고정 강호도] ${mapResult.version} · ${mapResult.seed} · 장식 ${mapResult.decorHash}`);
     }
   }catch(error){
     console.error("에셋 로딩 실패",error);

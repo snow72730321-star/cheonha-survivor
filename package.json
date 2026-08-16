@@ -1,6 +1,6 @@
 {
   "name": "cheonha-survivor",
-  "version": "14.14.0",
+  "version": "14.15.0",
   "private": true,
   "scripts": {
     "test": "node tests/run-all.mjs",

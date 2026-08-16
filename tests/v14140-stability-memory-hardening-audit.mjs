@@ -7,14 +7,14 @@ const root=path.resolve(import.meta.dirname,"..");
 const read=relative=>fs.readFileSync(path.join(root,relative),"utf8");
 const html=read("index.html"),sw=read("service-worker.js"),loader=read("js/core/asset-loader.js"),pwa=read("js/core/pwa.js");
 const save=read("js/core/save-manager.js"),forge=read("js/systems/forge-v13.js"),runtime=read("js/systems/game-runtime-v14.js");
-const combat=read("js/systems/combat-runtime.js"),world=read("js/systems/world-map-v14-12.js"),systemWorld=read("js/systems/system-overhaul-v14-10.js");
+const combat=read("js/systems/combat-runtime.js"),world=read("js/systems/world-map-v14-15.js"),systemWorld=read("js/systems/system-overhaul-v14-10.js");
 const menu=read("js/render/sprite-remaster-v14-3-18.js"),gacha=read("js/systems/storage-forge.js"),cutscene=read("js/vfx/awakening-cutscene-v14-3-8.js");
 const pkg=JSON.parse(read("package.json"));
 
-assert.equal(pkg.version,"14.14.0");
-assert.match(html,/v14\.14\.0-stability-memory-hardening/);
-assert.match(loader,/const BUILD="v14\.14\.0-stability-memory-hardening"/);
-assert.match(sw,/cheonha-v14-14-0-stability-memory-hardening/);
+assert.equal(pkg.version,"14.15.0");
+assert.match(html,/v14\.15\.0-authored-seeded-world-map/);
+assert.match(loader,/const BUILD="v14\.15\.0-authored-seeded-world-map"/);
+assert.match(sw,/cheonha-v14-15-0-authored-seeded-world-map/);
 assert.match(save,/const VERSION=17/);
 
 const ctx={console,window:{},document:{getElementById:()=>null},localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},URL:{createObjectURL:()=>"",revokeObjectURL:()=>{}},Blob:class{},Date,Math,Number,JSON,Object,Array,String,Set,
@@ -59,4 +59,4 @@ for(const file of walk(path.join(root,"assets")).filter(file=>file.endsWith(".pn
 }
 
 assert.equal(pkg.scripts.test,"node tests/run-all.mjs","전체 테스트 자동 수집이 연결되지 않음");
-console.log("v14.14.0 stability/memory hardening audit: OK");
+console.log("v14.15.0 stability/memory hardening audit: OK");
