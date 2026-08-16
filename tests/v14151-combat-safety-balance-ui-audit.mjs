@@ -10,9 +10,9 @@ const html=fs.readFileSync("index.html","utf8");
 const sw=fs.readFileSync("service-worker.js","utf8");
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));
 
-assert.equal(pkg.version,"14.15.4");
-assert.match(html,/v14\.15\.4-cumulative-root/);
-assert.match(sw,/cheonha-v14-15-4-cumulative-root/);
+assert.equal(pkg.version,"14.15.6");
+assert.match(html,/v14\.15\.6-cumulative-root/);
+assert.match(sw,/cheonha-v14-15-6-cumulative-root/);
 
 // 낙성창진은 플레이어 소유 공격이며, 착탄과 넉백을 적 이동/접촉보다 먼저 판정한다.
 const starfall=combat.match(/if\(a\.starfall[\s\S]*?\n if\(a\.overlord/)?.[0]||"";
@@ -49,4 +49,4 @@ assert.match(runtime,/const LEVEL_CHOICE_RESUME_GRACE=\.7/);
 assert.match(runtime,/fixedAccumulator=0;player\.levelResumeGrace=LEVEL_CHOICE_RESUME_GRACE/);
 assert.match(combat,/if\(\(player\.levelResumeGrace\|\|0\)>0\)[\s\S]*?return\}elapsed\+=dt/);
 
-console.log("v14.15.4 combat safety/balance/max-level audit: OK");
+console.log("v14.15.6 combat safety/balance/max-level audit: OK");

@@ -11,10 +11,10 @@ const combat=read("js/systems/combat-runtime.js"),world=read("js/systems/world-m
 const menu=read("js/render/sprite-remaster-v14-3-18.js"),gacha=read("js/systems/storage-forge.js"),cutscene=read("js/vfx/awakening-cutscene-v14-3-8.js");
 const pkg=JSON.parse(read("package.json"));
 
-assert.equal(pkg.version,"14.15.4");
-assert.match(html,/v14\.15\.4-cumulative-root/);
-assert.match(loader,/const BUILD="v14\.15\.4-cumulative-root"/);
-assert.match(sw,/cheonha-v14-15-4-cumulative-root/);
+assert.equal(pkg.version,"14.15.6");
+assert.match(html,/v14\.15\.6-cumulative-root/);
+assert.match(loader,/const BUILD="v14\.15\.6-cumulative-root"/);
+assert.match(sw,/cheonha-v14-15-6-cumulative-root/);
 assert.match(save,/const VERSION=17/);
 
 const ctx={console,window:{},document:{getElementById:()=>null},localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},URL:{createObjectURL:()=>"",revokeObjectURL:()=>{}},Blob:class{},Date,Math,Number,JSON,Object,Array,String,Set,
@@ -59,4 +59,4 @@ for(const file of walk(path.join(root,"assets")).filter(file=>file.endsWith(".pn
 }
 
 assert.equal(pkg.scripts.test,"node tests/run-all.mjs","전체 테스트 자동 수집이 연결되지 않음");
-console.log("v14.15.4 stability/memory hardening audit: OK");
+console.log("v14.15.6 stability/memory hardening audit: OK");

@@ -17,6 +17,7 @@
 (function installForgeV13(){
   const BUILD = 16;
   const MAX_ENHANCE = 25;
+  const ENHANCE_SUCCESS_VFX = "assets/vfx/forge/enhance-success.gif";
   // 현재 단계에서 다음 단계로 올라갈 기본 성공률(+0→+1 ... +24→+25).
   const ENHANCE_CHANCE = [1,.95,.90,.85,.80,.70,.60,.50,.40,.30,.10,.10,.10,.10,.10,.05,.05,.05,.05,.05,.03,.03,.03,.03,.01];
   const ARTISAN_EXPECTED_INVESTMENT_MULTIPLIER = 1.4;
@@ -276,9 +277,19 @@
   function selectedItem(){return account.weapons.find(x=>x.id===selectedItemId)}
   function setAnvilEffect(scene,effect=""){
     if(!scene)return;
+    scene.querySelector(".forge-success-vfx")?.remove();
     scene.classList.add("anvil-scene","art-anvil-scene");
     scene.classList.remove("striking","success","failure");
     if(effect)scene.classList.add(effect);
+    if(effect==="success"){
+      const vfx=document.createElement("img");
+      vfx.className="forge-success-vfx";
+      vfx.src=ENHANCE_SUCCESS_VFX;
+      vfx.alt="";
+      vfx.setAttribute("aria-hidden","true");
+      vfx.decoding="async";
+      scene.appendChild(vfx);
+    }
   }
   function openDetail(id,tab="enhance"){
     if(enhancementInFlight)return;
@@ -361,10 +372,11 @@
     if(account.gold<cost){message.className="forge-result-message bad";message.textContent=`금자가 부족하다. ${cost} 금자가 필요하다.`;GameAudio.playUI("error");return}
     account.gold-=cost;setEnhancementBusy(true);saveAccountData();updateForgeLiveGold();setAnvilEffect(scene,"striking");message.className="forge-result-message"; message.textContent="장인이 호흡을 가다듬고 망치를 내리친다…"; GameAudio.playUI("forge-strike");
     setTimeout(()=>{
-      let destroyed=false;
+      let destroyed=false,successful=false;
       try{
         const rates=enhancementOutcomeRates(item),r=Math.random();
         if(r<rates.success){
+          successful=true;
           item.level++;item.artisanBreath=0;item.failStack=0;item.damageMul=item.baseDamageMul*enhancementMultiplier(item.level,item);
           setAnvilEffect(scene,"success");message.className="forge-result-message good";message.textContent=`강화 성공! ${item.name}이 +${item.level}에 도달했다. 장인의 숨결이 초기화됐다.`;
           GameAudio.playUI("forge-success");setTimeout(()=>GameAudio.playUI("forge-success-tail"),75);
@@ -381,7 +393,7 @@
         }
         saveAccountData();renderWeaponInventory();if(!destroyed)renderDetail();
       }finally{
-        setEnhancementBusy(false);setTimeout(()=>setAnvilEffect(scene),650);
+        setEnhancementBusy(false);setTimeout(()=>setAnvilEffect(scene),successful?850:650);
         if(destroyed)setTimeout(()=>{detailOverlay().classList.remove("show");refreshForge()},850);
       }
     },520);

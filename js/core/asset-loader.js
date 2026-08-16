@@ -8,7 +8,7 @@
  * 코드 생성 캐릭터로 되돌아가는 상황을 막기 위해 모든 시스템이 같은 Image 객체를 공유한다.
  */
 const GameAssets=(()=>{
-  const BUILD="v14.15.4-cumulative-root";
+  const BUILD="v14.15.6-cumulative-root";
   const characterIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
   const enemyIds=["bandit","spear","brute","master","assassin","blackblade","ironmonk","poisonhand","boss"];
   const weaponVisualIds=["sword","spear","bow","poison","tao","saber","katana","fist"];
@@ -21,6 +21,7 @@ const GameAssets=(()=>{
     "assets/map/terrain/west-cliff-road.webp"
   ];
   const vfxFiles=[
+    "assets/vfx/forge/enhance-success.gif",
     "assets/vfx/common/beam_blue.png",
     "assets/vfx/common/beam_red.png",
     "assets/vfx/common/blade.png",

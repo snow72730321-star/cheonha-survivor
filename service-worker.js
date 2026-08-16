@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.15.4: 누적 배포본 · 왜도 VFX 경로 일원화. */
+/** v14.15.6: 누적 배포본 · 강화 성공 GIF 프레임 잔상 제거. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-15-4-cumulative-root";
+const CACHE="cheonha-v14-15-6-cumulative-root";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
