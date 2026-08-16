@@ -1,0 +1,11 @@
+import fs from "node:fs";
+const html=fs.readFileSync("index.html","utf8"),css=fs.readFileSync("css/forge-mobile-final-v14-11-1.css","utf8"),js=fs.readFileSync("js/ui/forge-mobile-final-v14-11-1.js","utf8"),sw=fs.readFileSync("service-worker.js","utf8");
+const must=(c,m)=>{if(!c)throw new Error(m)};
+must(html.includes('id="forgeWeaponActions"'),"weapon action host missing");
+must(html.includes('id="forgeOreActions"')&&html.includes('id="forgeOreSelectedSummary"'),"ore hosts missing");
+must(js.includes('actions=$("forgeWeaponActions")'),"weapon actions not rebound");
+must(js.includes('actionsHost=$("forgeOreActions")'),"ore actions not rebound");
+must(!css.includes('v14.12 forge interaction realignment')&&!css.includes('v14.12.3 — asset realignment'),"legacy coordinate overrides remain");
+must(css.includes('v14.12.7 — single iPhone-calibrated forge layout'),"final calibrated layout missing");
+must((sw.includes('cheonha-v14-12-7-forge-device-alignment')||sw.includes('cheonha-v14-12-8-black-compare-align'))&&sw.includes('isForgeUiArt'),"forge SW refresh policy missing");
+console.log("v14.12.6 forge layout clean audit: OK");
