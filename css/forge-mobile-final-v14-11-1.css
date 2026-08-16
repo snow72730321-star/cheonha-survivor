@@ -111,7 +111,7 @@
 /* Enhance layout */
 #forgeDetail[data-forge-mode="enhance"] .forge-detail-title{top:31.8%}
 #forgeDetail[data-forge-mode="enhance"] .anvil-scene{position:absolute!important;left:38%!important;top:18.1%!important;width:24%!important;height:13.5%!important;min-height:0!important;margin:0!important;background:transparent!important;border:0!important;overflow:visible!important}
-#forgeDetail[data-forge-mode="enhance"] .anvil-workshop-art,#forgeDetail[data-forge-mode="enhance"] .forge-scene-glow,#forgeDetail[data-forge-mode="enhance"] .forge-fire,#forgeDetail[data-forge-mode="enhance"] .anvil-hammer{display:none!important}
+#forgeDetail[data-forge-mode="enhance"] .anvil-workshop-art,#forgeDetail[data-forge-mode="enhance"] .forge-scene-glow{display:none!important}
 #forgeDetail[data-forge-mode="enhance"] .anvil-weapon{position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;transform:none!important}
 #forgeDetail[data-forge-mode="enhance"] .anvil-weapon img{max-width:90%!important;max-height:90%!important;object-fit:contain!important}
 #forgeDetail[data-forge-mode="enhance"] .forge-rate-card{position:absolute!important;left:17%!important;right:17%!important;top:47.8%!important;height:17.5%!important;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(4,1fr)!important;gap:0!important;background:transparent!important;border:0!important;margin:0!important;padding:0!important}

@@ -42,11 +42,11 @@ const WeaponVisuals=(()=>{
     return family(id||selectedWeapon||"sword").hud||family(id||selectedWeapon||"sword").asset;
   }
   function rarity(item){return rarities[item?.grade]||rarities.common}
-  function decorate(node,item,fallbackFamily){
+  function decorate(node,item,fallbackFamily,updateSource=true){
     if(!node)return;
     item=normalize(item);const el=element(item),lv=tier(item),wid=item?.visualId||fallbackFamily||selectedWeapon||"sword",rar=rarity(item);
     node.style.setProperty("--weapon-aura",el.color);node.style.setProperty("--weapon-rarity",rar.color);node.dataset.weaponTier=String(lv);node.dataset.weaponElement=item?.element||"han";node.dataset.weaponFamily=wid;node.dataset.weaponRarity=item?.grade||"common";
-    const img=node.querySelector("img");if(img){img.src=asset(item||wid);img.alt=`${family(wid).name} 무기`;img.style.filter=el.filter+` drop-shadow(0 5px 4px rgba(0,0,0,.68)) drop-shadow(0 0 ${4+rar.glow+lv*3}px ${el.color})`}
+    const img=node.querySelector("img");if(img){if(updateSource)img.src=asset(item||wid);img.alt=`${family(wid).name} 무기`;img.style.filter=el.filter+` drop-shadow(0 5px 4px rgba(0,0,0,.68)) drop-shadow(0 0 ${4+rar.glow+lv*3}px ${el.color})`}
   }
   function renderAnvilWeapon(node,item){
     if(!node||!item)return;normalize(item);const el=element(item),lv=tier(item);
@@ -63,10 +63,17 @@ const WeaponVisuals=(()=>{
     if(!img){img=document.createElement("img");img.className="anvil-weapon-img";media.append(img)}
     let meta=node.querySelector(":scope > .anvil-weapon-meta");
     if(!meta){meta=document.createElement("div");meta.className="anvil-weapon-meta";meta.innerHTML="<b></b><span></span>";node.append(meta)}
-    img.src=asset(item);img.alt=item.name;
     meta.querySelector("b").textContent=`+${item.level||0}`;meta.querySelector("span").textContent=el.name;
     [...node.classList].filter(name=>name.startsWith("weapon-tier-")).forEach(name=>node.classList.remove(name));
-    node.classList.add("anvil-weapon",`weapon-tier-${lv}`);decorate(node,item,item.weapon);
+    node.classList.add("anvil-weapon",`weapon-tier-${lv}`);decorate(node,item,item.weapon,false);
+    const primary=hudAsset(item),fallback=asset(item);
+    node.classList.remove("weapon-asset-error");img.hidden=false;
+    img.onload=()=>{node.classList.add("weapon-asset-ready");node.classList.remove("weapon-asset-error")};
+    img.onerror=()=>{
+      if(img.dataset.fallbackTried!=="1"&&fallback!==primary){img.dataset.fallbackTried="1";img.src=fallback;return}
+      node.classList.add("weapon-asset-error");img.hidden=true;
+    };
+    if(img.getAttribute("src")!==primary){delete img.dataset.fallbackTried;node.classList.remove("weapon-asset-ready");img.src=primary}
   }
   function updateUltimateButton(){
     const btn=document.getElementById("ultimateBtn");if(!btn)return;

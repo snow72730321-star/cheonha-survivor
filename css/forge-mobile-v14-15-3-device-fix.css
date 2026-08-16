@@ -11,12 +11,18 @@
   bottom:auto!important;
   display:block!important;
   overflow:hidden!important;
+  z-index:10!important;
+  opacity:1!important;
+  visibility:visible!important;
 }
 #forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
   position:absolute!important;
   inset:0!important;
   display:grid!important;
   place-items:center!important;
+  z-index:2!important;
+  opacity:1!important;
+  visibility:visible!important;
 }
 #forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
   width:100%!important;
@@ -26,7 +32,11 @@
   object-fit:contain!important;
   object-position:center!important;
   transform:none!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
 }
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .forge-success-vfx{z-index:6!important}
 #forgeDetail[data-forge-mode="enhance"] #anvilScene.striking .anvil-weapon-media,
 #forgeDetail[data-forge-mode="enhance"] #anvilScene.success .anvil-weapon-media,
 #forgeDetail[data-forge-mode="enhance"] #anvilScene.failure .anvil-weapon-media{

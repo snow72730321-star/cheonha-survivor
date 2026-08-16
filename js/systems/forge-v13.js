@@ -227,7 +227,7 @@
         <button class="forge-tab" data-forge-tab="codex">단조 도감</button>
       </div>
       <div class="forge-pane active" data-forge-pane="enhance">
-        <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="forge-fire"></div><div class="anvil-weapon" id="anvilWeapon"><img class="anvil-weapon-img" alt="무기"></div><div class="anvil-hammer asset-hammer"></div><div class="forge-sparks"></div><div class="forge-impact-flash"></div></div>
+        <div class="anvil-scene art-anvil-scene" id="anvilScene"><img class="anvil-workshop-art" src="assets/ui/forge-workshop.svg" alt="대장간 작업대"><div class="forge-scene-glow"></div><div class="anvil-weapon" id="anvilWeapon"><div class="anvil-weapon-media"><img class="anvil-weapon-img" alt="강화 대상 무기"></div></div></div>
         <div class="forge-enhance-level"><b id="enhanceCurrentLevel">+0</b><b id="enhanceNextLevel">+1</b></div>
         <div class="forge-enhance-outcomes">
           <div class="success"><span>성공 확률</span><b id="enhanceRate">100%</b></div>
@@ -275,12 +275,27 @@
   }
 
   function selectedItem(){return account.weapons.find(x=>x.id===selectedItemId)}
+  function renderAnvilSelection(scene=detailOverlay().querySelector("#anvilScene"),item=selectedItem()){
+    const node=scene?.querySelector("#anvilWeapon");
+    if(!node||!item)return false;
+    node.hidden=false;node.removeAttribute("aria-hidden");
+    if(window.WeaponVisuals)WeaponVisuals.renderAnvilWeapon(node,item);
+    else{
+      let media=node.querySelector(".anvil-weapon-media");
+      if(!media){media=document.createElement("div");media.className="anvil-weapon-media";node.append(media)}
+      let img=media.querySelector(".anvil-weapon-img");
+      if(!img){img=document.createElement("img");img.className="anvil-weapon-img";media.append(img)}
+      img.src=`assets/weapons/hud/${item.weapon}.png`;img.alt=item.name||"강화 대상 무기";
+    }
+    return true;
+  }
   function setAnvilEffect(scene,effect=""){
     if(!scene)return;
     scene.querySelector(".forge-success-vfx")?.remove();
     scene.classList.add("anvil-scene","art-anvil-scene");
     scene.classList.remove("striking","success","failure");
     if(effect)scene.classList.add(effect);
+    renderAnvilSelection(scene);
     if(effect==="success"){
       const vfx=document.createElement("img");
       vfx.className="forge-success-vfx";
@@ -336,8 +351,7 @@
       const next=nextItem?CombatPowerSystem.calculate(nextItem):null;
       cpBox.innerHTML=`<div class="cp-main"><b>${CombatPowerSystem.format(cp.total)}</b><span>무기 전투력</span></div><div class="cp-components"><span>기초·강화 <b>${CombatPowerSystem.format(cp.core)}</b></span><span>제작 품질 <b>+${CombatPowerSystem.format(cp.quality)}</b></span><span>속성 <b>+${CombatPowerSystem.format(cp.ability)}</b></span><span>잠재 <b>+${CombatPowerSystem.format(cp.potential)}</b></span><span>공명 능력치 <b>+${CombatPowerSystem.format(cp.resonance)}</b></span></div>${next?`<div class="cp-next">강화 성공 시 <b>${CombatPowerSystem.format(next.total)}</b> <em>+${CombatPowerSystem.format(next.total-cp.total)}</em></div>`:`<div class="cp-next max">최대 강화 전투력</div>`}`;
     }
-    if(window.WeaponVisuals) WeaponVisuals.renderAnvilWeapon(root.querySelector("#anvilWeapon"),item);
-    else root.querySelector("#anvilWeapon").textContent=`${weaponDefs[item.weapon].icon} ${item.name}`;
+    renderAnvilSelection(root.querySelector("#anvilScene"),item);
     const currentLevelEl=root.querySelector("#enhanceCurrentLevel"),nextLevelEl=root.querySelector("#enhanceNextLevel");
     if(currentLevelEl)currentLevelEl.textContent=`+${item.level}`;
     if(nextLevelEl)nextLevelEl.textContent=item.level>=MAX_ENHANCE?"MAX":`+${item.level+1}`;

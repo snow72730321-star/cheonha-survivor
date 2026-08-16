@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.15.6: 누적 배포본 · 강화 성공 GIF 프레임 잔상 제거. */
+/** v14.15.7: 누적 배포본 · 구형 강화 연출 제거 + 강화 무기 표시 복구. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-15-6-cumulative-root";
+const CACHE="cheonha-v14-15-7-cumulative-root";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",

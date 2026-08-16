@@ -15,5 +15,5 @@ ok(css.includes('.forge-smith-weapon-types')&&css.includes('grid-template-column
 ok(storage.includes('smith-preview-rows')&&storage.includes('smith-preview-ability')&&storage.includes('smith-preview-cost'),"smith preview not mapped into art detail panel");
 ok(forge.includes('id="enhanceDownRate"')&&forge.includes('id="enhanceDestroyRate"')&&forge.includes('단계 하락')&&forge.includes('파괴 확률'),"enhancement 3-row rate mapping source missing");
 ok(css.includes('.combat-power-breakdown{display:none!important}')&&css.includes('.forge-enhance-outcomes')&&css.includes('.forge-enhance-costs'),"enhance popup frame alignment missing");
-ok(sw.includes('cheonha-v14-15-6-cumulative-root')&&sw.includes('js/systems/world-map-v14-15.js'),"current PWA world map cache missing");
+ok(sw.includes('cheonha-v14-15-7-cumulative-root')&&sw.includes('js/systems/world-map-v14-15.js'),"current PWA world map cache missing");
 console.log("v14.12 codex passive + authored map + forge alignment audit: OK");
