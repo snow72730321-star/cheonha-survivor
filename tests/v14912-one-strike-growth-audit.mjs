@@ -1,0 +1,10 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(new URL(`../${p}`,import.meta.url),"utf8");
+const ok=(v,m)=>{if(!v)throw new Error(m)};
+const state=read("js/core/runtime-state.js"),combat=read("js/systems/combat-runtime.js"),meta=read("js/data/characters-meta.js"),hud=read("js/render/sprite-remaster-v14-3-18.js");
+ok(combat.includes("oneStrikeStacks:0"),"일극 런 초기화 누락");
+ok(meta.includes("Math.min(100,n|0)")&&meta.includes("player.maxHp+=delta*.5")&&meta.includes("Math.pow(1.003,delta)"),"일극 영구 성장 수치 누락");
+ok(meta.includes('source==="tenThousand"')&&meta.includes("setOneStrikeStacks((player.oneStrikeStacks||0)+1)"),"만권일극 처치 연동 누락");
+ok(state.includes("일극은 이번 전투 동안 영구 유지")&&state.includes("최대 100"),"만권일극 설명 누락");
+ok(hud.includes("일극 ${o}/100")&&hud.includes("leftX")&&hud.includes("rightX"),"좌우 스택 HUD 누락");
+console.log("v14.9.12 one-strike growth audit passed");
