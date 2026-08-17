@@ -11,10 +11,10 @@ const combat=read("js/systems/combat-runtime.js"),world=read("js/systems/world-m
 const menu=read("js/render/sprite-remaster-v14-3-18.js"),gacha=read("js/systems/storage-forge.js"),cutscene=read("js/vfx/awakening-cutscene-v14-3-8.js");
 const pkg=JSON.parse(read("package.json"));
 
-assert.equal(pkg.version,"14.16.2");
-assert.match(html,/v14\.16\.2-raid-transcend/);
-assert.match(loader,/const BUILD="v14\.16\.2-raid-transcend"/);
-assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
+assert.equal(pkg.version,"14.16.4");
+assert.match(html,/v14\.16\.4-raid-endgame/);
+assert.match(loader,/const BUILD="v14\.16\.4-raid-endgame"/);
+assert.match(sw,/cheonha-v14-16-4-raid-endgame/);
 assert.match(save,/const VERSION=18/);
 
 const ctx={console,window:{},document:{getElementById:()=>null},localStorage:{getItem:()=>null,setItem:()=>{},removeItem:()=>{}},URL:{createObjectURL:()=>"",revokeObjectURL:()=>{}},Blob:class{},Date,Math,Number,JSON,Object,Array,String,Set,

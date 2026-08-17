@@ -23,21 +23,26 @@
     "assets/raid/bosses/cheonma-demon-dragon.png"
   ];
   const STAGES=[
-    {id:"peng",gate:1,name:"도마종 단주 팽단휘",sprite:RAID_ASSETS[1],duration:100,hp:140000,damage:26,speed:66,r:48,gimmick:"혈도세 · 체력 60%에서 파천도진 강화"},
-    {id:"namgung",gate:2,name:"법마종 대주 남궁혁",sprite:RAID_ASSETS[2],duration:105,hp:240000,damage:31,speed:54,r:45,gimmick:"사상법진 · 빛나는 안전 법인으로 이동"},
-    {id:"ma",gate:3,name:"검마종 종주 마허진",sprite:RAID_ASSETS[3],duration:110,hp:390000,damage:37,speed:60,r:47,gimmick:"삼절검총 · 검인 3개 파괴 전 본체 보호"},
-    {id:"cheondan",gate:4,name:"우호법 천단",sprite:RAID_ASSETS[4],duration:120,hp:620000,damage:43,speed:50,r:53,gimmick:"금강반진 · 정면 방어 중 후방을 공략"},
-    {id:"cheonma",gate:5,name:"천마(폭주)",sprite:RAID_ASSETS[5],duration:330,hp:1250000,damage:50,speed:0,r:92,gimmick:"마수 한쪽 파괴 → 마룡 변신 → 천마 본체",fixed:true}
+    {id:"peng",gate:1,name:"도마종 단주 팽단휘",sprite:RAID_ASSETS[1],duration:100,hp:200000,damage:30,speed:68,r:48,gimmick:"혈도세 · 피격 시 혈기 누적, 해방 패턴 회피 시 파훼"},
+    {id:"namgung",gate:2,name:"법마종 대주 남궁혁",sprite:RAID_ASSETS[2],duration:105,hp:350000,damage:35,speed:56,r:45,gimmick:"사상법진 · 안전 법인 실패 시 봉마와 치명상"},
+    {id:"ma",gate:3,name:"검마종 종주 마허진",sprite:RAID_ASSETS[3],duration:110,hp:580000,damage:41,speed:62,r:47,gimmick:"삼절검총 · 검인 3개를 제한시간 안에 파괴"},
+    {id:"cheondan",gate:4,name:"우호법 천단",sprite:RAID_ASSETS[4],duration:120,hp:900000,damage:47,speed:52,r:53,gimmick:"금강반진 · 후방 누적 피해로 반진을 붕괴"},
+    {id:"cheonma",gate:5,name:"천마(폭주)",sprite:RAID_ASSETS[5],duration:300,hp:2500000,damage:56,speed:0,r:92,gimmick:"마수 공명 → 마룡 심핵 → 천마 본체 10줄",fixed:true}
   ];
   const FINAL_ASSETS=Object.freeze({body:RAID_ASSETS[5],leftArm:RAID_ASSETS[6],rightArm:RAID_ASSETS[7],dragon:RAID_ASSETS[8]});
-  const FINAL_HP=Object.freeze({arm:420000,dragon:900000,body:1250000});
+  const FINAL_HP=Object.freeze({arm:650000,dragon:1400000,body:2500000});
+  const FINAL_BODY_BARS=10;
 
   const raid={
     active:false,lastRun:false,stageIndex:0,completedGates:0,stageTime:0,currentBoss:null,
     telegraphs:[],parts:[],patternIndex:0,patternTimer:0,awaitingGrowth:false,awaitingCombat:false,keyConsumed:false,nextStage:0,
     previousDifficulty:"chuchul",gimmickTriggered:false,gimmickTimer:0,shieldActive:false,
     shieldAngle:0,autoTraining:false,finishing:false,finalMaxTotal:0,finalDamage:0,
-    finalPhase:0,finalCompletedDamage:0,finalPhaseMax:{arm:0,dragon:0,body:0},overseer:null,phaseGrace:0
+    finalPhase:0,finalCompletedDamage:0,finalPhaseMax:{arm:0,dragon:0,body:0},overseer:null,phaseGrace:0,
+    breakTime:0,breakMultiplier:1,breakTargetId:null,bloodStacks:0,bloodDecay:0,healSuppression:0,previousHp:0,
+    maFailStacks:0,magicCorruption:0,cheondanBreakDamage:0,cheondanBreakNeed:0,
+    armResonanceActive:false,armResonanceTargetId:null,dragonCoreActive:false,dragonCoreTriggers:{high:false,low:false},
+    gimmickGaugeActive:false,gimmickGaugeLabel:"",gimmickGaugeValue:0,gimmickGaugeMax:1,bodyEnraged:false
   };
 
   const hud={
@@ -60,6 +65,17 @@
   }
   function raidPowerScale(){return 1}
   function arenaPoint(index,radius=330){const a=-Math.PI/2+index*Math.PI/2;return{x:Math.cos(a)*radius,y:Math.sin(a)*radius}}
+  function setGimmickGauge(label,value,max){raid.gimmickGaugeActive=true;raid.gimmickGaugeLabel=label;raid.gimmickGaugeValue=Math.max(0,value);raid.gimmickGaugeMax=Math.max(1,max)}
+  function clearGimmickGauge(){raid.gimmickGaugeActive=false;raid.gimmickGaugeLabel="";raid.gimmickGaugeValue=0;raid.gimmickGaugeMax=1}
+  function raidPenaltyDamage(ratio,label="기믹 실패"){
+    if(state!=="playing"||!raid.active)return false;const taken=Math.max(1,player.maxHp*Math.max(0,ratio));player.hp-=taken;player.metrics.damageTaken+=taken;player.metrics.noHit=0;flash=.92;screenShake=Math.max(screenShake,16);GameAudio.playSFX("player-hurt");
+    if(label)showMessage(`${label} · 최대 체력 ${Math.round(ratio*100)}% 손실`,1.5);if(player.hp<=0){player.hp=0;endGame(false,"gimmick");return true}return false;
+  }
+  function applyRaidBreak(entity,duration=8,multiplier=1.3,label="파훼 성공"){
+    raid.breakTime=Math.max(raid.breakTime,duration);raid.breakMultiplier=Math.max(raid.breakMultiplier,multiplier);raid.breakTargetId=entity?.raidId||null;raid.patternTimer=Math.max(raid.patternTimer,duration+.35);raid.telegraphs.length=0;if(entity)entity.stunTime=Math.max(entity.stunTime||0,duration);clearGimmickGauge();showMessage(`${label} · ${duration.toFixed(0)}초간 받는 피해 +${Math.round((multiplier-1)*100)}%`,1.8);
+  }
+  function addBloodStacks(amount=1){raid.bloodStacks=Math.max(0,Math.min(3,raid.bloodStacks+amount));raid.bloodDecay=9;showMessage(`혈기 ${raid.bloodStacks}/3 · 받는 피해 증가`,1.25)}
+  function addMagicCorruption(){raid.magicCorruption=Math.min(3,raid.magicCorruption+1);showMessage(`마기침식 ${raid.magicCorruption}/3 · 받는 피해 증가 / 주는 피해 감소`,1.6);if(raid.magicCorruption>=3)raidPenaltyDamage(.95,"마기침식 폭발")}
 
   function clearCombatObjects(keepBoss=false){
     for(const item of projectiles)GamePools.projectile.release(item);
@@ -120,13 +136,13 @@
     if(!raid.active||index<0||index>=STAGES.length)return;
     clearCombatObjects();raid.awaitingCombat=false;raid.stageIndex=index;raid.nextStage=index;raid.patternIndex=0;raid.patternTimer=2.8;
     if(index!==4){raid.finalPhase=0;raid.phaseGrace=0}
-    raid.gimmickTriggered=false;raid.gimmickTimer=0;raid.shieldActive=false;raid.stageTime=STAGES[index].duration;
+    raid.gimmickTriggered=false;raid.gimmickTimer=0;raid.shieldActive=false;raid.breakTime=0;raid.breakMultiplier=1;raid.breakTargetId=null;raid.bloodStacks=0;raid.bloodDecay=0;raid.healSuppression=0;raid.maFailStacks=0;raid.magicCorruption=0;raid.cheondanBreakDamage=0;raid.cheondanBreakNeed=0;raid.armResonanceActive=false;raid.armResonanceTargetId=null;raid.dragonCoreActive=false;raid.dragonCoreTriggers={high:false,low:false};raid.bodyEnraged=false;clearGimmickGauge();raid.stageTime=STAGES[index].duration;
     player.x=0;player.y=index===4?245:250;player.hp=Math.min(player.maxHp,player.hp+player.maxHp*.3);
     player.invuln=Math.max(player.invuln||0,2.2);spawnTimer=Infinity;nextMiniBossAt=Infinity;finalBossAt=Infinity;runDuration=Infinity;bossSpawned=true;
     const stage=STAGES[index];let entity;
     if(stage.id==="cheonma"){spawnFinalPhaseOne(stage);entity=raid.currentBoss}
     else{entity=makeBoss(stage);boss=entity;raid.currentBoss=entity;enemies.push(entity)}
-    state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ui.bossWrap.style.display="block";
+    raid.previousHp=player.hp;state="playing";ui.dodgeBtn.style.display="flex";ui.ultimateBtn.style.display="flex";ui.bossWrap.style.display="block";
     hud.root?.classList.add("show");updateRaidHud();
     if(index!==4)showMessage(`${index+1}관문 · ${stage.name}`,2.5);
     GameAudio.playSFX("boss-spawn");GameEvents.emit("boss:spawn",{boss:entity,raid:true,stage:index});
@@ -149,27 +165,33 @@
   function lineThroughPoint(x,y,a,length=1250){return{x1:x-Math.cos(a)*length,y1:y-Math.sin(a)*length,x2:x+Math.cos(a)*length,y2:y+Math.sin(a)*length}}
 
   function pengPattern(e){
-    const i=raid.patternIndex++%3,damage=e.damage*(e.raidEnraged?1.18:1);
+    const i=raid.patternIndex++%3,damage=e.damage*(e.raidEnraged?1.18:1),markHit=fn=>{const before=player.hp;fn();if(player.hp<before)addBloodStacks(1)};
     if(i===0){
       const a=bossToPlayerAngle(e),line=lineThroughPoint(player.x,player.y,a,800);
-      queueTelegraph({kind:"line",name:"혈도횡단",...line,width:34,warning:1.05,execute:()=>burstLine(line.x1,line.y1,line.x2,line.y2,34,damage,"#ef5b4e")});
+      queueTelegraph({kind:"line",name:"혈도횡단",...line,width:34,warning:1.05,execute:()=>markHit(()=>burstLine(line.x1,line.y1,line.x2,line.y2,34,damage,"#ef5b4e"))});
     }else if(i===1){
       const a=bossToPlayerAngle(e);
-      queueTelegraph({kind:"cone",name:"멸문도강",x:e.x,y:e.y,a,r:390,half:.42,warning:1.0,execute:()=>{hitCone(e.x,e.y,a,390,.42,damage*1.15);addVisual({type:"cone",x:e.x,y:e.y,a,r:390,half:.42,life:.25,max:.25,color:"#ff6d52"})}});
+      queueTelegraph({kind:"cone",name:"멸문도강",x:e.x,y:e.y,a,r:390,half:.42,warning:1.0,execute:()=>markHit(()=>{hitCone(e.x,e.y,a,390,.42,damage*1.15);addVisual({type:"cone",x:e.x,y:e.y,a,r:390,half:.42,life:.25,max:.25,color:"#ff6d52"})})});
     }else{
       const lines=[0,Math.PI/2,Math.PI/4,-Math.PI/4].map(a=>lineThroughPoint(e.x,e.y,a,760));
-      queueTelegraph({kind:"multiLine",name:"파천도진",lines,width:24,warning:1.2,execute:()=>lines.forEach(line=>burstLine(line.x1,line.y1,line.x2,line.y2,24,damage*.82,"#d5403d"))});
+      queueTelegraph({kind:"multiLine",name:"파천도진",lines,width:24,warning:1.2,execute:()=>markHit(()=>lines.forEach(line=>burstLine(line.x1,line.y1,line.x2,line.y2,24,damage*.82,"#d5403d")))});
     }
     if(!raid.gimmickTriggered&&e.hp/e.maxHp<=.6){
       raid.gimmickTriggered=true;e.raidEnraged=true;e.speed*=1.16;
-      queueTelegraph({kind:"circle",name:"기믹 · 혈도세 해방",x:e.x,y:e.y,r:245,warning:1.55,color:"#ff4038",execute:()=>{burstCircle(e.x,e.y,245,e.damage*1.3,"#ff4038");raid.patternTimer=Math.min(raid.patternTimer,1.2);showMessage("팽단휘의 혈도세가 폭주한다",1.7)}});
+      queueTelegraph({kind:"circle",name:"기믹 · 혈도세 해방",x:e.x,y:e.y,r:245,warning:1.75,color:"#ff4038",execute:()=>{
+        const failed=Math.hypot(player.x-e.x,player.y-e.y)<=245+(player.hitRadius||player.r);
+        if(failed){raidPenaltyDamage(.45,"혈도세 파훼 실패");addBloodStacks(2)}else applyRaidBreak(e,8,1.30,"혈도세 파훼");
+        raid.patternTimer=Math.min(raid.patternTimer,1.2);
+      }});
     }
   }
 
   function namgungSafeSeal(e){
     const safe=arenaPoint(Math.floor(raid.patternIndex/2)%4,300);
     queueTelegraph({kind:"safe",name:"기믹 · 사상법진",safeX:safe.x,safeY:safe.y,safeR:92,warning:2.05,color:"#7fbfff",execute:()=>{
-      if(Math.hypot(player.x-safe.x,player.y-safe.y)>92-(player.hitRadius||player.r))hurtPlayer(e.damage*1.55);
+      const failed=Math.hypot(player.x-safe.x,player.y-safe.y)>92-(player.hitRadius||player.r);
+      if(failed){raidPenaltyDamage(.68,"사상법진 파훼 실패");raid.healSuppression=20;showMessage("봉마 20초 · 회복 효과 70% 감소",1.6)}
+      else applyRaidBreak(e,8,1.30,"사상법진 역류");
       addVisual({type:"ring",x:safe.x,y:safe.y,r:92,life:.55,max:.55,color:"#8fd6ff",width:9});
     }});
   }
@@ -191,9 +213,9 @@
   }
 
   function spawnSwordSeals(e){
-    const hp=Math.round(e.maxHp*.105),points=[arenaPoint(0,255),arenaPoint(1,255),arenaPoint(3,255)];
+    const hp=Math.round(e.maxHp*.11),points=[arenaPoint(0,255),arenaPoint(1,255),arenaPoint(3,255)];
     points.forEach((p,index)=>makePart(`sword-seal-${index+1}`,`검인 ${index+1}`,p.x,p.y,hp,29));
-    raid.gimmickTimer=12;showMessage("삼절검총 · 검인 3개를 파괴하라",2.2);updateRaidHud();
+    raid.gimmickTimer=12;setGimmickGauge("삼절검총 · 남은 검인",3,3);showMessage("삼절검총 · 12초 안에 검인 3개를 파괴하라",2.2);updateRaidHud();
   }
   function maPattern(e){
     const i=raid.patternIndex++%3;
@@ -211,8 +233,8 @@
   }
 
   function activateCheondanShield(e){
-    raid.shieldActive=true;raid.shieldAngle=bossToPlayerAngle(e);raid.gimmickTimer=4.2;
-    showMessage("금강반진 · 정면 공격을 막는다. 후방으로 이동하라",2.1);updateRaidHud();
+    raid.shieldActive=true;raid.shieldAngle=bossToPlayerAngle(e);raid.gimmickTimer=4.2;raid.cheondanBreakDamage=0;raid.cheondanBreakNeed=e.maxHp*.08;
+    setGimmickGauge("금강반진 · 후방 파훼",raid.cheondanBreakNeed,raid.cheondanBreakNeed);showMessage("금강반진 · 4.2초 안에 후방에서 반진을 붕괴하라",2.1);updateRaidHud();
   }
   function cheondanPattern(e){
     const i=raid.patternIndex++%4;
@@ -230,8 +252,15 @@
   }
 
   function alivePart(id){return raid.parts.find(part=>part.raidId===id&&!part.dead)}
+  function startArmResonance(){
+    const arms=raid.parts.filter(p=>p.raidFinalArm&&!p.dead);if(!arms.length)return;const target=arms[Math.floor(Math.random()*arms.length)],need=target.maxHp*.075;raid.armResonanceActive=true;raid.armResonanceTargetId=target.raidId;raid.gimmickTimer=10;setGimmickGauge(`마기 공명 · ${target.bossName}`,need,need);showMessage(`마기 공명 · ${target.bossName}을 집중 공격하라`,2);
+  }
+  function startDragonCore(e,key){
+    if(raid.dragonCoreActive)return;raid.dragonCoreActive=true;raid.dragonCoreTriggers[key]=true;raid.gimmickTimer=10;const need=e.maxHp*.08;setGimmickGauge("마룡의 심핵",need,need);showMessage("마룡의 심핵 노출 · 10초 안에 파괴하라",2.1);
+  }
   function finalArmPattern(e){
-    const left=alivePart("cheonma-left-arm"),right=alivePart("cheonma-right-arm"),i=raid.patternIndex++%3;
+    const left=alivePart("cheonma-left-arm"),right=alivePart("cheonma-right-arm"),i=raid.patternIndex++%4;
+    if(i===3&&!raid.armResonanceActive){startArmResonance();return}
     if(i===0&&left){
       const a=Math.atan2(player.y-left.y,player.x-left.x),x2=left.x+Math.cos(a)*1150,y2=left.y+Math.sin(a)*1150;
       queueTelegraph({kind:"line",name:"좌측 마수 · 멸혼마광",x1:left.x,y1:left.y,x2,y2,width:46,warning:1.35,color:"#b83dff",execute:()=>burstLine(left.x,left.y,x2,y2,46,e.damage,"#b83dff")});
@@ -264,12 +293,17 @@
     }else if(i===2){
       const a=bossToPlayerAngle(e);queueTelegraph({kind:"cone",name:"천마 본체 · 천마신장",x:e.x,y:e.y,a,r:560,half:.55,warning:1.5,color:"#e92c50",execute:()=>{hitCone(e.x,e.y,a,560,.55,e.damage*1.15);addVisual({type:"cone",x:e.x,y:e.y,a,r:560,half:.55,life:.34,max:.34,color:"#f33758"})}});
     }else{
-      const safe=arenaPoint(raid.patternIndex%4,305);queueTelegraph({kind:"safe",name:"천마 본체 · 마역붕괴",safeX:safe.x,safeY:safe.y,safeR:98,warning:2.0,color:"#ff304d",execute:()=>{if(Math.hypot(player.x-safe.x,player.y-safe.y)>98-(player.hitRadius||player.r))hurtPlayer(e.damage*1.45);addVisual({type:"ring",x:safe.x,y:safe.y,r:98,life:.5,max:.5,color:"#ff6b82",width:10})}});
+      const safe=arenaPoint(raid.patternIndex%4,305);queueTelegraph({kind:"safe",name:"천마 본체 · 마역붕괴",safeX:safe.x,safeY:safe.y,safeR:98,warning:2.0,color:"#ff304d",execute:()=>{
+        const failed=Math.hypot(player.x-safe.x,player.y-safe.y)>98-(player.hitRadius||player.r);
+        if(failed){raidPenaltyDamage(.45,"마역붕괴 파훼 실패");addMagicCorruption()}
+        else applyRaidBreak(e,raid.bodyEnraged?10:8,1.30,"마역붕괴 파훼");
+        addVisual({type:"ring",x:safe.x,y:safe.y,r:98,life:.5,max:.5,color:"#ff6b82",width:10});
+      }});
     }
   }
 
   function schedulePattern(){
-    const e=raid.currentBoss;if(!e||e.dead)return;
+    const e=raid.currentBoss;if(!e||e.dead||raid.breakTime>0)return;
     if(e.raidId==="peng")pengPattern(e);
     else if(e.raidId==="namgung")namgungPattern(e);
     else if(e.raidId==="ma")maPattern(e);
@@ -278,7 +312,8 @@
     else if(e.raidId==="cheonma-dragon")demonDragonPattern(e);
     else heavenlyDemonBodyPattern(e);
     const base={peng:3.25,namgung:3.45,ma:3.25,cheondan:3.5,"cheonma-overseer":3.35,"cheonma-dragon":3.15,"cheonma-body":2.95}[e.raidId]||3.4;
-    raid.patternTimer=base*(e.raidEnraged?.82:1);
+    const maSpeed=e.raidId==="ma"?Math.pow(.93,raid.maFailStacks||0):1,bodySpeed=e.raidId==="cheonma-body"&&raid.bodyEnraged?.8:1;
+    raid.patternTimer=base*(e.raidEnraged?.82:1)*maSpeed*bodySpeed;
   }
 
   function tickTelegraphs(dt){
@@ -291,11 +326,20 @@
   }
   function tickGimmicks(dt){
     if(raid.gimmickTimer<=0)return;raid.gimmickTimer-=dt;
-    if(raid.currentBoss?.raidId==="ma"&&raid.gimmickTimer<=0){
-      const seals=raid.parts.filter(part=>part.raidId.startsWith("sword-seal-")&&!part.dead);
-      if(seals.length){hurtPlayer(raid.currentBoss.damage*1.35);raid.currentBoss.hp=Math.min(raid.currentBoss.maxHp,raid.currentBoss.hp+raid.currentBoss.maxHp*.08);seals.forEach(part=>part.dead=true);showMessage("검총 붕괴 실패 · 마허진의 기혈 회복",1.8)}
+    const e=raid.currentBoss;
+    if(e?.raidId==="ma"){
+      const seals=raid.parts.filter(part=>part.raidId.startsWith("sword-seal-")&&!part.dead);if(seals.length)setGimmickGauge("삼절검총 · 남은 검인",seals.length,3);
+      if(raid.gimmickTimer<=0&&seals.length){raidPenaltyDamage(.50,"검총 붕괴 실패");e.hp=Math.min(e.maxHp,e.hp+e.maxHp*.15);raid.maFailStacks++;e.damage*=1.10;seals.forEach(part=>part.dead=true);clearGimmickGauge();showMessage(`검마강림 ${raid.maFailStacks}중첩 · 체력 15% 회복`,1.8)}
     }
-    if(raid.currentBoss?.raidId==="cheondan"&&raid.gimmickTimer<=0){raid.shieldActive=false;showMessage("금강반진 해제 · 공격 기회",1.2)}
+    if(e?.raidId==="cheondan"&&raid.shieldActive&&raid.gimmickTimer<=0){
+      raid.shieldActive=false;e.hp=Math.min(e.maxHp,e.hp+e.maxHp*.12);e.damage*=1.08;raid.patternTimer=.65;clearGimmickGauge();showMessage("금강반진 파훼 실패 · 보호막 12% / 강화 패턴",1.8)
+    }
+    if(raid.armResonanceActive&&raid.gimmickTimer<=0){
+      raid.armResonanceActive=false;raid.armResonanceTargetId=null;clearGimmickGauge();raidPenaltyDamage(.55,"마기 공명 실패");addMagicCorruption();showMessage("양대 마수 공명 폭발",1.5)
+    }
+    if(raid.dragonCoreActive&&raid.gimmickTimer<=0&&e?.raidId==="cheonma-dragon"){
+      raid.dragonCoreActive=false;e.hp=Math.min(e.maxHp,e.hp+e.maxHp*.10);e.damage*=1.10;clearGimmickGauge();raidPenaltyDamage(.45,"마룡 심핵 파괴 실패");addMagicCorruption();showMessage("마룡 체력 10% 회복 · 마기침식 누적",1.8)
+    }
   }
 
   function raidTick(dt){
@@ -303,11 +347,18 @@
     spawnTimer=Infinity;nextMiniBossAt=Infinity;finalBossAt=Infinity;runDuration=Infinity;bossSpawned=true;
     const distance=Math.hypot(player.x,player.y);if(distance>ARENA_RADIUS){const q=ARENA_RADIUS/distance;player.x*=q;player.y*=q}
     for(const entity of enemies){if((entity.raidBoss&&entity.fixed)||entity.raidFinalArm){entity.x=entity.homeX??entity.x;entity.y=entity.homeY??entity.y;entity.pushX=entity.pushY=0}}
-    if(raid.phaseGrace>0){raid.phaseGrace=Math.max(0,raid.phaseGrace-dt);player.invuln=Math.max(player.invuln||0,.2);updateRaidHud();return}
-    raid.stageTime-=dt;raid.patternTimer-=dt;tickGimmicks(dt);tickTelegraphs(dt);
-    if(raid.patternTimer<=0&&raid.telegraphs.length<2)schedulePattern();
+    if(raid.phaseGrace>0){raid.phaseGrace=Math.max(0,raid.phaseGrace-dt);player.invuln=Math.max(player.invuln||0,.2);raid.previousHp=player.hp;updateRaidHud();return}
+    raid.stageTime-=dt;raid.patternTimer-=dt;
+    if(raid.breakTime>0){raid.breakTime=Math.max(0,raid.breakTime-dt);if(raid.breakTime<=0){raid.breakMultiplier=1;raid.breakTargetId=null;raid.patternTimer=Math.min(raid.patternTimer,.55)}}
+    if(raid.bloodDecay>0){raid.bloodDecay-=dt;if(raid.bloodDecay<=0&&raid.bloodStacks>0){raid.bloodStacks--;raid.bloodDecay=raid.bloodStacks>0?7:0}}
+    if(raid.healSuppression>0){raid.healSuppression=Math.max(0,raid.healSuppression-dt);if(player.hp>raid.previousHp)player.hp=raid.previousHp+(player.hp-raid.previousHp)*.30}
+    tickGimmicks(dt);tickTelegraphs(dt);
+    const e=raid.currentBoss;
+    if(e?.raidId==="cheonma-dragon"&&!raid.dragonCoreActive){const r=e.hp/e.maxHp;if(r<=.70&&!raid.dragonCoreTriggers.high)startDragonCore(e,"high");else if(r<=.35&&!raid.dragonCoreTriggers.low)startDragonCore(e,"low")}
+    if(e?.raidId==="cheonma-body"&&!raid.bodyEnraged&&e.hp/e.maxHp<=.30){raid.bodyEnraged=true;e.damage*=1.15;showMessage("천마진체 · 최후 3줄, 패턴 가속",2.1)}
+    if(raid.patternTimer<=0&&raid.telegraphs.length<2&&raid.breakTime<=0)schedulePattern();
     if(raid.stageTime<=0)finishRaid(false,"time");
-    updateRaidHud();
+    raid.previousHp=player.hp;updateRaidHud();
   }
 
   function currentProgress(){
@@ -375,9 +426,9 @@
       let text=stage.gimmick;
       if(stage.id==="ma"&&raid.parts.some(p=>p.raidId.startsWith("sword-seal-")&&!p.dead))text=`검총 붕괴까지 ${Math.max(0,raid.gimmickTimer).toFixed(1)}초`;
       if(stage.id==="cheondan"&&raid.shieldActive)text=`금강반진 ${Math.max(0,raid.gimmickTimer).toFixed(1)}초 · 후방 공격`;
-      if(final&&raid.finalPhase===1)text="좌우 마수 중 어느 한쪽이든 파괴하면 마룡으로 변신";
-      if(final&&raid.finalPhase===2)text="마룡의 전조 범위를 회피하고 본체를 끌어내라";
-      if(final&&raid.finalPhase===3)text="천마 본체 직접전 · 마역붕괴의 안전 법인을 확인";
+      if(final&&raid.finalPhase===1)text=raid.armResonanceActive?`마기 공명 ${Math.max(0,raid.gimmickTimer).toFixed(1)}초 · 지정 마수 집중 공격`:"좌우 마수 중 어느 한쪽이든 파괴하면 마룡으로 변신";
+      if(final&&raid.finalPhase===2)text=raid.dragonCoreActive?`마룡 심핵 ${Math.max(0,raid.gimmickTimer).toFixed(1)}초 · 집중 공격`:"마룡의 전조 범위를 회피하고 본체를 끌어내라";
+      if(final&&raid.finalPhase===3)text=`천마 본체 10줄 · 마기침식 ${raid.magicCorruption}/3${raid.bodyEnraged?" · 천마진체":""}`;
       hud.gimmick.textContent=text;
     }
     if(hud.parts){const visible=raid.parts.filter(p=>!p.raidId.startsWith("sword-seal-")||!p.dead);hud.parts.innerHTML=visible.map(p=>`<div class="raid-part-bar ${p.dead?"destroyed":""}"><span>${p.bossName}</span><div class="raid-part-track"><i style="width:${Math.max(0,p.hp/p.maxHp*100)}%"></i></div></div>`).join("")}
@@ -400,7 +451,7 @@
     try{
       const [weaponResult,raidResult]=await Promise.all([GameAssets.preloadWeapon(selectedWeapon),GameAssets.preloadList(RAID_ASSETS,()=>{},3)]);
       if(weaponResult.failed.length||raidResult.failed.length)showSystemToast("일부 레이드 에셋을 불러오지 못했습니다. 네트워크 연결을 확인해 주세요.",true);
-      ensureRaidAccount();raid.active=true;raid.lastRun=false;raid.finishing=false;raid.keyConsumed=false;raid.awaitingCombat=false;raid.stageIndex=0;raid.completedGates=0;raid.finalDamage=0;raid.finalPhase=0;raid.finalCompletedDamage=0;raid.phaseGrace=0;raid.previousDifficulty=selectedDifficulty;selectedDifficulty="chuchul";
+      ensureRaidAccount();raid.active=true;raid.lastRun=false;raid.finishing=false;raid.keyConsumed=false;raid.awaitingCombat=false;raid.stageIndex=0;raid.completedGates=0;raid.finalDamage=0;raid.finalPhase=0;raid.finalCompletedDamage=0;raid.phaseGrace=0;raid.breakTime=0;raid.bloodStacks=0;raid.healSuppression=0;raid.maFailStacks=0;raid.magicCorruption=0;raid.armResonanceActive=false;raid.dragonCoreActive=false;raid.dragonCoreTriggers={high:false,low:false};raid.bodyEnraged=false;clearGimmickGauge();raid.previousDifficulty=selectedDifficulty;selectedDifficulty="chuchul";
       initAudio();resetGame();clearCombatObjects();elapsed=0;spawnTimer=Infinity;nextMiniBossAt=Infinity;finalBossAt=Infinity;runDuration=Infinity;bossSpawned=true;
       updateCombatPortrait();[ui.menu,ui.result,ui.pause,ui.augment,ui.forge,hud.lobby].forEach(layer=>layer?.classList.remove("show"));
       ui.ultimateBtn.style.display="none";ui.dodgeBtn.style.display="none";hud.root?.classList.add("show");startRaidGrowth();last=performance.now();
@@ -410,7 +461,7 @@
 
   function openLobby(){
     if(!selectedWeapon){showMessage("레이드에 출전할 협객을 먼저 선택하시오",1.5);return}
-    ensureRaidAccount();const cp=window.CombatPowerSystem?CombatPowerSystem.equippedPower(selectedWeapon):0,rec=window.CombatPowerSystem?.recommended?.("raid")||55000;if(hud.tokens)hud.tokens.textContent=`천마전의 열쇠 ${account.raidKeys.toLocaleString()}개`;const start=document.getElementById("soloRaidStart");if(start){start.disabled=account.raidKeys<1;start.textContent=account.raidKeys<1?"천마전의 열쇠가 필요합니다":`레이드 준비 · 권장 전투력 ${CombatPowerSystem?.format?CombatPowerSystem.format(rec):rec}`};const power=document.getElementById("raidPowerHint");if(power)power.innerHTML=`현재 전투력 <b>${window.CombatPowerSystem?CombatPowerSystem.format(cp):cp}</b> / 권장 <b>${window.CombatPowerSystem?CombatPowerSystem.format(rec):rec}</b>${cp<rec?" · <span class='danger-note'>영원 +15 이상 권장</span>":" · 출전 권장"}`;hud.lobby?.classList.add("show");
+    ensureRaidAccount();const cp=window.CombatPowerSystem?CombatPowerSystem.equippedPower(selectedWeapon):0,rec=window.CombatPowerSystem?.recommended?.("raid")||75000;if(hud.tokens)hud.tokens.textContent=`천마전의 열쇠 ${account.raidKeys.toLocaleString()}개`;const start=document.getElementById("soloRaidStart");if(start){start.disabled=account.raidKeys<1;start.textContent=account.raidKeys<1?"천마전의 열쇠가 필요합니다":`레이드 준비 · 권장 전투력 ${CombatPowerSystem?.format?CombatPowerSystem.format(rec):rec}`};const power=document.getElementById("raidPowerHint");if(power)power.innerHTML=`현재 전투력 <b>${window.CombatPowerSystem?CombatPowerSystem.format(cp):cp}</b> / 권장 <b>${window.CombatPowerSystem?CombatPowerSystem.format(rec):rec}</b>${cp<rec?" · <span class='danger-note'>영원 +20 이상 권장</span>":" · 출전 권장"}`;hud.lobby?.classList.add("show");
   }
   function decorateGrowth(){
     if(!raid.active||state!=="levelup")return;ui.levelUp.classList.add("raid-growth");
@@ -484,11 +535,20 @@
   damageEnemy=function(entity,amount,source,options={}){
     if(raid.active&&entity){
       if(entity.raidDisplayOnly||(entity.raidFinalEntity||entity.raidFinalArm)&&raid.phaseGrace>0)return 0;
-      if(entity.raidId==="ma"&&raid.parts.some(part=>part.raidId.startsWith("sword-seal-")&&!part.dead))amount=Math.min(amount*.05,Math.max(0,entity.hp-1));
-      if(entity.raidId==="cheondan"&&raid.shieldActive){const from=Math.atan2(player.y-entity.y,player.x-entity.x);if(Math.abs(angleDiff(from,raid.shieldAngle))<1.05)amount*=.1}
+      if(raid.magicCorruption>0)amount*=Math.max(.55,1-raid.magicCorruption*.07);
+      if(entity.raidId==="ma"){if(raid.parts.some(part=>part.raidId.startsWith("sword-seal-")&&!part.dead))amount=Math.min(amount*.05,Math.max(0,entity.hp-1));amount*=Math.max(.65,1-raid.maFailStacks*.05)}
+      if(raid.breakTime>0&&(!raid.breakTargetId||entity.raidId===raid.breakTargetId))amount*=raid.breakMultiplier;
+      if(entity.raidId==="cheondan"&&raid.shieldActive){const from=Math.atan2(player.y-entity.y,player.x-entity.x);if(Math.abs(angleDiff(from,raid.shieldAngle))<1.05)amount*=.05}
     }
-    return baseDamageEnemy.call(this,entity,amount,source,options);
+    const dealt=baseDamageEnemy.call(this,entity,amount,source,options);
+    if(!raid.active||!entity||!dealt)return dealt;
+    if(entity.raidId==="cheondan"&&raid.shieldActive){const from=Math.atan2(player.y-entity.y,player.x-entity.x),rear=Math.abs(angleDiff(from,raid.shieldAngle))>=1.05;if(rear){raid.cheondanBreakDamage+=dealt;setGimmickGauge("금강반진 · 후방 파훼",Math.max(0,raid.cheondanBreakNeed-raid.cheondanBreakDamage),raid.cheondanBreakNeed);if(raid.cheondanBreakDamage>=raid.cheondanBreakNeed){raid.shieldActive=false;raid.gimmickTimer=0;applyRaidBreak(entity,10,1.30,"금강반진 붕괴")}}}
+    if(entity.raidFinalArm&&raid.armResonanceActive&&entity.raidId===raid.armResonanceTargetId){raid.gimmickGaugeValue=Math.max(0,raid.gimmickGaugeValue-dealt);if(raid.gimmickGaugeValue<=0){raid.armResonanceActive=false;raid.gimmickTimer=0;applyRaidBreak(entity,8,1.30,"마기 공명 파괴")}}
+    if(entity.raidId==="cheonma-dragon"&&raid.dragonCoreActive){raid.gimmickGaugeValue=Math.max(0,raid.gimmickGaugeValue-dealt);if(raid.gimmickGaugeValue<=0){raid.dragonCoreActive=false;raid.gimmickTimer=0;applyRaidBreak(entity,10,1.35,"마룡 심핵 파괴")}}
+    return dealt;
   };
+  const baseRaidHurtPlayer=hurtPlayer;
+  hurtPlayer=function(amount){if(raid.active){amount*=1+Math.min(.25,raid.bloodStacks*.08)+raid.magicCorruption*.15}return baseRaidHurtPlayer.call(this,amount)};
   const baseKillEnemy=killEnemy;
   killEnemy=function(entity,source="basic",options={}){
     if(!raid.active||!entity?.raidBoss&&!entity?.raidPart)return baseKillEnemy.apply(this,arguments);
@@ -496,7 +556,7 @@
     if(entity.raidPart){
       if(entity.raidFinalArm&&raid.finalPhase===1){showMessage(`${entity.bossName} 파괴 · 마룡 변신`,2);startFinalPhaseTwo();return}
       showMessage(`${entity.bossName} 파괴`,1.1);
-      if(entity.raidId.startsWith("sword-seal-")&&!raid.parts.some(part=>part.raidId.startsWith("sword-seal-")&&!part.dead)){raid.gimmickTimer=0;showMessage("삼절검총 붕괴 · 본체 보호 해제",1.7)}
+      if(entity.raidId.startsWith("sword-seal-")){const alive=raid.parts.filter(part=>part.raidId.startsWith("sword-seal-")&&!part.dead);setGimmickGauge("삼절검총 · 남은 검인",alive.length,3);if(!alive.length){raid.gimmickTimer=0;applyRaidBreak(raid.currentBoss,10,1.35,"삼절검총 붕괴")}}
       updateRaidHud();return;
     }
     if(entity.raidId==="cheonma-dragon"&&raid.finalPhase===2){startFinalPhaseThree();return}

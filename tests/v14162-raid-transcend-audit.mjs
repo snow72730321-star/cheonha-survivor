@@ -9,6 +9,6 @@ assert.match(forge,/const TRANSCEND_EFF=Object\.freeze\(\[1,1\.10,1\.22,1\.35\]\
 for(const id of ["sword_blade_sea","sword_tenk_mastery","spear_point_heaven","spear_vein_burst","bow_endless_volley","bow_sunmoon_cycle","poison_return","poison_deadheart","tao_five_cycle","tao_thunderfall","saber_bloodwar","saber_demon_mark","katana_eclipse_echo","katana_extreme_open","fist_unbreakable","fist_one_world"])assert.ok(forge.includes(id)&&(tx.includes(id)||combat.includes(id)),`${id} transcend option not wired`);
 assert.match(combat,/scale=n===0\?1:n===1\?\.70:n===2\?\.50:n===3\?\.35:\.25/);assert.match(combat,/source:"tenkFused"/);
 assert.match(state,/if\(lv===1\|\|lv===3\)p\.projectileBonus\+\+/);assert.match(state,/p\.damageMul\*=1\.03/);
-assert.match(power,/raid:55000/);assert.match(power,/function transcendEfficiency\(item\)\{return \[1,1\.10,1\.22,1\.35\]/);assert.match(save,/transcendLevel:Math\.floor/);assert.match(save,/transcendAttempts:Math\.floor/);assert.match(save,/transcendOption:/);
+assert.match(power,/raid:75000/);assert.match(power,/function transcendEfficiency\(item\)\{return \[1,1\.10,1\.22,1\.35\]/);assert.match(save,/transcendLevel:Math\.floor/);assert.match(save,/transcendAttempts:Math\.floor/);assert.match(save,/transcendOption:/);
 assert.match(mobile,/forgeInspectTranscend/);assert.match(mobile,/openDetail\(item\.id,"transcend"\)/);
 console.log("v14.16.2 raid/transcend/sword balance audit: OK");

@@ -28,7 +28,7 @@ assert.match(forge,/setTimeout\(\(\)=>setAnvilEffect\(scene\),successful\?850:65
 assert.match(css,/\.forge-success-vfx\{[\s\S]*?pointer-events:none[\s\S]*?mix-blend-mode:screen/);
 assert.match(css,/@keyframes enhanceSuccessVfxReveal/);
 assert.match(html,/css\/forge-v13\.css\?v=14162/);
-assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
+assert.match(sw,/cheonha-v14-16-4-raid-endgame/);
 assert.doesNotMatch(sw.match(/const APP_SHELL=\[([\s\S]*?)\];/)?.[1]||"",/assets\/vfx\//,"VFX must stay out of the install-time app shell");
 assert.ok(loader.includes(`"${assetPath}"`),"asset loader must warm enhancement success GIF");
 

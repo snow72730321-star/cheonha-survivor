@@ -11,9 +11,9 @@ const deviceCss=read("css/forge-mobile-v14-15-3-device-fix.css");
 const html=read("index.html");
 const sw=read("service-worker.js");
 
-assert.match(html,/v14\.16\.2-raid-transcend/);
+assert.match(html,/v14\.16\.4-raid-endgame/);
 assert.match(html,/css\/v14-improvements\.css\?v=14162/);
-assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
+assert.match(sw,/cheonha-v14-16-4-raid-endgame/);
 
 for(const token of ["forge-sparks","forge-impact-flash","anvil-hammer","forge-fire"]){
   assert.doesNotMatch(forge,new RegExp(token),`legacy forge DOM remains: ${token}`);

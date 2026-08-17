@@ -6,7 +6,7 @@ const forge=fs.readFileSync("js/systems/forge-v13.js","utf8");
 const css=fs.readFileSync("css/forge-mobile-v14-14-1-hotfix.css","utf8");
 const sw=fs.readFileSync("service-worker.js","utf8");
 
-assert.match(html,/v14\.16\.2-raid-transcend/);
+assert.match(html,/v14\.16\.4-raid-endgame/);
 assert.match(html,/forge-mobile-v14-14-1-hotfix\.css\?v=14162/);
 assert.ok(
   html.indexOf("forge-mobile-v14-14-1-hotfix.css")>html.indexOf("forge-mobile-final-v14-11-1.css"),
@@ -27,7 +27,7 @@ assert.match(css,/\.smith-preview-rows\{[\s\S]*?grid-template-rows:repeat\(4,min
 assert.match(css,/\.forge-smith-execute\{[\s\S]*?width:auto!important/);
 assert.match(css,/\.forge-weapon-filter button,[\s\S]*?align-items:center!important[\s\S]*?justify-content:center!important/);
 
-assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
+assert.match(sw,/cheonha-v14-16-4-raid-endgame/);
 assert.match(sw,/css\/forge-mobile-v14-14-1-hotfix\.css/);
 assert.match(sw,/caches\.match\(request,\{ignoreSearch:true\}\)/);
 

@@ -1,22 +1,22 @@
 "use strict";
 
-/** v14.16.2: 열쇠형 1인 레이드 · 무신 초월 엔드게임 성장. */
+/** v14.16.4: 엔드게임 레이드 난이도·기믹 파훼 강화. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-2-raid-transcend";
+const CACHE="cheonha-v14-16-4-raid-endgame";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
-  "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css","css/forge-mobile-final-v14-11-1.css","css/forge-mobile-v14-14-1-hotfix.css","css/forge-mobile-v14-15-3-device-fix.css","css/solo-raid-v14-16.css",
+  "css/base.css","css/systems.css","css/remaster.css","css/mobile.css","css/animation-pass.css","css/awakening-cutscene.css","css/forge-v13.css","css/v14-improvements.css","css/audio-mixer-v14-3-3.css","css/forge-mobile-final-v14-11-1.css","css/forge-mobile-v14-14-1-hotfix.css","css/forge-mobile-v14-15-3-device-fix.css","css/solo-raid-v14-16.css","css/boss-hud-v14-16-3.css",
   "js/core/runtime-state.js","js/core/game-events.js","js/core/save-manager.js","js/core/asset-loader.js","js/core/pwa.js","js/core/startup.js",
   "js/data/balance-v14.js","js/data/characters-meta.js",
   "js/systems/spatial-grid.js","js/systems/object-pool.js","js/systems/content-registry.js","js/systems/storage-forge.js","js/systems/combat-runtime.js","js/systems/meta-combat.js","js/systems/forge-v13.js","js/systems/combat-power-v14-7-7.js","js/systems/katana-rework-v15.js","js/systems/game-runtime-v14.js","js/systems/combat-progression-v14-3-1.js","js/systems/abyss-mode-v14-8-7.js","js/systems/system-overhaul-v14-10.js","js/systems/world-map-v14-15.js","js/systems/solo-raid-v14-16.js","js/systems/weapon-transcend-v14-16-2.js",
   "js/render/canvas-renderer.js","js/render/animation-controller.js","js/render/sprite-remaster-v14-3-18.js","js/render/weapon-visuals-v14-4.js",
-  "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js","js/ui/forge-mobile-final-v14-11-1.js",
+  "js/ui/input.js","js/ui/menu-codex.js","js/ui/meta-menus-events.js","js/ui/advanced-settings-v14-3-3.js","js/ui/forge-mobile-final-v14-11-1.js","js/ui/boss-bar-ui-v14-16-3.js",
   "js/audio/audio-manager-v14-3-8.js","js/vfx/awakening-cutscene-v14-3-8.js","js/vfx/v10.js","js/vfx/sprite-vfx-v14-3-8.js",
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
   "assets/icons/icon-192.png","assets/icons/icon-512.png",
   "assets/map/data/map-v1.json","assets/map/terrain/common-ground.webp","assets/map/terrain/center-training-ground.webp","assets/map/terrain/north-bamboo-grove.webp","assets/map/terrain/east-ruined-gate.webp","assets/map/terrain/south-moon-pond.webp","assets/map/terrain/west-cliff-road.webp",
-  "assets/raid/map/cheonma-altar.webp","assets/raid/bosses/peng-danhui.png","assets/raid/bosses/namgung-hyeok.png","assets/raid/bosses/ma-heojin.png","assets/raid/bosses/cheondan.png","assets/raid/bosses/cheonma-throne.png","assets/raid/bosses/cheonma-left-maqi-arm.png","assets/raid/bosses/cheonma-right-maqi-arm.png","assets/raid/bosses/cheonma-demon-dragon.png"
+  "assets/raid/map/cheonma-altar.webp","assets/raid/bosses/peng-danhui.png","assets/raid/bosses/namgung-hyeok.png","assets/raid/bosses/ma-heojin.png","assets/raid/bosses/cheondan.png","assets/raid/bosses/cheonma-throne.png","assets/raid/bosses/cheonma-left-maqi-arm.png","assets/raid/bosses/cheonma-right-maqi-arm.png","assets/raid/bosses/cheonma-demon-dragon.png","assets/ui/bossbar/raid-boss-frame.png","assets/ui/bossbar/raid-boss-fill-red.png","assets/ui/bossbar/raid-boss-fill-purple.png"
 ];
 
 async function cacheAppShell(){

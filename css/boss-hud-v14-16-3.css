@@ -1,0 +1,77 @@
+/* v14.16.3 · 상단 레이드형 보스 체력바 HUD */
+#bossWrap{
+  position:fixed;left:50%;top:max(4px,calc(env(safe-area-inset-top) + 4px));transform:translateX(-50%);
+  width:min(1120px,calc(100vw - 18px));aspect-ratio:3/1;display:none;pointer-events:none;z-index:14;
+  margin:0!important;background:none!important;
+}
+#bossWrap .boss-hud-art{position:absolute;inset:0}
+#bossWrap .boss-hud-frame{
+  position:absolute;inset:0;background:url('../assets/ui/bossbar/raid-boss-frame.png') center/contain no-repeat;
+  filter:drop-shadow(0 8px 24px rgba(0,0,0,.45));z-index:4;
+}
+#bossWrap .boss-main-track,#bossWrap .boss-sub-track{position:absolute;overflow:hidden;z-index:2}
+#bossWrap .boss-main-track{left:15.2%;top:40.5%;width:76%;height:12.2%;border-radius:999px}
+#bossWrap .boss-sub-track{left:18.9%;top:59.0%;width:63.8%;height:4.9%;border-radius:999px;opacity:.96}
+#bossFill,#bossSubFill{display:block;height:100%;width:0;transition:width .12s linear;background-repeat:no-repeat;background-size:100% 100%}
+#bossFill{background-image:url('../assets/ui/bossbar/raid-boss-fill-red.png')}
+#bossSubFill{background-image:url('../assets/ui/bossbar/raid-boss-fill-purple.png')}
+
+#bossWrap .boss-portrait-slot{
+  position:absolute;left:3.4%;top:18.4%;width:10.7%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;z-index:3;
+  box-shadow:0 0 0 1px rgba(255,226,165,.15) inset;
+}
+#bossFramePortrait{width:100%;height:100%;object-fit:cover;object-position:center 20%;display:block;opacity:0;transition:opacity .15s linear;filter:saturate(.9) contrast(1.08)}
+#bossFramePortrait.has-image{opacity:1}
+
+#bossWrap .boss-nameplate{
+  position:absolute;left:32.5%;top:10.2%;width:34.8%;height:16%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:5;
+  text-align:center;padding:0 16px;
+}
+#bossTitle{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(12px,1.55vw,20px);font-weight:800;letter-spacing:.02em;color:#fff0d0;text-shadow:0 2px 6px rgba(0,0,0,.72)}
+#bossStageLabel{margin-top:1px;font-size:clamp(8px,.9vw,11px);font-weight:700;letter-spacing:.08em;color:#f0c77e;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+#bossText{
+  position:absolute;right:17.2%;top:32.9%;z-index:5;font-size:clamp(10px,1vw,14px);font-weight:800;letter-spacing:.03em;color:#fff4dc;
+  text-shadow:0 2px 5px rgba(0,0,0,.78);
+}
+#bossSubText{
+  position:absolute;left:19.1%;top:53.2%;z-index:5;font-size:clamp(8px,.82vw,11px);font-weight:700;letter-spacing:.04em;color:#d9c7ff;
+  text-shadow:0 1px 4px rgba(0,0,0,.85);opacity:.95;
+}
+#bossPhasePips{
+  position:absolute;left:38%;bottom:16.9%;width:24%;height:8.6%;display:grid;grid-template-columns:repeat(7,1fr);gap:1.7%;align-items:center;z-index:3;
+}
+#bossPhasePips i{width:100%;aspect-ratio:1/1;justify-self:center;transform:rotate(45deg) scale(.72);border-radius:2px;background:rgba(18,20,26,.18);box-shadow:none;opacity:0}
+#bossPhasePips i.pending{opacity:.45;background:rgba(16,18,22,.5);box-shadow:0 0 0 1px rgba(219,186,114,.18) inset}
+#bossPhasePips i.done{opacity:1;background:linear-gradient(135deg,#ffbf57,#ff5636);box-shadow:0 0 12px rgba(255,124,69,.42),0 0 0 1px rgba(255,218,154,.34) inset}
+#bossPhasePips i.current{opacity:1;background:linear-gradient(135deg,#ffe28e,#ff482f);box-shadow:0 0 16px rgba(255,96,75,.55),0 0 0 1px rgba(255,245,214,.58) inset;animation:bossPipPulse .8s ease-in-out infinite alternate}
+#bossPhasePips i.hidden{opacity:0}
+@keyframes bossPipPulse{to{transform:rotate(45deg) scale(.8);filter:brightness(1.12)}}
+
+#bossWrap.raid-mode #bossSubText{color:#e1d4ff}
+#bossWrap:not(.raid-mode) #bossSubText{opacity:0}
+#bossWrap:not(.raid-mode) #bossSubFill{width:0!important}
+
+#raidHud{top:max(116px,calc(env(safe-area-inset-top) + 102px))}
+.raid-pattern-warning{top:calc(max(116px,env(safe-area-inset-top) + 102px) + 94px)}
+
+@media (max-width:900px){
+  #bossWrap{width:min(900px,calc(100vw - 12px));top:max(4px,calc(env(safe-area-inset-top) + 4px))}
+  #raidHud{top:max(98px,calc(env(safe-area-inset-top) + 84px))}
+  .raid-pattern-warning{top:calc(max(98px,env(safe-area-inset-top) + 84px) + 82px)}
+}
+@media (max-width:760px){
+  #bossWrap{width:min(760px,calc(100vw - 6px));top:max(2px,calc(env(safe-area-inset-top) + 2px))}
+  #bossWrap .boss-main-track{top:40.6%;height:12.4%}
+  #bossWrap .boss-sub-track{top:59.2%;height:5.2%}
+  #bossTitle{font-size:clamp(10px,2vw,14px)}
+  #bossText{font-size:clamp(8px,1.5vw,11px)}
+  #bossSubText{font-size:clamp(7px,1.25vw,9px)}
+  #raidHud{top:max(84px,calc(env(safe-area-inset-top) + 72px));width:min(330px,calc(100vw - 84px))}
+  .raid-pattern-warning{top:calc(max(84px,env(safe-area-inset-top) + 72px) + 76px);font-size:10px}
+}
+@media (max-width:480px){
+  #bossWrap{width:calc(100vw - 4px)}
+  #raidHud{top:max(78px,calc(env(safe-area-inset-top) + 66px));left:50%;right:auto;transform:translateX(-50%);width:min(300px,calc(100vw - 74px))}
+  .raid-pattern-warning{top:calc(max(78px,env(safe-area-inset-top) + 66px) + 72px)}
+}
+@media (prefers-reduced-motion:reduce){#bossPhasePips i.current{animation:none}}

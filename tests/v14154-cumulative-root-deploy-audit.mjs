@@ -8,12 +8,12 @@ const forge=read("js/systems/forge-v13.js");
 const visuals=read("js/render/weapon-visuals-v14-4.js");
 const css=read("css/forge-mobile-v14-15-3-device-fix.css");
 
-assert.equal(read("BUILD.txt").split(/\r?\n/)[0],"v14.16.2-raid-transcend");
+assert.equal(read("BUILD.txt").split(/\r?\n/)[0],"v14.16.4-raid-endgame");
 assert.match(html,/forge-mobile-v14-15-3-device-fix\.css\?v=14162/);
 assert.match(html,/js\/systems\/forge-v13\.js\?v=14162/);
 assert.match(html,/js\/render\/weapon-visuals-v14-4\.js\?v=14162/);
 assert.match(html,/js\/systems\/katana-rework-v15\.js\?v=14162/);
-assert.match(sw,/cheonha-v14-16-2-raid-transcend/);
+assert.match(sw,/cheonha-v14-16-4-raid-endgame/);
 assert.match(sw,/cache\.addAll\(/);
 assert.doesNotMatch(sw,/Promise\.allSettled/);
 assert.match(sw,/if\(!response\.ok\)throw new Error/);
