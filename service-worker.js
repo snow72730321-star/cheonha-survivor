@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.16.8: 무신 초월 전용 에셋 완성 · 보구 대비 메인 UI 확장. */
+/** v14.16.9: 대장간 메인 허브 원복 · 무기관리 10슬롯/5버튼 · 초월 전용 UI 유지. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-8-transcend-final";
+const CACHE="cheonha-v14-16-9-hub-restore";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
