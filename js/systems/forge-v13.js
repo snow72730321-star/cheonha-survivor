@@ -470,9 +470,32 @@
 
   function transcendOption(item){return (TRANSCEND_OPTIONS[item?.weapon]||[]).find(x=>x.id===item?.transcendOption)||null}
   function renderTranscendPane(item=selectedItem()){
-    const root=detailOverlay(),box=root.querySelector("#forgeTranscendPanel");if(!box||!item)return;normalizeWeapon(item);const eligible=item.grade==="eternal",lv=item.transcendLevel||0,attempts=item.transcendAttempts||0,eff=Math.round(((TRANSCEND_EFF[lv]||1)-1)*100),opt=transcendOption(item),choices=TRANSCEND_OPTIONS[item.weapon]||[];account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));
-    box.innerHTML=`<div class="potential-grade">무신 초월 · ${lv}/3</div><div class="forge-rate-card"><div><b>${lv}/3</b><small>초월 단계</small></div><div><b>${attempts}/10</b><small>누적 시도</small></div><div><b>+${eff}%</b><small>잠재 효율</small></div></div><p class="desc">영원 등급 무기 전용 · 시도당 무신석 1개 · 기본 성공률 10% · 최대 3초월 · 무기당 총 10회 제한. 10번째까지 0초월이면 첫 초월만 확정된다.</p><div class="ore-mileage-balance">보유 무신석 <b>${account.divineStones.toLocaleString()}</b></div>${opt?`<div class="unlock-banner"><b>초월 옵션 · ${opt.name}</b><br>${opt.desc}</div>`:lv>0?`<div class="transcend-choice"><p class="desc">첫 초월 옵션을 하나 선택하시오. 선택 후 변경할 수 없다.</p>${choices.map(o=>`<button class="secondary" data-transcend-option="${o.id}" type="button"><b>${o.name}</b><small>${o.desc}</small></button>`).join("")}</div>`:""}<button class="primary" id="transcendExecute" type="button" ${!eligible||lv>=3||attempts>=10||account.divineStones<1?"disabled":""}>${!eligible?"영원 등급만 초월 가능":lv>=3?"3초월 완료":attempts>=10?"초월 시도 한도 소진":"초월 시도 · 무신석 1개"}</button><p class="forge-result-message" id="transcendMessage">${eligible?"초월은 강화 단계와 무관하게 시도할 수 있다.":"영원 등급 무기를 선택하시오."}</p>`;
-    box.querySelector("#transcendExecute")?.addEventListener("click",attemptTranscend);box.querySelectorAll("[data-transcend-option]").forEach(b=>b.addEventListener("click",()=>chooseTranscendOption(b.dataset.transcendOption)));
+    const root=detailOverlay(),box=root.querySelector("#forgeTranscendPanel");if(!box||!item)return;
+    normalizeWeapon(item);
+    const eligible=item.grade==="eternal",lv=item.transcendLevel||0,attempts=item.transcendAttempts||0,eff=Math.round(((TRANSCEND_EFF[lv]||1)-1)*100),opt=transcendOption(item),choices=TRANSCEND_OPTIONS[item.weapon]||[];
+    account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));
+    const gd=gradeDefs.find(g=>g.id===item.grade);
+    const cp=window.CombatPowerSystem?CombatPowerSystem.value(item):0;
+    const art=window.WeaponVisuals?WeaponVisuals.asset(item):`assets/weapons/hud/${item.weapon}.png`;
+    const roman=["영","I","II","III"];const successLabel=(lv===0&&attempts>=9)?"확정":"10%";
+    const canTranscend=eligible&&lv<3&&attempts<10&&account.divineStones>=1&&!(lv>0&&!opt);
+    const renderCard=(o,mode)=>{const extra=mode==="selected"?`<em>선택됨 · ${roman[lv]}단계 적용 중</em>`:mode==="locked"?'<em>다른 옵션을 선택하여 잠김</em>':mode==="preview"?'<em>1초월 성공 시 선택 가능</em>':'<em>선택 시 이후 변경 불가</em>';if(mode==="pick")return `<button class="secondary transcend-option-card is-pick" data-transcend-option="${o.id}" type="button"><b>${o.name}</b><small>${o.desc}</small>${extra}</button>`;return `<div class="transcend-option-card ${mode==="selected"?"is-selected":mode==="locked"?"is-locked":"is-preview"}"><b>${o.name}</b><small>${o.desc}</small>${extra}</div>`};
+    let optionBlock='';
+    if(!eligible){
+      optionBlock=`<div class="transcend-choice"><p class="desc">영원 등급 무기만 무신 초월과 초월 옵션을 사용할 수 있다.</p>${choices.map(o=>renderCard(o,'preview')).join('')}</div>`;
+    }else if(lv===0){
+      optionBlock=`<div class="transcend-choice"><p class="desc">1초월 성공 시 아래 두 초월 옵션 중 하나를 선택한다.</p>${choices.map(o=>renderCard(o,'preview')).join('')}</div>`;
+    }else if(!opt){
+      optionBlock=`<div class="transcend-choice"><p class="desc">첫 초월에 성공했다. 초월 옵션 하나를 먼저 선택하시오.</p>${choices.map(o=>renderCard(o,'pick')).join('')}</div>`;
+    }else{
+      optionBlock=`<div class="transcend-choice"><p class="desc">선택한 초월 옵션은 유지되며 초월 단계가 오를수록 함께 강화된다.</p>${choices.map(o=>renderCard(o,o.id===opt.id?'selected':'locked')).join('')}</div>`;
+    }
+    const actionLabel=!eligible?"영원 등급만 초월 가능":lv>=3?"3초월 완료":attempts>=10?"초월 시도 한도 소진":lv>0&&!opt?"초월 옵션을 먼저 선택":(lv===0&&attempts>=9?"확정 1초월 시도 · 무신석 1개":"초월 시도 · 무신석 1개");
+    const helper=!eligible?"영원 등급 무기를 선택하시오.":lv>0&&!opt?"초월 옵션을 선택해야 다음 초월 시도가 가능하다.":opt?`현재 초월 옵션 · ${opt.name} / 잠재 효율 +${eff}% 적용 중`:`현재 잠재 효율 보너스 +${eff}%`;
+    box.innerHTML=`<div class="transcend-weapon-art"><img src="${art}" alt="${item.name}"></div><div class="transcend-weapon-copy"><b class="rarity-${item.grade}">${gd?.name||item.grade} ${item.name} +${item.level||0}</b><small>${weaponDefs[item.weapon]?.name||item.weapon} · 전투력 ${cp&&window.CombatPowerSystem?CombatPowerSystem.format(cp):"-"}</small></div><div class="potential-grade">무신 초월 · ${roman[lv]} 단계</div><div class="forge-rate-card"><div><b>${lv}/3</b><small>초월 단계</small></div><div><b>${attempts}/10</b><small>누적 시도</small></div><div><b>${successLabel}</b><small>성공률</small></div></div><p class="desc transcend-desc">잠재 효율 보너스 +${eff}% · 시도당 무신석 1개 · 기본 10% · 첫 10회 모두 실패 시 1초월 보장 · 최대 3초월</p><div class="ore-mileage-balance">보유 무신석 <b>${account.divineStones.toLocaleString()}</b></div>${optionBlock}<button class="primary" id="transcendExecute" type="button" ${!canTranscend?"disabled":""}>${actionLabel}</button><p class="forge-result-message" id="transcendMessage">${helper}</p>`;
+    const artBox=box.querySelector(".transcend-weapon-art");if(artBox&&window.WeaponVisuals)WeaponVisuals.decorate(artBox,item,item.weapon);
+    box.querySelector("#transcendExecute")?.addEventListener("click",attemptTranscend);
+    box.querySelectorAll("[data-transcend-option]").forEach(b=>b.addEventListener("click",()=>chooseTranscendOption(b.dataset.transcendOption)));
   }
   function attemptTranscend(){const item=selectedItem();if(!item)return;normalizeWeapon(item);if(item.grade!=="eternal"||item.transcendLevel>=3||item.transcendAttempts>=10)return;account.divineStones=Math.max(0,Math.floor(Number(account.divineStones)||0));if(account.divineStones<1){showMessage("무신석이 필요하다",1.2);return}account.divineStones--;item.transcendAttempts++;const guaranteed=item.transcendLevel===0&&item.transcendAttempts===10,success=guaranteed||Math.random()<.10;if(success){item.transcendLevel++;showMessage(`초월 성공 · ${item.transcendLevel}초월`,1.4);GameAudio.playUI("forge-success")}else{showMessage(`초월 실패 · ${item.transcendAttempts}/10`,1.2);GameAudio.playUI("forge-failure")}saveAccountData();renderWeaponInventory();renderDetail()}
   function chooseTranscendOption(id){const item=selectedItem();if(!item||item.transcendLevel<1||item.transcendOption)return;const opt=(TRANSCEND_OPTIONS[item.weapon]||[]).find(x=>x.id===id);if(!opt)return;item.transcendOption=opt.id;saveAccountData();renderWeaponInventory();renderDetail();showMessage(`초월 옵션 · ${opt.name}`,1.4);GameAudio.playUI("potential-accept")}

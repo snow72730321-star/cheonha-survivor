@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.16.5: 타격 성능 최적화 · 검 밸런스 · 모바일 보스 HUD. */
+/** v14.16.8: 무신 초월 전용 에셋 완성 · 보구 대비 메인 UI 확장. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-5-performance-sword";
+const CACHE="cheonha-v14-16-8-transcend-final";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
@@ -16,7 +16,7 @@ const APP_SHELL=[
   "js/skills/sword.js","js/skills/spear.js","js/skills/bow.js","js/skills/poison.js","js/skills/tao.js","js/skills/saber.js","js/skills/katana.js","js/skills/fist.js","js/boss/blood-demon.js",
   "assets/icons/icon-192.png","assets/icons/icon-512.png",
   "assets/map/data/map-v1.json","assets/map/terrain/common-ground.webp","assets/map/terrain/center-training-ground.webp","assets/map/terrain/north-bamboo-grove.webp","assets/map/terrain/east-ruined-gate.webp","assets/map/terrain/south-moon-pond.webp","assets/map/terrain/west-cliff-road.webp",
-  "assets/raid/map/cheonma-altar.webp","assets/raid/map/cheonma-altar-mobile.webp","assets/raid/bosses/peng-danhui.png","assets/raid/bosses/namgung-hyeok.png","assets/raid/bosses/ma-heojin.png","assets/raid/bosses/cheondan.png","assets/raid/bosses/cheonma-throne.png","assets/raid/bosses/cheonma-left-maqi-arm.png","assets/raid/bosses/cheonma-right-maqi-arm.png","assets/raid/bosses/cheonma-demon-dragon.png","assets/ui/bossbar/raid-boss-frame-compact.png"
+  "assets/raid/map/cheonma-altar.webp","assets/raid/map/cheonma-altar-mobile.webp","assets/raid/bosses/peng-danhui.png","assets/raid/bosses/namgung-hyeok.png","assets/raid/bosses/ma-heojin.png","assets/raid/bosses/cheondan.png","assets/raid/bosses/cheonma-throne.png","assets/raid/bosses/cheonma-left-maqi-arm.png","assets/raid/bosses/cheonma-right-maqi-arm.png","assets/raid/bosses/cheonma-demon-dragon.png","assets/ui/bossbar/raid-boss-frame-compact.png","assets/ui/forge-mobile-final/transcend.png"
 ];
 
 async function cacheAppShell(){
