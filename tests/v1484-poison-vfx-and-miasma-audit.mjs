@@ -1,0 +1,10 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const combat=fs.readFileSync("js/systems/combat-runtime.js","utf8");
+const vfx=fs.readFileSync("js/vfx/sprite-vfx-v14-3-8.js","utf8");
+assert.match(combat,/cloudCount=1\+Math\.floor\(\(a\.miasma-1\)\/2\),r=72\+a\.miasma\*10/);
+assert.match(combat,/chosen\.some\(q=>Math\.hypot\(q\.x-c\.x,q\.y-c\.y\)<r\*1\.25\)/);
+assert.match(vfx,/skillPoisonExplosion"\?82/);
+assert.match(vfx,/skillExplodedButterfly:\{[^}]*blend:"source-over"/);
+assert.match(vfx,/skillTaoFiveThunder:\{[^}]*blend:"source-over"/);
+console.log("v14.8.4 poison VFX + miasma audit: OK");
