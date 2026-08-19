@@ -297,13 +297,17 @@
     if(!node||!item)return false;
     node.hidden=false;node.removeAttribute("aria-hidden");
     if(window.WeaponVisuals)WeaponVisuals.renderAnvilWeapon(node,item);
-    else{
-      let media=node.querySelector(".anvil-weapon-media");
-      if(!media){media=document.createElement("div");media.className="anvil-weapon-media";node.append(media)}
-      let img=media.querySelector(".anvil-weapon-img");
-      if(!img){img=document.createElement("img");img.className="anvil-weapon-img";media.append(img)}
-      img.src=`assets/weapons/hud/${item.weapon}.png`;img.alt=item.name||"강화 대상 무기";
-    }
+    let media=node.querySelector(".anvil-weapon-media");
+    if(!media){media=document.createElement("div");media.className="anvil-weapon-media";node.append(media)}
+    let img=media.querySelector(".anvil-weapon-img");
+    if(!img){img=document.createElement("img");img.className="anvil-weapon-img";media.append(img)}
+    // iOS Safari에서 강화 팝업 재렌더 후 <img>가 빈 상태로 남는 경우를 막는다.
+    // 실제 무기군 HUD 에셋을 img와 백업 배경 양쪽에 연결한다.
+    const previewSrc=window.WeaponVisuals?.hudAsset?.(item)||`assets/weapons/hud/${item.weapon}.png`;
+    img.hidden=false;img.style.removeProperty("display");img.alt=item.name||"강화 대상 무기";
+    if(img.getAttribute("src")!==previewSrc)img.src=previewSrc;
+    media.style.setProperty("--forge-preview-image",`url("${previewSrc}")`);
+    media.classList.add("has-forge-preview");
     return true;
   }
   function setAnvilEffect(scene,effect=""){

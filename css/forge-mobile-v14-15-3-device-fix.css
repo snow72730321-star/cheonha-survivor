@@ -54,3 +54,33 @@
   box-sizing:border-box!important;
   transform:none!important;
 }
+
+
+/* v14.16.11 enhancement preview + artisan gauge exact asset alignment */
+#forgeDetail[data-forge-mode="enhance"] #anvilScene{
+  left:36.6%!important;top:12.55%!important;width:26.8%!important;height:16.0%!important;
+  overflow:hidden!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon{
+  inset:5.5%!important;overflow:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
+  inset:0!important;background-image:var(--forge-preview-image)!important;background-position:center!important;background-repeat:no-repeat!important;background-size:contain!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center!important;display:block!important;opacity:1!important;visibility:visible!important;z-index:2!important;
+}
+/* 에셋 자체에 빈 장인의 숨결 트랙이 그려져 있으므로 코드에서는 충전량만 정확히 안쪽에 덮는다. */
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath{
+  position:absolute!important;left:0!important;right:0!important;top:0!important;height:100%!important;margin:0!important;padding:0!important;overflow:visible!important;pointer-events:none!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath>div:first-child{
+  position:absolute!important;left:15.0%!important;right:15.0%!important;top:60.55%!important;height:2.0%!important;display:flex!important;align-items:center!important;justify-content:space-between!important;font-size:clamp(7px,1.78vw,9px)!important;line-height:1!important;color:#c9bba5!important;z-index:3!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{
+  position:absolute!important;left:24.4%!important;right:21.7%!important;top:62.72%!important;bottom:auto!important;height:1.28%!important;min-height:0!important;max-height:none!important;padding:0!important;margin:0!important;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important;z-index:2!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{display:none!important;content:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
+  position:relative!important;display:block!important;height:100%!important;min-height:0!important;border-radius:999px!important;background:linear-gradient(90deg,#1665bb 0%,#3f9bf1 52%,#8bdcff 82%,#d9f7ff 100%)!important;box-shadow:0 0 5px rgba(64,159,255,.50),inset 0 0 2px rgba(255,255,255,.45)!important;
+}
