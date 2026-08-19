@@ -137,7 +137,11 @@
       gradeHost.innerHTML=synthGrades.map(g=>{const n=account.ores[`${selectedOreType}:${g}`]||0;return `<button type="button" data-ore-grade="${g}" class="forge-ore-grade-card rarity-border-${g} ${g===selectedOreGrade?"active":""}"><b class="rarity-${g}">${gradeLabel(g)}</b><strong>${fmt(n)}</strong></button>`}).join("");
       gradeHost.querySelectorAll("[data-ore-grade]").forEach(b=>b.addEventListener("click",()=>{selectedOreGrade=b.dataset.oreGrade;renderOrePage()}));
     }
-    if(special){const m=account.ores[`${selectedOreType}:mythic`]||0,e=account.ores[`${selectedOreType}:eternal`]||0;special.innerHTML=`<div class="rarity-mythic"><b>신화</b><strong>${fmt(m)}</strong></div><div class="rarity-eternal"><b>영원</b><strong>${fmt(e)}</strong></div>`}
+    if(special){
+      const m=account.ores[`${selectedOreType}:mythic`]||0,e=account.ores[`${selectedOreType}:eternal`]||0,selectors=Math.max(0,Math.floor(Number(account.eternalOreSelectors)||0));
+      special.innerHTML=`<div class="rarity-mythic"><b>신화</b><strong>${fmt(m)}</strong></div><button class="forge-eternal-special rarity-eternal" id="forgeEternalSelectorQuick" type="button" aria-label="영원 광석 선택권 열기"><b>영원</b><strong>${fmt(e)}</strong><small>선택권 ${fmt(selectors)}장${selectors?" · 사용":""}</small></button>`;
+      $("forgeEternalSelectorQuick")?.addEventListener("click",()=>{if(typeof openEternalSelector==="function")openEternalSelector()});
+    }
     const key=`${selectedOreType}:${selectedOreGrade}`,have=account.ores[key]||0,next=nextSynthGrade(selectedOreGrade),unit=oreSellValue(selectedOreGrade),max=Math.floor(have/ORE_SYNTH_COUNT),ore=oreTypes[selectedOreType];
     if(detail)detail.innerHTML=`<div class="forge-ore-copy"><b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>${ore.ability} · ${ore.desc}</span><small>개당 판매 ${fmt(unit)} 금자${next?` · 동일 광물 5개 → ${gradeLabel(next)} 1개`:" · 일반 합성 최종 등급"}</small></div>`;
     if(summaryHost)summaryHost.innerHTML=`<b class="rarity-${selectedOreGrade}">${gradeLabel(selectedOreGrade)} ${ore.name}</b><span>보유 ${fmt(have)}개</span>`;

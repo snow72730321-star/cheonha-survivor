@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.16.9: 대장간 메인 허브 원복 · 무기관리 10슬롯/5버튼 · 초월 전용 UI 유지. */
+/** v14.16.10: 초월 UI 좌표·나가기 버튼 · 영원 선택권 진입점 수정. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-9-hub-restore";
+const CACHE="cheonha-v14-16-10-transcend-ui-fix";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
