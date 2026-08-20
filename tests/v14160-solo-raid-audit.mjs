@@ -1,0 +1,23 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8");
+const html=read("index.html"),raid=read("js/systems/solo-raid-v14-16.js"),css=read("css/solo-raid-v14-16.css"),loader=read("js/core/asset-loader.js"),save=read("js/core/save-manager.js"),sw=read("service-worker.js"),map=read("js/systems/world-map-v14-15.js"),runtime=read("js/systems/game-runtime-v14.js"),menu=read("js/ui/menu-codex.js"),storage=read("js/systems/storage-forge.js");
+const pkg=JSON.parse(read("package.json"));
+assert.equal(pkg.version,"14.16.14");
+assert.match(html,/content="v14\.16\.14-bogu-ui-assets" name="game-build"/);
+assert.doesNotMatch(html,/id="soloRaidOpen"/);
+assert.match(menu,/raid-difficulty-card/);assert.match(menu,/SoloRaidMode\?\.openLobby/);assert.match(menu,/recommended\?\.\("raid"\)\|\|75000/);
+for(const id of ["soloRaidLobby","soloRaidStart","raidHud","raidStageText","raidTimerText","raidPartBars","raidPowerHint"])assert.match(html,new RegExp(`id="${id}"`),`${id} UI missing`);
+assert.match(css,/\.raid-pattern-warning/);assert.match(css,/@media\(max-width:760px\)/);
+assert.match(raid,/const START_LEVEL=20/);assert.match(raid,/const GATE_LEVELS=\[8,9,10,10\]/);assert.match(raid,/pendingLevelUps=START_LEVEL-1/);
+assert.match(raid,/account\.raidKeys<1/);assert.match(raid,/account\.raidKeys--/);assert.match(raid,/keyConsumed=true/);assert.match(raid,/function onGrowthReady/);assert.match(raid,/function enterRaidCombat/);assert.match(raid,/전투진입 전에는 보스·패턴·제한시간이 시작되지 않는다/);
+assert.match(runtime,/window\.SoloRaidMode\?\.active&&typeof window\.SoloRaidMode\.onGrowthReady/);
+assert.match(storage,/raidKey:\.02/);assert.match(storage,/raidKey:80/);
+assert.match(raid,/function raidPowerScale\(\)\{return 1\}/);assert.match(raid,/hp:200000/);assert.match(raid,/hp:350000/);assert.match(raid,/hp:580000/);assert.match(raid,/hp:900000/);assert.match(raid,/body:2500000/);
+for(const name of ["도마종 단주 팽단휘","법마종 대주 남궁혁","검마종 종주 마허진","우호법 천단","천마(폭주)"])assert.ok(raid.includes(name),`${name} missing`);
+for(const gimmick of ["혈도세","사상법진","삼절검총","금강반진","cheonma-left-arm","cheonma-right-arm","cheonma-dragon","cheonma-body"])assert.ok(raid.includes(gimmick),`${gimmick} missing`);
+assert.match(raid,/account\.eternalOreSelectors\+\+/);assert.match(raid,/account\.weaponSoulStones\+=5/);assert.match(raid,/account\.divineStones\+=3/);assert.match(raid,/randomOre\("mythic"\)/);assert.match(raid,/randomOre\("legendary"\)/);
+assert.match(save,/raidKeys:Math\.floor/);assert.match(save,/divineStones:Math\.floor/);assert.match(save,/eternalOreSelectors:Math\.floor/);assert.match(save,/bestFinalDamage:finite/);
+for(const file of ["peng-danhui.png","namgung-hyeok.png","ma-heojin.png","cheondan.png","cheonma-throne.png","cheonma-left-maqi-arm.png","cheonma-right-maqi-arm.png","cheonma-demon-dragon.png"]){const path=`assets/raid/bosses/${file}`,data=fs.readFileSync(path);assert.equal(data.subarray(1,4).toString(),"PNG");assert.ok(data.length>250000);assert.ok(loader.includes(path)&&sw.includes(path)&&raid.includes(path));}
+assert.match(map,/SoloRaidMode\?\.active/);assert.match(sw,/const CACHE="cheonha-v14-16-14-bogu-ui-assets"/);
+console.log("v14.16.2 keyed solo raid/growth gate/reward audit: OK");

@@ -1,0 +1,16 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const read=p=>fs.readFileSync(p,"utf8");
+const html=read("index.html"),css=read("css/bogu-v14-16-13.css"),bogu=read("js/systems/bogu-v14-16-13.js"),sw=read("service-worker.js");
+assert.ok(fs.existsSync("assets/ui/forge-mobile-final/bogu.png"));
+assert.ok(fs.existsSync("assets/ui/forge-mobile-final/faceting.png"));
+assert.match(html,/v14\.16\.14-bogu-ui-assets/);
+assert.match(css,/forge-mobile-final\/bogu\.png/);
+assert.match(css,/forge-mobile-final\/faceting\.png/);
+assert.match(css,/grid-template-columns:repeat\(10,1fr\)/);
+assert.match(bogu,/data-bogu-select-line/);
+assert.match(bogu,/boguToggleEquip/);
+assert.doesNotMatch(bogu,/id="boguDiscard"/);
+assert.match(sw,/assets\/ui\/forge-mobile-final\/bogu\.png/);
+assert.match(sw,/assets\/ui\/forge-mobile-final\/faceting\.png/);
+console.log("v14.16.14 bogu/faceting dedicated UI assets audit: OK");

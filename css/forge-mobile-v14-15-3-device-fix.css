@@ -1,0 +1,124 @@
+/* v14.15.3 final device guard.
+ * This file intentionally loads last. It contains only state-sensitive rules
+ * that must win after an enhancement rerender or a black-jade comparison.
+ */
+
+#forgeDetail[data-forge-mode="enhance"] #anvilScene.anvil-scene.art-anvil-scene .anvil-weapon{
+  position:absolute!important;
+  inset:4%!important;
+  width:auto!important;
+  height:auto!important;
+  bottom:auto!important;
+  display:block!important;
+  overflow:hidden!important;
+  z-index:10!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
+  position:absolute!important;
+  inset:0!important;
+  display:grid!important;
+  place-items:center!important;
+  z-index:2!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  transform:none!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .forge-success-vfx{z-index:6!important}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene.striking .anvil-weapon-media,
+#forgeDetail[data-forge-mode="enhance"] #anvilScene.success .anvil-weapon-media,
+#forgeDetail[data-forge-mode="enhance"] #anvilScene.failure .anvil-weapon-media{
+  inset:0!important;
+}
+#forgeDetail[data-forge-mode="compare"] .compare-potentials{top:27%!important;height:42%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(1){top:22.5%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(2){top:46.1%!important}
+#forgeDetail[data-forge-mode="compare"] .compare-box .potential-line:nth-of-type(3){top:69.8%!important}
+#forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions{bottom:11.8%!important;height:7.7%!important}
+#forgeDetail[data-forge-mode="compare"] #potentialCompare>.refine-actions button,
+#forgeDetail[data-forge-mode="enhance"] #enhanceExecute,
+#forge .forge-smith-execute,
+#forge .forge-codex-open{
+  box-sizing:border-box!important;
+  transform:none!important;
+}
+
+
+/* v14.16.11 enhancement preview + artisan gauge exact asset alignment */
+#forgeDetail[data-forge-mode="enhance"] #anvilScene{
+  left:36.6%!important;top:12.55%!important;width:26.8%!important;height:16.0%!important;
+  overflow:hidden!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon{
+  inset:5.5%!important;overflow:visible!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
+  inset:0!important;background-image:var(--forge-preview-image)!important;background-position:center!important;background-repeat:no-repeat!important;background-size:contain!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center!important;display:block!important;opacity:1!important;visibility:visible!important;z-index:2!important;
+}
+/* 에셋 자체에 빈 장인의 숨결 트랙이 그려져 있으므로 코드에서는 충전량만 정확히 안쪽에 덮는다. */
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath{
+  position:absolute!important;left:0!important;right:0!important;top:0!important;height:100%!important;margin:0!important;padding:0!important;overflow:visible!important;pointer-events:none!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath>div:first-child{
+  position:absolute!important;left:15.0%!important;right:15.0%!important;top:60.55%!important;height:2.0%!important;display:flex!important;align-items:center!important;justify-content:space-between!important;font-size:clamp(7px,1.78vw,9px)!important;line-height:1!important;color:#c9bba5!important;z-index:3!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{
+  position:absolute!important;left:24.4%!important;right:21.7%!important;top:62.72%!important;bottom:auto!important;height:1.28%!important;min-height:0!important;max-height:none!important;padding:0!important;margin:0!important;border:0!important;border-radius:999px!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important;z-index:2!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{display:none!important;content:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
+  position:relative!important;display:block!important;height:100%!important;min-height:0!important;border-radius:999px!important;background:linear-gradient(90deg,#1665bb 0%,#3f9bf1 52%,#8bdcff 82%,#d9f7ff 100%)!important;box-shadow:0 0 5px rgba(64,159,255,.50),inset 0 0 2px rgba(255,255,255,.45)!important;
+}
+
+/* v14.16.12 — enhancement master-art preview + exact artisan gauge pixel alignment */
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
+  background:none!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
+  object-fit:contain!important;
+  object-position:center!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+/* enhance.png 941×1672: actual inner gauge = x 248..732, y 1064..1090. */
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{
+  left:26.355%!important;
+  right:22.104%!important;
+  top:63.636%!important;
+  bottom:auto!important;
+  width:auto!important;
+  height:1.615%!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{display:none!important;content:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
+  height:100%!important;
+  min-height:0!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,#1665bb 0%,#3f9bf1 52%,#8bdcff 82%,#d9f7ff 100%)!important;
+  box-shadow:0 0 5px rgba(64,159,255,.50),inset 0 0 2px rgba(255,255,255,.45)!important;
+}

@@ -1,0 +1,12 @@
+import fs from "node:fs";import path from "node:path";
+const root=path.resolve(import.meta.dirname,"..");const read=p=>fs.readFileSync(path.join(root,p),"utf8");const ok=(v,m)=>{if(!v)throw new Error(m)};
+const html=read("index.html"),js=read("js/systems/storage-forge.js"),css=read("css/forge-v13.css"),sw=read("service-worker.js");
+ok(fs.existsSync(path.join(root,"assets/ui/ore-gacha-draw.gif")),"뽑기 연출 GIF 누락");
+ok(fs.existsSync(path.join(root,"assets/ui/ore-gacha-draw.mp4")),"뽑기 연출 MP4 누락");
+ok(html.includes('id="oreGachaCinematic"')&&html.includes('id="oreGachaCinematicMedia"'),"뽑기 연출 오버레이 누락");
+ok(js.includes("ORE_GACHA_ANIM_MS=6100")&&js.includes("playOreGachaCinematic")&&js.includes("finishOreGachaCinematic"),"뽑기 연출 lifecycle 누락");
+ok(js.includes('oreGachaSkipButton')&&js.includes('e.code==="Space"')&&js.includes('desktopGachaSkipAllowed')&&!js.includes('layer.addEventListener("pointerdown"')&&!js.includes('layer.addEventListener("touchstart"'),"전용 스킵 버튼/PC Space 규칙 누락");
+ok(js.includes("lastOreGachaResult={summary,wins};saveAccountData();refreshForge();playOreGachaCinematic()"),"결과 선확정/저장 후 연출 순서 누락");
+ok(css.includes(".ore-gacha-cinematic")&&css.includes("z-index:320"),"뽑기 연출 전체화면 스타일 누락");
+ok(js.includes('ore-gacha-draw.mp4')&&js.includes('ore-gacha-draw.gif')&&sw.includes('ore-gacha-draw\\.(?:gif|mp4)'),"MP4 우선·GIF 대체·스트리밍 정책 누락");
+console.log("v14.10.2 ore gacha cinematic audit: OK");

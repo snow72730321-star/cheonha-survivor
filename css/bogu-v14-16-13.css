@@ -1,0 +1,97 @@
+/* v14.16.14 · 보구/세공 전용 에셋 적용 */
+
+/* ───────────── 보구 관리: 전용 941×1672 에셋 ───────────── */
+#forge .forge-mobile-weapons.bogu-mode{background-image:url('../assets/ui/forge-mobile-final/bogu.png')!important}
+#forge .forge-mobile-weapons.bogu-mode>.forge-art-back,
+#forge .forge-mobile-weapons.bogu-mode>.forge-live-balance,
+#forge .forge-mobile-weapons.bogu-mode>.forge-weapon-filter,
+#forge .forge-mobile-weapons.bogu-mode #weaponInventory,
+#forge .forge-mobile-weapons.bogu-mode #forgeWeaponInspect,
+#forge .forge-mobile-weapons.bogu-mode #forgeWeaponActions,
+#forge .forge-mobile-weapons.bogu-mode #forgeBrokenWeapons{display:none!important}
+#forge .forge-bogu-panel{display:none}
+#forge .forge-mobile-weapons.bogu-mode .forge-bogu-panel{display:block;position:absolute;inset:0;z-index:15;color:#e9dfcd}
+
+#forge .bogu-back-to-weapons{position:absolute;left:2.2%;top:1.5%;width:13%;height:7.2%;z-index:30;border:0!important;background:transparent!important;color:transparent!important;padding:0!important}
+#forge .bogu-inventory{position:absolute;left:7.8%;top:22.2%;width:35.3%;height:57.0%;overflow:hidden}
+#forge .bogu-inventory-count{position:absolute;right:3%;top:-5.4%;z-index:4;font-size:clamp(7px,1.8vw,9px);color:#ae9d82;text-shadow:0 1px 3px #000}
+#forge .bogu-gem-grid{position:absolute;inset:0;overflow:auto;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:auto;align-content:start;gap:1.45% 2.1%;padding:.6%;scrollbar-width:none}
+#forge .bogu-gem-grid::-webkit-scrollbar{display:none}
+#forge .bogu-gem-tile{position:relative;aspect-ratio:1;border:0!important;background:transparent!important;color:#ddd!important;padding:4%!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;border-radius:3px!important}
+#forge .bogu-gem-tile.selected{box-shadow:inset 0 0 0 2px rgba(239,196,104,.76),0 0 12px rgba(232,164,61,.22)!important;background:rgba(100,67,26,.12)!important}
+#forge .bogu-gem-orb{font-size:clamp(18px,5vw,28px);line-height:1;filter:drop-shadow(0 0 6px currentColor)}
+#forge .bogu-gem-tile b{font-size:clamp(6.5px,1.65vw,8.5px);line-height:1}
+#forge .bogu-gem-tile small{font-size:clamp(5.5px,1.4vw,7px);color:#b9ac96;line-height:1}
+#forge .bogu-gem-tile em{font-style:normal;font-size:clamp(5.5px,1.35vw,7px);color:#ddd0b8;line-height:1}
+#forge .bogu-gem-tile i{position:absolute;right:5%;top:4%;font-style:normal;font-size:clamp(5px,1.2vw,6px);color:#ffe7a4;background:#5a3d17;padding:1px 3px;border-radius:2px}
+#forge .bogu-empty-list{grid-column:1/-1;text-align:center;color:#928774;font-size:clamp(7px,1.8vw,9px);margin-top:72%;line-height:1.6}
+
+#forge .bogu-detail{position:absolute;left:47.0%;right:7.9%;top:13.2%;height:46.3%;overflow:hidden}
+#forge .bogu-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;color:#958976;font-size:clamp(7px,1.8vw,9px);padding:14% 8% 0}
+#forge .bogu-empty b{color:#e2d5bd;font-size:clamp(10px,2.5vw,13px)}
+#forge .bogu-detail-orb{position:absolute;left:4%;right:4%;top:0;height:57.0%;display:flex;align-items:center;justify-content:center}
+#forge .bogu-detail-orb span{font-size:clamp(62px,17vw,96px);filter:drop-shadow(0 0 18px currentColor)}
+#forge .bogu-detail-meta{position:absolute;left:3%;right:3%;top:62.0%;bottom:1%;font-size:clamp(6.5px,1.65vw,8.5px)}
+#forge .bogu-detail-meta>.name{position:absolute;left:23%;right:4%;top:0;height:17%;display:flex;align-items:center;overflow:hidden}
+#forge .bogu-detail-meta>.name b{font-size:clamp(8px,2vw,10.5px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#forge .bogu-detail-meta>.grade{position:absolute;left:23%;right:4%;top:18%;height:17%;display:flex;align-items:center;gap:6px;overflow:hidden}
+#forge .bogu-detail-meta>.grade b{font-size:clamp(7px,1.8vw,9px)}
+#forge .bogu-detail-meta>.grade span{font-size:clamp(5.5px,1.35vw,7px);color:#9f927e;white-space:nowrap}
+#forge .bogu-detail-meta>.summary{position:absolute;left:23%;right:4%;top:37%;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden}
+#forge .bogu-detail-meta>.summary>b{font-size:clamp(6.5px,1.6vw,8px);color:#d9c9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#forge .bogu-detail-meta>.summary>span{font-size:clamp(5.5px,1.35vw,7px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#forge .bogu-detail-meta>.summary>.positive{color:#cfe7ff}#forge .bogu-detail-meta>.summary>.negative{color:#e1a097}
+
+#forge .bogu-equipped{position:absolute;left:51.0%;right:7.7%;top:64.2%;height:15.3%;display:grid;grid-template-rows:repeat(3,1fr);gap:5.2%}
+#forge .bogu-equip-slot{border:0!important;background:transparent!important;color:#cfc0a7!important;text-align:left;padding:0 13% 0 14%!important;overflow:hidden;font-size:clamp(6.5px,1.65vw,8.5px);text-shadow:0 1px 3px #000;white-space:nowrap;text-overflow:ellipsis}
+#forge .bogu-equip-slot.empty{opacity:.42}
+#forge .bogu-equip-slot:active{background:rgba(70,50,25,.15)!important}
+#forge .bogu-actions{position:absolute;left:7.2%;right:7.1%;top:83.0%;height:6.6%;display:grid;grid-template-columns:1fr 1fr;gap:8.2%;z-index:25}
+#forge .bogu-actions button{width:100%;height:100%;border:0!important;background:transparent!important;color:transparent!important;font-size:0!important;padding:0!important;box-shadow:none!important}
+#forge .bogu-actions button:disabled{opacity:.30}
+#forge .bogu-status{position:absolute;left:10%;right:8%;top:92.0%;height:3.6%;display:flex;align-items:center;justify-content:center;text-align:center;color:#9f927e;font-size:clamp(6px,1.5vw,8px);text-shadow:0 1px 3px #000;pointer-events:none}
+
+/* ───────────── 세공: 전용 941×1672 에셋 ───────────── */
+.bogu-facet-overlay{padding:0!important;align-items:center!important;justify-content:center!important;background:#020304!important;z-index:120!important;overflow:hidden!important}
+.bogu-facet-panel{position:relative!important;width:min(100vw,56.28dvh,560px)!important;aspect-ratio:941/1672!important;max-height:100dvh!important;overflow:hidden!important;padding:0!important;margin:0!important;border:0!important;border-radius:0!important;background:url('../assets/ui/forge-mobile-final/faceting.png') center/100% 100% no-repeat!important;box-shadow:0 0 80px rgba(0,0,0,.88)!important;color:#e8decd!important}
+.bogu-facet-back,.bogu-facet-close{position:absolute;z-index:40;top:1.5%;width:13%;height:7.3%;border:0!important;background:transparent!important;color:transparent!important;padding:0!important;box-shadow:none!important}
+.bogu-facet-back{left:2%}.bogu-facet-close{right:2%}
+#boguFacetBody{position:absolute;inset:0;padding:0!important;overflow:hidden!important}
+.bogu-facet-scene{position:absolute;inset:0}
+
+.bogu-facet-preview{position:absolute;left:34.0%;right:34.0%;top:14.6%;height:15.6%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.bogu-facet-preview span{font-size:clamp(46px,13vw,78px);line-height:1;filter:drop-shadow(0 0 15px currentColor);opacity:.78}
+.bogu-facet-ore-plate{position:absolute;left:28.0%;right:27.0%;top:34.45%;height:4.2%;display:flex;align-items:center;justify-content:flex-end;padding-left:18%;overflow:hidden}
+.bogu-facet-ore-plate select,.bogu-facet-ore-plate b{width:100%;max-width:100%;height:100%;border:0!important;background:transparent!important;color:#e8dcc3!important;text-align:center;font-size:clamp(7px,1.85vw,9.5px);font-weight:800;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bogu-facet-ore-plate select{-webkit-appearance:none;appearance:none;padding:0 2%}
+.bogu-facet-chance{position:absolute;left:20%;right:20%;top:43.1%;height:3.6%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.bogu-facet-chance strong{font-size:clamp(13px,3.7vw,20px);color:#f2d68f;text-shadow:0 0 10px rgba(255,203,90,.25),0 2px 4px #000}
+
+.bogu-facet-line{position:absolute!important;left:4.0%!important;right:5.0%!important;height:6.7%!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;display:block!important;cursor:pointer}
+.bogu-facet-line:nth-of-type(1){top:49.35%!important}.bogu-facet-line:nth-of-type(2){top:57.30%!important}.bogu-facet-line:nth-of-type(3){top:65.20%!important}
+.bogu-facet-line.selected:after{content:'';position:absolute;left:0;right:0;top:3%;bottom:3%;border:1px solid rgba(119,181,255,.36);box-shadow:inset 0 0 18px rgba(55,112,200,.10);pointer-events:none}
+.bogu-facet-line.negative.selected:after{border-color:rgba(220,104,92,.38);box-shadow:inset 0 0 18px rgba(149,57,48,.10)}
+.bogu-facet-line-name,.bogu-facet-line>select{position:absolute!important;left:0!important;top:8%!important;width:17.4%!important;height:84%!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0 4%!important;border:0!important;background:transparent!important;color:#d7e9ff!important;font-size:clamp(7px,1.9vw,10px)!important;font-weight:900!important;text-align:center!important;outline:none!important;overflow:hidden!important}
+.bogu-facet-line.negative .bogu-facet-line-name,.bogu-facet-line.negative>select{color:#e29a91!important}
+.bogu-facet-line>select{-webkit-appearance:none!important;appearance:none!important;text-align-last:center!important}
+.bogu-facet-line-name b{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bogu-facet-nodes{position:absolute!important;left:20.7%!important;right:1.5%!important;top:10%!important;height:80%!important;display:grid!important;grid-template-columns:repeat(10,1fr)!important;gap:0!important;align-items:center!important;justify-items:center!important}
+.bogu-facet-nodes i{display:block!important;width:38%!important;aspect-ratio:1!important;border:0!important;border-radius:1px!important;background:transparent!important;transform:rotate(45deg) scale(.64)!important;opacity:1!important}
+.bogu-facet-nodes i.success{background:#79c6f2!important;box-shadow:0 0 8px rgba(96,194,247,.80)!important}
+.bogu-facet-line.negative .bogu-facet-nodes i.success{background:#d66d61!important;box-shadow:0 0 8px rgba(222,91,76,.72)!important}
+.bogu-facet-nodes i.fail{background:#423a35!important;box-shadow:inset 0 0 0 1px rgba(192,157,105,.25)!important;opacity:.70!important;transform:rotate(45deg) scale(.46)!important}
+.bogu-facet-nodes i.pending{background:transparent!important;box-shadow:none!important}
+
+.bogu-facet-attempt{position:absolute;left:18%;right:11%;top:74.55%;height:3.1%;display:flex;align-items:center;justify-content:center;gap:12%;font-size:clamp(6.5px,1.7vw,8.5px);color:#c6b89f;text-shadow:0 1px 3px #000;pointer-events:none}
+.bogu-facet-attempt b{color:#edd6a3;font-size:clamp(7px,1.85vw,9.5px)}
+.bogu-facet-status{position:absolute;left:8%;right:8%;top:80.4%;height:5.5%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:0 4%;overflow:hidden;color:#a99d88;font-size:clamp(5.8px,1.45vw,7.5px);line-height:1.25}
+.bogu-facet-status b{color:#e5d4b4;font-size:clamp(7px,1.8vw,9px);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bogu-facet-status span{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bogu-facet-main-action{position:absolute!important;left:21.5%!important;right:21.5%!important;top:88.0%!important;height:6.9%!important;border:0!important;background:transparent!important;color:transparent!important;font-size:0!important;padding:0!important;box-shadow:none!important;z-index:30!important}
+.bogu-facet-main-action:disabled{opacity:.34!important}
+.bogu-no-ore .bogu-facet-status,.bogu-completed .bogu-facet-status{top:80.2%;height:5.8%}
+
+@media(max-width:480px){
+ #forge .bogu-gem-tile b{font-size:6.5px}#forge .bogu-gem-tile small,#forge .bogu-gem-tile em{font-size:5.5px}
+ .bogu-facet-panel{width:min(100vw,56.28dvh)!important}
+}

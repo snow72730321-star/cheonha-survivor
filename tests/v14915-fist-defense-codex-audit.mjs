@@ -1,0 +1,27 @@
+import fs from "node:fs";
+const read=p=>fs.readFileSync(p,"utf8");
+const ok=(v,m)=>{if(!v)throw new Error(m)};
+const state=read("js/core/runtime-state.js");
+const meta=read("js/data/characters-meta.js");
+const hud=read("js/render/sprite-remaster-v14-3-18.js");
+const codex=read("js/ui/menu-codex.js");
+const menus=read("js/ui/meta-menus-events.js");
+const css=read("css/v14-improvements.css");
+const html=read("index.html");
+const sw=read("service-worker.js");
+const pkg=JSON.parse(read("package.json"));
+
+ok(state.includes("3스택에서 일극개방")&&state.includes("10/9/8초마다")&&state.includes("80% 감소"),"만권일극 설명/방어 주기 누락");
+ok(meta.includes("const TEN_THOUSAND_TRIGGER=3")&&meta.includes("Math.min(TEN_THOUSAND_TRIGGER,before+1)"),"만권 3스택 제한 누락");
+ok(meta.includes('gainTenThousandStack("guardian")'),"불괴호신 방어의 만권 판정 누락");
+ok(meta.includes("player.diamondGuardReady=false")&&meta.includes("amount*=.2")&&meta.includes("diamondGuardInterval()"),"80% 1회 피해 경감 소비 로직 누락");
+ok(meta.includes("return Math.max(8,11-lv)")&&meta.includes("만권일극 · 금강호체 준비"),"10/9/8초 재충전 로직 누락");
+ok(hud.includes('만권 ${m}/3')&&hud.includes('player.diamondGuardReady?"호체 준비"'),"만권/금강호체 HUD 누락");
+ok(codex.includes("codex-path-nav")&&codex.includes("codex-filter")&&codex.includes("codex-highlight-grid")&&codex.includes("codex-common-grid"),"무공 도감 분류 UI 누락");
+ok(codex.includes("해금 조건")&&codex.includes("진화 조건")&&codex.includes("현재 진행"),"도감 조건/진행 정보 누락");
+ok(menus.includes('buildCodex();ui.codex.classList.add("show")')&&html.includes('id="pauseCodexBtn"'),"도감 열기/일시정지 도감 동선 누락");
+ok(css.includes("v14.9.15 martial codex overhaul")&&css.includes(".codex-skill-grid")&&css.includes("@media(max-width:620px)"),"도감 반응형 스타일 누락");
+ok(html.includes("v14.16.14-bogu-ui-assets")&&html.includes("panel codex-panel"),"도감 HTML/현재 빌드 표기 누락");
+ok(sw.includes("cheonha-v14-16-14-bogu-ui-assets"),"현재 캐시 키 누락");
+ok(pkg.version==="14.16.14","package version not bumped to 14.16.4");
+console.log("v14.9.15 fist defense/codex audit: OK");

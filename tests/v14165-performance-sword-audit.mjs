@@ -1,0 +1,13 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const read=p=>fs.readFileSync(p,"utf8");
+const combat=read("js/systems/combat-runtime.js"),remaster=read("js/render/sprite-remaster-v14-3-18.js"),sprite=read("js/vfx/sprite-vfx-v14-3-8.js"),raid=read("js/systems/solo-raid-v14-16.js"),state=read("js/core/runtime-state.js"),meta=read("js/data/characters-meta.js"),css=read("css/solo-raid-v14-16.css"),html=read("index.html"),sw=read("service-worker.js");
+assert.match(html,/v14\.16\.14-bogu-ui-assets/);
+assert.match(sw,/cheonha-v14-16-14-bogu-ui-assets/);
+assert.match(remaster,/bossPopupMergeV7/);assert.match(remaster,/hitStopNextV7/);assert.match(remaster,/hitStopV7=Math\.max\(hitStopV7,bossLike\?\.012:\.009\)/);assert.match(remaster,/dt\*=\.35/);assert.match(remaster,/mobile\?20:28/);
+assert.match(sprite,/impactVfxNext/);assert.match(sprite,/interval=noisyImpactSources\.has\(source\)\?\(raid\?100:75\)/);assert.match(sprite,/cap=Math\.min\(cap,84\)/);
+assert.match(raid,/raidHudAccumulator=\.10/);assert.match(raid,/signature!==raidPartSignature/);assert.match(raid,/FINAL_BODY_BARS=10/);assert.match(css,/#raidHud\{display:none!important\}/);assert.match(css,/raid-boss-frame-compact\.png/);
+assert.match(combat,/swordVolleyHits:new Map|volleyHits=new Map/);assert.match(combat,/n===1\?\.72:n===2\?\.52:n===3\?\.38:n===4\?\.28:n===5\?\.20:\.15/);assert.match(combat,/n===1\?\.62:n===2\?\.40:n===3\?\.26:\.16/);assert.match(combat,/raidBoss\)\?\.78:1/);
+assert.match(state,/if\(lv===2\)p\.projectileBonus\+\+;p\.damageMul\*=1\.02/);assert.match(meta,/p\.projectileBonus\+=1;p\.areaMul\*=1\.08/);
+assert.ok(fs.existsSync("assets/ui/bossbar/raid-boss-frame-compact.png"));assert.ok(fs.existsSync("assets/raid/map/cheonma-altar-mobile.webp"));
+console.log("v14.16.5 performance/sword balance audit: OK");
