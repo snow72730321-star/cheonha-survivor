@@ -11,9 +11,9 @@ const deviceCss=read("css/forge-mobile-v14-15-3-device-fix.css");
 const html=read("index.html");
 const sw=read("service-worker.js");
 
-assert.match(html,/v14\.16\.14-bogu-ui-assets/);
-assert.match(html,/css\/v14-improvements\.css\?v=141614/);
-assert.match(sw,/cheonha-v14-16-14-bogu-ui-assets/);
+assert.match(html,/v14\.16\.15-bogu-effect-toggle/);
+assert.match(html,/css\/v14-improvements\.css\?v=141615/);
+assert.match(sw,/cheonha-v14-16-15-bogu-effect-toggle/);
 
 for(const token of ["forge-sparks","forge-impact-flash","anvil-hammer","forge-fire"]){
   assert.doesNotMatch(forge,new RegExp(token),`legacy forge DOM remains: ${token}`);

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 const r=p=>fs.readFileSync(p,"utf8");
 const html=r("index.html"),forge=r("js/systems/forge-v13.js"),combat=r("js/systems/combat-runtime.js"),tx=r("js/systems/weapon-transcend-v14-16-2.js"),storage=r("js/systems/storage-forge.js"),save=r("js/core/save-manager.js"),power=r("js/systems/combat-power-v14-7-7.js"),state=r("js/core/runtime-state.js"),mobile=r("js/ui/forge-mobile-final-v14-11-1.js"),sw=r("service-worker.js");
-assert.match(html,/weapon-transcend-v14-16-2\.js\?v=141614/);assert.match(sw,/weapon-transcend-v14-16-2\.js/);
+assert.match(html,/weapon-transcend-v14-16-2\.js\?v=141615/);assert.match(sw,/weapon-transcend-v14-16-2\.js/);
 assert.match(storage,/raidKey:\.02/);assert.match(storage,/raidKey:80/);
 assert.match(forge,/item\.transcendLevel>=3/);assert.match(forge,/item\.transcendAttempts>=10/);assert.match(forge,/Math\.random\(\)<\.10/);assert.match(forge,/item\.transcendLevel===0&&item\.transcendAttempts===10/);
 assert.match(forge,/const TRANSCEND_EFF=Object\.freeze\(\[1,1\.10,1\.22,1\.35\]\)/);

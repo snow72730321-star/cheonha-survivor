@@ -1,6 +1,6 @@
 "use strict";
 /**
- * v14.16.14 · 보구 / 보옥 세공 전용 에셋 통합
+ * v14.16.15 · 보구 / 보옥 세공 효과 안내 토글
  * - 광석 1개를 소비해 보옥 세공을 시작한다.
  * - 긍정 효과 2종 + 부정 효과 1종을 선택한다.
  * - 각 줄 10회, 공유 성공 확률 75% 시작 / 성공 -10%p / 실패 +10%p / 25~75%.
@@ -36,7 +36,7 @@
     ice:{name:"빙심기",desc:"피해 감소",base:.0020,format:"pct"},
     thunder:{name:"뇌맥기",desc:"부가 무공 재사용",base:.0040,format:"pct"}
   });
-  let selectedGemId=null,facetCompletedId=null,facetSelectedLine=0;
+  let selectedGemId=null,facetCompletedId=null,facetSelectedLine=0,facetHelpOpen=false;
 
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const gradeIndexLocal=id=>Math.max(0,gradeDefs.findIndex(g=>g.id===id));
@@ -158,7 +158,7 @@
     overlay=document.createElement("section");overlay.id="boguFacetOverlay";overlay.className="overlay bogu-facet-overlay";
     overlay.innerHTML='<div class="panel bogu-facet-panel"><button id="boguFacetBack" class="bogu-facet-back" type="button" aria-label="세공 화면 뒤로가기"></button><button id="boguFacetClose" class="bogu-facet-close" type="button" aria-label="세공 닫기"></button><div id="boguFacetBody"></div></div>';
     document.body.appendChild(overlay);
-    const close=()=>overlay.classList.remove("show");
+    const close=()=>{facetHelpOpen=false;overlay.classList.remove("show")};
     document.getElementById("boguFacetBack")?.addEventListener("click",close);
     document.getElementById("boguFacetClose")?.addEventListener("click",close);
     overlay.addEventListener("click",e=>{if(e.target===overlay)close()});
@@ -169,6 +169,24 @@
     const entries=Object.entries(account.ores||{}).filter(([key,n])=>n>0&&/^[a-z]+:(common|rare|epic|unique|legendary|mythic|eternal)$/.test(key)).sort((a,b)=>gradeIndexLocal(b[0].split(":")[1])-gradeIndexLocal(a[0].split(":")[1]));
     return entries.map(([key,n])=>{const[type,grade]=key.split(":");return `<option value="${key}">[${labels[grade]}] ${oreTypes[type]?.name||type} ×${Math.floor(n)}</option>`}).join("");
   }
+  function effectPerSuccess(def,grade){return def?def.base*gradeScale(grade):0}
+  function effectAmountText(def,value,negative=false){
+    if(!def)return "-";
+    const body=def.format==="flat"?`${Math.round(value)}`:fmtPct(value);
+    return `${negative?"-":"+"}${body}`;
+  }
+  function effectGuideRowsSetup(grade){
+    const positive=Object.entries(POSITIVE).map(([id,d])=>`<div class="bogu-effect-guide-row positive"><b>${d.name}</b><span>${d.desc}</span><em>성공 1칸 ${effectAmountText(d,effectPerSuccess(d,grade),false)}</em></div>`).join("");
+    const negative=Object.entries(NEGATIVE).map(([id,d])=>`<div class="bogu-effect-guide-row negative"><b>${d.name}</b><span>${d.desc}</span><em>성공 1칸 ${effectAmountText(d,effectPerSuccess(d,grade),true)}</em></div>`).join("");
+    return `<section><h4>버프</h4>${positive}</section><section><h4>디버프</h4>${negative}</section>`;
+  }
+  function effectGuideRowsActive(s){
+    const defs=[POSITIVE[s.positive[0]],POSITIVE[s.positive[1]],NEGATIVE[s.negative]],ids=[s.positive[0],s.positive[1],s.negative];
+    const rows=defs.map((d,i)=>{const neg=i===2,one=effectPerSuccess(d,s.grade),now=lineValue(ids[i],s.successes[i],s.grade,neg);return `<div class="bogu-effect-guide-row ${neg?"negative":"positive"}"><b>${d.name}</b><span>${d.desc}</span><em>1칸 ${effectAmountText(d,one,neg)} · 현재 ${effectAmountText(d,now,neg)} (${s.successes[i]}/10)</em></div>`}).join("");
+    const passive=ORE_PASSIVE[s.oreType],pv=orePassiveValue(s.oreType,s.grade);
+    return `<section><h4>선택 세공 효과</h4>${rows}</section><section class="ore-passive"><h4>광석 부가효과</h4><div class="bogu-effect-guide-row passive"><b>${passive?.name||"-"}</b><span>${passive?.desc||""}</span><em>${passive?fmtValue(passive,pv):"-"}</em></div></section>`;
+  }
+  function helpMarkup(inner=""){return `<button class="bogu-facet-help-toggle ${facetHelpOpen?"active":""}" id="boguFacetHelpToggle" type="button" aria-expanded="${facetHelpOpen?"true":"false"}">${facetHelpOpen?"효과 닫기":"효과 보기"}</button><div class="bogu-facet-effect-guide ${facetHelpOpen?"show":""}" id="boguFacetEffectGuide">${inner}</div>`}
   function setupMarkup(){
     const pos=Object.entries(POSITIVE),neg=Object.entries(NEGATIVE),ores=oreOptionsHtml();
     if(!ores)return '<div class="bogu-facet-scene bogu-no-ore"><div class="bogu-facet-status"><b>세공 가능한 광석이 없다.</b><span>광물 관리·천공각·전투 보상에서 광석을 획득하시오.</span></div></div>';
@@ -183,6 +201,7 @@
       <article class="bogu-facet-line negative setup-line" data-setup-line="2"><select id="boguNegative" aria-label="디버프">${nOpts}</select><div class="bogu-facet-nodes">${nodesHtml([])}</div></article>
       <div class="bogu-facet-attempt"><b>준비</b><span>0 / 30</span></div>
       <div class="bogu-facet-status" id="boguOreNote"></div>
+      ${helpMarkup()}
       <button class="bogu-facet-main-action" id="boguFacetStart" type="button" aria-label="선택한 광석으로 세공 시작"></button>
     </div>`;
   }
@@ -191,6 +210,7 @@
     const[type,grade]=(select.value||"").split(":"),passive=ORE_PASSIVE[type],labels=GRADE_LABEL();
     if(orb){orb.className=grade?`rarity-${grade}`:"";orb.textContent="◆"}
     note.innerHTML=type&&grade?`<b class="rarity-${grade}">${labels[grade]} ${oreTypes[type]?.name||type}</b><span>세공 배율 ×${gradeScale(grade).toFixed(2)} · ${passive?.name||"-"} ${passive?fmtValue(passive,orePassiveValue(type,grade)):""}</span>`:"";
+    const guide=document.getElementById("boguFacetEffectGuide");if(guide&&grade)guide.innerHTML=effectGuideRowsSetup(grade);
   }
   function startFaceting(){
     ensureAccount();const ore=document.getElementById("boguOreSelect")?.value||"",a=document.getElementById("boguPositiveA")?.value,b=document.getElementById("boguPositiveB")?.value,n=document.getElementById("boguNegative")?.value;
@@ -222,6 +242,7 @@
       ${rows}
       <div class="bogu-facet-attempt"><b>${total} / 30</b><span>${selectedDef?.name||""} 선택</span></div>
       <div class="bogu-facet-status"><b>${selectedDef?.name||""} · 현재 ${selectedNeg?"-":"+"}${selectedDef?.format==="flat"?Math.round(selectedValue):fmtPct(selectedValue)}</b><span>${selectedDef?.desc||""} · 성공 시 10%p↓ / 실패 시 10%p↑ · ${passive.name} ${fmtValue(passive,orePassiveValue(s.oreType,s.grade))}</span></div>
+      ${helpMarkup(effectGuideRowsActive(s))}
       <button class="bogu-facet-main-action" id="boguFacetGo" type="button" ${s.attempts[facetSelectedLine]>=FACETS?"disabled":""} aria-label="선택한 옵션 세공"></button>
     </div>`;
   }
@@ -231,11 +252,15 @@
     body.innerHTML=account.boguFaceting?activeMarkup(account.boguFaceting):(facetCompletedId&&gemById(facetCompletedId)?completedMarkup():setupMarkup());
     document.getElementById("boguOreSelect")?.addEventListener("change",updateSetupNote);updateSetupNote();
     document.getElementById("boguFacetStart")?.addEventListener("click",startFaceting);
+    document.getElementById("boguFacetHelpToggle")?.addEventListener("click",()=>{facetHelpOpen=!facetHelpOpen;renderFacetOverlay()});
+    document.getElementById("boguPositiveA")?.addEventListener("change",updateSetupNote);
+    document.getElementById("boguPositiveB")?.addEventListener("change",updateSetupNote);
+    document.getElementById("boguNegative")?.addEventListener("change",updateSetupNote);
     body.querySelectorAll("[data-bogu-select-line]").forEach(row=>row.addEventListener("click",()=>{facetSelectedLine=Number(row.dataset.boguSelectLine);renderFacetOverlay()}));
     document.getElementById("boguFacetGo")?.addEventListener("click",()=>facetLine(facetSelectedLine));
     document.getElementById("boguFacetDone")?.addEventListener("click",()=>{facetCompletedId=null;overlay.classList.remove("show")});
   }
-  function openFaceting(){ensureAccount();if(!account.boguFaceting)facetCompletedId=null;facetSelectedLine=account.boguFaceting?Math.max(0,account.boguFaceting.attempts.findIndex(x=>x<FACETS)):0;renderFacetOverlay();facetOverlay().classList.add("show")}
+  function openFaceting(){ensureAccount();if(!account.boguFaceting)facetCompletedId=null;facetSelectedLine=account.boguFaceting?Math.max(0,account.boguFaceting.attempts.findIndex(x=>x<FACETS)):0;facetHelpOpen=false;renderFacetOverlay();facetOverlay().classList.add("show")}
 
   function gemTile(gem){const labels=GRADE_LABEL(),eq=account.boguEquipped.findIndex(x=>x===gem.id),rows=effectSummary(gem);return `<button class="bogu-gem-tile rarity-border-${gem.grade} ${selectedGemId===gem.id?"selected":""}" type="button" data-bogu-gem="${gem.id}"><span class="bogu-gem-orb rarity-${gem.grade}">◆</span><b class="rarity-${gem.grade}">${labels[gem.grade]}</b><small>${oreTypes[gem.oreType]?.name||gem.oreType}</small><em>${rows[0]?.successes||0}/${rows[1]?.successes||0}/${rows[2]?.successes||0}</em>${eq>=0?`<i>${eq+1}</i>`:""}</button>`}
   function detailMarkup(gem){

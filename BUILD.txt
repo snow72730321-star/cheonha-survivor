@@ -1,1 +1,1 @@
-v14.16.14-bogu-ui-assets
+v14.16.15-bogu-effect-toggle

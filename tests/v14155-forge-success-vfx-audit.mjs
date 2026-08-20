@@ -27,8 +27,8 @@ assert.match(forge,/if\(effect==="success"\)[\s\S]*?scene\.appendChild\(vfx\)/);
 assert.match(forge,/setTimeout\(\(\)=>setAnvilEffect\(scene\),successful\?850:650\)/);
 assert.match(css,/\.forge-success-vfx\{[\s\S]*?pointer-events:none[\s\S]*?mix-blend-mode:screen/);
 assert.match(css,/@keyframes enhanceSuccessVfxReveal/);
-assert.match(html,/css\/forge-v13\.css\?v=141614/);
-assert.match(sw,/cheonha-v14-16-14-bogu-ui-assets/);
+assert.match(html,/css\/forge-v13\.css\?v=141615/);
+assert.match(sw,/cheonha-v14-16-15-bogu-effect-toggle/);
 assert.doesNotMatch(sw.match(/const APP_SHELL=\[([\s\S]*?)\];/)?.[1]||"",/assets\/vfx\//,"VFX must stay out of the install-time app shell");
 assert.ok(loader.includes(`"${assetPath}"`),"asset loader must warm enhancement success GIF");
 

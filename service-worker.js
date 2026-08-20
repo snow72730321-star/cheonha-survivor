@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.16.14: 보구 · 세공 전용 UI 에셋 통합. */
+/** v14.16.15: 세공 효과 안내 토글 · 등급별 1칸 효과 표시. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-14-bogu-ui-assets";
+const CACHE="cheonha-v14-16-15-bogu-effect-toggle";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",

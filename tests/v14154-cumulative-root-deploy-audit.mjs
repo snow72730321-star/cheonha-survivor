@@ -8,12 +8,12 @@ const forge=read("js/systems/forge-v13.js");
 const visuals=read("js/render/weapon-visuals-v14-4.js");
 const css=read("css/forge-mobile-v14-15-3-device-fix.css");
 
-assert.equal(read("BUILD.txt").split(/\r?\n/)[0],"v14.16.14-bogu-ui-assets");
-assert.match(html,/forge-mobile-v14-15-3-device-fix\.css\?v=141614/);
-assert.match(html,/js\/systems\/forge-v13\.js\?v=141614/);
-assert.match(html,/js\/render\/weapon-visuals-v14-4\.js\?v=141614/);
-assert.match(html,/js\/systems\/katana-rework-v15\.js\?v=141614/);
-assert.match(sw,/cheonha-v14-16-14-bogu-ui-assets/);
+assert.equal(read("BUILD.txt").split(/\r?\n/)[0],"v14.16.15-bogu-effect-toggle");
+assert.match(html,/forge-mobile-v14-15-3-device-fix\.css\?v=141615/);
+assert.match(html,/js\/systems\/forge-v13\.js\?v=141615/);
+assert.match(html,/js\/render\/weapon-visuals-v14-4\.js\?v=141615/);
+assert.match(html,/js\/systems\/katana-rework-v15\.js\?v=141615/);
+assert.match(sw,/cheonha-v14-16-15-bogu-effect-toggle/);
 assert.match(sw,/cache\.addAll\(/);
 assert.doesNotMatch(sw,/Promise\.allSettled/);
 assert.match(sw,/if\(!response\.ok\)throw new Error/);

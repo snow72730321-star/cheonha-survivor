@@ -12,6 +12,6 @@ ok(!block.includes('img.hidden=true'), 'preview must never hide image on load fa
 ok(css.includes('left:26.355%!important')&&css.includes('right:22.104%!important'),'artisan gauge x alignment missing');
 ok(css.includes('top:63.636%!important')&&css.includes('height:1.615%!important'),'artisan gauge y/height alignment missing');
 ok(fs.existsSync('assets/weapons/master/katana.png')&&fs.existsSync('assets/weapons/hud/katana.png'),'katana preview assets missing');
-ok(html.includes('v14.16.14-bogu-ui-assets'),'build meta missing');
-ok(sw.includes('cheonha-v14-16-14-bogu-ui-assets'),'cache version missing');
+ok(html.includes('v14.16.15-bogu-effect-toggle'),'build meta missing');
+ok(sw.includes('cheonha-v14-16-15-bogu-effect-toggle'),'cache version missing');
 console.log('v14.16.12 enhancement preview/gauge audit: OK');
