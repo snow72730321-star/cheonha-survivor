@@ -84,3 +84,41 @@
 #forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
   position:relative!important;display:block!important;height:100%!important;min-height:0!important;border-radius:999px!important;background:linear-gradient(90deg,#1665bb 0%,#3f9bf1 52%,#8bdcff 82%,#d9f7ff 100%)!important;box-shadow:0 0 5px rgba(64,159,255,.50),inset 0 0 2px rgba(255,255,255,.45)!important;
 }
+
+/* v14.16.12 — enhancement master-art preview + exact artisan gauge pixel alignment */
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media{
+  background:none!important;
+}
+#forgeDetail[data-forge-mode="enhance"] #anvilScene .anvil-weapon-media>.anvil-weapon-img{
+  object-fit:contain!important;
+  object-position:center!important;
+  display:block!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+/* enhance.png 941×1672: actual inner gauge = x 248..732, y 1064..1090. */
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track{
+  left:26.355%!important;
+  right:22.104%!important;
+  top:63.636%!important;
+  bottom:auto!important;
+  width:auto!important;
+  height:1.615%!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track::before{display:none!important;content:none!important}
+#forgeDetail[data-forge-mode="enhance"] .artisan-breath-track i{
+  height:100%!important;
+  min-height:0!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,#1665bb 0%,#3f9bf1 52%,#8bdcff 82%,#d9f7ff 100%)!important;
+  box-shadow:0 0 5px rgba(64,159,255,.50),inset 0 0 2px rgba(255,255,255,.45)!important;
+}

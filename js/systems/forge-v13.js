@@ -294,20 +294,48 @@
   function selectedItem(){return account.weapons.find(x=>x.id===selectedItemId)}
   function renderAnvilSelection(scene=detailOverlay().querySelector("#anvilScene"),item=selectedItem()){
     const node=scene?.querySelector("#anvilWeapon");
-    if(!node||!item)return false;
+    if(!scene||!node||!item)return false;
     node.hidden=false;node.removeAttribute("aria-hidden");
-    if(window.WeaponVisuals)WeaponVisuals.renderAnvilWeapon(node,item);
-    let media=node.querySelector(".anvil-weapon-media");
+
+    // 강화 화면에서는 별도의 anvil HUD 렌더러를 거치지 않는다.
+    // 무기 관리 화면에서 실제로 표시되는 master 에셋을 동일하게 사용한다.
+    // 기존 renderAnvilWeapon()의 HUD→master 비동기 전환과 hidden 처리 경쟁 때문에
+    // iOS Safari에서 이미지가 빈칸으로 남는 경로를 제거한다.
+    const primary=window.WeaponVisuals?.asset?.(item)||`assets/weapons/master/${item.weapon}.png`;
+    const fallback=window.WeaponVisuals?.hudAsset?.(item)||`assets/weapons/hud/${item.weapon}.png`;
+
+    let media=node.querySelector(":scope > .anvil-weapon-media");
     if(!media){media=document.createElement("div");media.className="anvil-weapon-media";node.append(media)}
-    let img=media.querySelector(".anvil-weapon-img");
+    let img=media.querySelector(":scope > .anvil-weapon-img");
     if(!img){img=document.createElement("img");img.className="anvil-weapon-img";media.append(img)}
-    // iOS Safari에서 강화 팝업 재렌더 후 <img>가 빈 상태로 남는 경우를 막는다.
-    // 실제 무기군 HUD 에셋을 img와 백업 배경 양쪽에 연결한다.
-    const previewSrc=window.WeaponVisuals?.hudAsset?.(item)||`assets/weapons/hud/${item.weapon}.png`;
-    img.hidden=false;img.style.removeProperty("display");img.alt=item.name||"강화 대상 무기";
-    if(img.getAttribute("src")!==previewSrc)img.src=previewSrc;
-    media.style.setProperty("--forge-preview-image",`url("${previewSrc}")`);
-    media.classList.add("has-forge-preview");
+
+    node.querySelector(":scope > .anvil-weapon-aura")?.remove();
+    node.querySelector(":scope > .anvil-weapon-meta")?.remove();
+    [...node.classList].filter(name=>name.startsWith("weapon-tier-")).forEach(name=>node.classList.remove(name));
+    node.classList.add("anvil-weapon");
+
+    // v14.16.11에서 넣었던 CSS background 우회도 제거한다. 하나의 master <img>만
+    // 사용해 소스 전환/중복 렌더 경쟁이 생기지 않도록 한다.
+    scene.style.removeProperty("--forge-preview-master");
+    media.style.removeProperty("--forge-preview-image");
+    media.classList.remove("has-forge-preview");
+
+    img.hidden=false;img.removeAttribute("hidden");img.style.removeProperty("display");
+    img.alt=item.name||"강화 대상 무기";
+    img.onload=()=>{node.classList.add("weapon-asset-ready");node.classList.remove("weapon-asset-error")};
+    img.onerror=()=>{
+      if(img.dataset.masterFallback!=="1"&&fallback!==primary){
+        img.dataset.masterFallback="1";
+        img.src=fallback;
+        return;
+      }
+      // 실패해도 DOM을 숨기지 않는다. scene의 master background가 계속 보인다.
+      node.classList.add("weapon-asset-error");
+    };
+    delete img.dataset.masterFallback;
+    if(img.getAttribute("src")!==primary)img.src=primary;
+
+    if(window.WeaponVisuals?.decorate)WeaponVisuals.decorate(node,item,item.weapon,false);
     return true;
   }
   function setAnvilEffect(scene,effect=""){
