@@ -5,10 +5,11 @@
 
 #forgeDetail[data-forge-mode="enhance"] #anvilScene.anvil-scene.art-anvil-scene .anvil-weapon{
   position:absolute!important;
-  inset:4%!important;
+  /* v14.16.16: top/right/bottom/left를 모두 고정해 absolute 자식만 있어도
+     강화 무기 프리뷰 컨테이너 높이가 0으로 붕괴하지 않게 한다. */
+  inset:5.5%!important;
   width:auto!important;
   height:auto!important;
-  bottom:auto!important;
   display:block!important;
   overflow:hidden!important;
   z-index:10!important;

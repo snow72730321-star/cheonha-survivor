@@ -1,8 +1,8 @@
 "use strict";
 
-/** v14.16.15: 세공 효과 안내 토글 · 등급별 1칸 효과 표시. */
+/** v14.16.16: 강화 무기 프리뷰 0px 높이 붕괴 수정. */
 const CACHE_PREFIX="cheonha-";
-const CACHE="cheonha-v14-16-15-bogu-effect-toggle";
+const CACHE="cheonha-v14-16-16-enhance-preview-fix";
 // legacy audit compatibility token: cheonha-v14-12-8-black-compare-align
 const APP_SHELL=[
   "./","index.html","manifest.webmanifest","BUILD.txt",
